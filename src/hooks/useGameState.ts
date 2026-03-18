@@ -1,6 +1,9 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GameSettings, Team, RoundResult, CategoryId } from '../types';
 import { getShuffledWords } from '../data/words';
+
+const SETTINGS_KEY = '@alias_game_settings';
 
 const DEFAULT_SETTINGS: GameSettings = {
   roundDuration: 60,
@@ -24,6 +27,18 @@ export const useGameState = () => {
 
   const guessedWordsRef = useRef<string[]>([]);
   const skippedWordsRef = useRef<string[]>([]);
+
+  // Load saved settings on mount
+  useEffect(() => {
+    AsyncStorage.getItem(SETTINGS_KEY).then((saved) => {
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setSettings((prev) => ({ ...prev, ...parsed }));
+        } catch {}
+      }
+    });
+  }, []);
 
   const initializeTeams = useCallback((teamNames?: string[]) => {
     const newTeams: Team[] = [];
@@ -120,7 +135,11 @@ export const useGameState = () => {
   }, []);
 
   const updateSettings = useCallback((newSettings: Partial<GameSettings>) => {
-    setSettings((prev) => ({ ...prev, ...newSettings }));
+    setSettings((prev) => {
+      const updated = { ...prev, ...newSettings };
+      AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(updated)).catch(() => {});
+      return updated;
+    });
   }, []);
 
   const updateTeamName = useCallback((teamId: number, name: string) => {

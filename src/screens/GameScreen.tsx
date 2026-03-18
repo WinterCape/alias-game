@@ -15,6 +15,7 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { COLORS, SIZES } from '../constants/theme';
 import { useGame } from '../hooks/GameContext';
 import { useTimer } from '../hooks/useTimer';
+import { useSounds } from '../hooks/useSounds';
 
 const { width, height } = Dimensions.get('window');
 
@@ -33,6 +34,7 @@ export const GameScreen = ({ navigation }: any) => {
     checkWinner,
   } = useGame();
 
+  const { playCorrect, playSkip, playTick, playTimeUp, playStart } = useSounds();
   const [phase, setPhase] = useState<GamePhase>('ready');
   const [currentWord, setCurrentWord] = useState('');
   const [correctCount, setCorrectCount] = useState(0);
@@ -44,6 +46,7 @@ export const GameScreen = ({ navigation }: any) => {
 
   const onTimerComplete = useCallback(() => {
     setPhase('finished');
+    playTimeUp();
     Vibration.vibrate([0, 500, 200, 500]);
     const result = endRound();
     const winner = checkWinner();
@@ -62,6 +65,13 @@ export const GameScreen = ({ navigation }: any) => {
     onTimerComplete
   );
 
+  // Tick sound for last 10 seconds
+  useEffect(() => {
+    if (phase === 'playing' && timeLeft <= 10 && timeLeft > 0) {
+      playTick();
+    }
+  }, [timeLeft, phase, playTick]);
+
   useEffect(() => {
     activateKeepAwakeAsync();
     return () => {
@@ -74,6 +84,7 @@ export const GameScreen = ({ navigation }: any) => {
     setCurrentWord(getCurrentWord());
     setPhase('playing');
     startTimer();
+    playStart();
     setCorrectCount(0);
     setSkipCount(0);
   };
@@ -116,6 +127,7 @@ export const GameScreen = ({ navigation }: any) => {
 
   const handleCorrect = () => {
     if (phase !== 'playing') return;
+    playCorrect();
     flashScreen(COLORS.correct);
     animateCard('right', () => {
       markCorrect();
@@ -126,6 +138,7 @@ export const GameScreen = ({ navigation }: any) => {
 
   const handleSkip = () => {
     if (phase !== 'playing') return;
+    playSkip();
     flashScreen(COLORS.skip);
     Vibration.vibrate(100);
     animateCard('left', () => {
