@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GameSettings, Team, RoundResult, CategoryId } from '../types';
-import { getShuffledWords } from '../data/words';
+import { getShuffledWords, ALL_CATEGORIES } from '../data/words';
 
 const SETTINGS_KEY = '@alias_game_settings';
 
@@ -9,7 +9,8 @@ const DEFAULT_SETTINGS: GameSettings = {
   roundDuration: 60,
   winningScore: 50,
   numberOfTeams: 2,
-  selectedCategories: ['general', 'animale', 'mancare', 'sporturi'],
+  selectedCategories: [...ALL_CATEGORIES],
+  difficulty: 'all',
   skipPenalty: true,
 };
 
@@ -56,23 +57,23 @@ export const useGameState = () => {
   }, [settings.numberOfTeams]);
 
   const startNewRound = useCallback(() => {
-    const shuffled = getShuffledWords(settings.selectedCategories);
+    const shuffled = getShuffledWords(settings.selectedCategories, settings.difficulty);
     setWords(shuffled);
     setCurrentWordIndex(0);
     guessedWordsRef.current = [];
     skippedWordsRef.current = [];
-  }, [settings.selectedCategories]);
+  }, [settings.selectedCategories, settings.difficulty]);
 
   const getCurrentWord = useCallback((): string => {
     if (currentWordIndex < words.length) {
       return words[currentWordIndex];
     }
     // Reshuffle if we run out
-    const shuffled = getShuffledWords(settings.selectedCategories);
+    const shuffled = getShuffledWords(settings.selectedCategories, settings.difficulty);
     setWords(shuffled);
     setCurrentWordIndex(0);
     return shuffled[0];
-  }, [currentWordIndex, words, settings.selectedCategories]);
+  }, [currentWordIndex, words, settings.selectedCategories, settings.difficulty]);
 
   const markCorrect = useCallback(() => {
     const word = words[currentWordIndex];

@@ -11,15 +11,32 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { CATEGORIES } from '../data/categories';
+import { ALL_CATEGORIES } from '../data/words';
 import { useGame } from '../hooks/GameContext';
-import { CategoryId } from '../types';
+import { CategoryId, Difficulty } from '../types';
 
 const ROUND_DURATIONS = [30, 45, 60, 90, 120];
 const WINNING_SCORES = [25, 50, 75, 100];
 const TEAM_COUNTS = [2, 3, 4];
+const DIFFICULTIES: { id: Difficulty | 'all'; label: string; icon: string }[] = [
+  { id: 'easy', label: 'Ușor', icon: 'shield-outline' },
+  { id: 'medium', label: 'Mediu', icon: 'shield-half-full' },
+  { id: 'hard', label: 'Greu', icon: 'shield' },
+  { id: 'all', label: 'Toate', icon: 'sword-cross' },
+];
 
 export const SettingsScreen = ({ navigation }: any) => {
   const { settings, updateSettings } = useGame();
+
+  const allSelected = settings.selectedCategories.length === ALL_CATEGORIES.length;
+
+  const toggleAll = () => {
+    if (allSelected) {
+      updateSettings({ selectedCategories: [ALL_CATEGORIES[0]] });
+    } else {
+      updateSettings({ selectedCategories: [...ALL_CATEGORIES] });
+    }
+  };
 
   const toggleCategory = (id: CategoryId) => {
     const current = settings.selectedCategories;
@@ -130,6 +147,39 @@ export const SettingsScreen = ({ navigation }: any) => {
           ))}
         </View>
 
+        {/* Difficulty */}
+        <View style={styles.sectionHeader}>
+          <MaterialCommunityIcons name="sword" size={18} color={COLORS.gold} />
+          <Text style={styles.sectionTitle}>Dificultate</Text>
+        </View>
+        <View style={styles.optionRow}>
+          {DIFFICULTIES.map((d) => (
+            <TouchableOpacity
+              key={d.id}
+              style={[
+                styles.optionChip,
+                styles.difficultyChip,
+                settings.difficulty === d.id && styles.optionChipActive,
+              ]}
+              onPress={() => updateSettings({ difficulty: d.id })}
+            >
+              <MaterialCommunityIcons
+                name={d.icon as any}
+                size={16}
+                color={settings.difficulty === d.id ? COLORS.gold : COLORS.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.optionText,
+                  settings.difficulty === d.id && styles.optionTextActive,
+                ]}
+              >
+                {d.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         {/* Skip Penalty */}
         <TouchableOpacity
           style={styles.toggleRow}
@@ -162,10 +212,29 @@ export const SettingsScreen = ({ navigation }: any) => {
           <MaterialCommunityIcons name="map-legend" size={18} color={COLORS.gold} />
           <Text style={styles.sectionTitle}>Tărâmuri</Text>
         </View>
-        <Text style={styles.toggleDesc}>
-          Selectează cel puțin un tărâm
-        </Text>
         <View style={styles.categoryGrid}>
+          <TouchableOpacity
+            style={[
+              styles.categoryChip,
+              styles.allChip,
+              allSelected && styles.allChipActive,
+            ]}
+            onPress={toggleAll}
+          >
+            <MaterialCommunityIcons
+              name="earth"
+              size={20}
+              color={allSelected ? COLORS.goldBright : COLORS.textSecondary}
+            />
+            <Text
+              style={[
+                styles.categoryText,
+                allSelected && styles.allChipText,
+              ]}
+            >
+              Toate
+            </Text>
+          </TouchableOpacity>
           {CATEGORIES.map((cat) => {
             const isSelected = settings.selectedCategories.includes(cat.id);
             return (
@@ -321,6 +390,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
+  },
+  difficultyChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  allChip: {
+    borderStyle: 'dashed' as any,
+    borderColor: 'rgba(212,168,83,0.25)',
+  },
+  allChipActive: {
+    backgroundColor: 'rgba(212,168,83,0.2)',
+    borderColor: COLORS.goldBright,
+    borderStyle: 'solid' as any,
+  },
+  allChipText: {
+    color: COLORS.goldBright,
+    fontFamily: FONTS.bodyBlack,
   },
   categoryChip: {
     flexDirection: 'row',

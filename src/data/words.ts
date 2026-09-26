@@ -1,4 +1,10 @@
-import { CategoryId } from '../types';
+import { CategoryId, Difficulty } from '../types';
+
+const ALL_CATEGORIES: CategoryId[] = [
+  'general', 'animale', 'mancare', 'sporturi', 'profesii',
+  'natura', 'tehnologie', 'filme', 'muzica', 'istorie',
+  'geografie', 'scoala', 'casa', 'emotii', 'haine',
+];
 
 const WORDS: Record<CategoryId, string[]> = {
   general: [
@@ -268,19 +274,42 @@ const WORDS: Record<CategoryId, string[]> = {
   ],
 };
 
-export const getWordsByCategories = (categories: CategoryId[]): string[] => {
+export { ALL_CATEGORIES };
+
+const getWordsByDifficulty = (
+  categoryWords: string[],
+  difficulty: Difficulty | 'all'
+): string[] => {
+  if (difficulty === 'all') return categoryWords;
+  const third = Math.ceil(categoryWords.length / 3);
+  switch (difficulty) {
+    case 'easy':
+      return categoryWords.slice(0, third);
+    case 'medium':
+      return categoryWords.slice(third, third * 2);
+    case 'hard':
+      return categoryWords.slice(third * 2);
+  }
+};
+
+export const getWordsByCategories = (
+  categories: CategoryId[],
+  difficulty: Difficulty | 'all' = 'all'
+): string[] => {
   const allWords: string[] = [];
   categories.forEach((cat) => {
     if (WORDS[cat]) {
-      allWords.push(...WORDS[cat]);
+      allWords.push(...getWordsByDifficulty(WORDS[cat], difficulty));
     }
   });
   return allWords;
 };
 
-export const getShuffledWords = (categories: CategoryId[]): string[] => {
-  const words = getWordsByCategories(categories);
-  // Fisher-Yates shuffle
+export const getShuffledWords = (
+  categories: CategoryId[],
+  difficulty: Difficulty | 'all' = 'all'
+): string[] => {
+  const words = getWordsByCategories(categories, difficulty);
   for (let i = words.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [words[i], words[j]] = [words[j], words[i]];
