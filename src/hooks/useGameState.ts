@@ -13,8 +13,8 @@ const DEFAULT_SETTINGS: GameSettings = {
   skipPenalty: true,
 };
 
-const DEFAULT_TEAM_NAMES = ['Echipa 1', 'Echipa 2', 'Echipa 3', 'Echipa 4'];
-const TEAM_COLORS = ['#6C63FF', '#FF6584', '#43E97B', '#FFA502'];
+const DEFAULT_TEAM_NAMES = ['Dragonii', 'Vulturii', 'Lupii', 'Corbii'];
+const TEAM_COLORS = ['#D4A853', '#9B2335', '#2D6A4F', '#5E548E'];
 
 export const useGameState = () => {
   const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);

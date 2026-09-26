@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, SIZES } from '../constants/theme';
+import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useGame } from '../hooks/GameContext';
 
 export const RoundResultScreen = ({ route, navigation }: any) => {
@@ -18,11 +18,11 @@ export const RoundResultScreen = ({ route, navigation }: any) => {
   const team = teams[result.teamId];
 
   return (
-    <LinearGradient colors={['#0F0C29', '#302B63', '#24243E']} style={styles.container}>
+    <LinearGradient colors={[...COLORS.gradientTable]} style={styles.container}>
       <StatusBar barStyle="light-content" />
 
       <View style={styles.header}>
-        <Text style={styles.title}>Rezultat Rundă</Text>
+        <Text style={styles.title}>Rezultat Misiune</Text>
         <Text style={[styles.teamName, { color: team?.color }]}>{team?.name}</Text>
       </View>
 
@@ -31,20 +31,20 @@ export const RoundResultScreen = ({ route, navigation }: any) => {
           <Text style={[styles.scoreValue, { color: team?.color }]}>
             {result.score > 0 ? '+' : ''}{result.score}
           </Text>
-          <Text style={styles.scoreLabel}>puncte</Text>
+          <Text style={styles.scoreLabel}>exp</Text>
         </View>
 
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
-            <MaterialCommunityIcons name="check-circle" size={24} color={COLORS.correct} />
+            <MaterialCommunityIcons name="sword" size={24} color={COLORS.correctGlow} />
             <Text style={styles.statValue}>{result.guessedWords.length}</Text>
-            <Text style={styles.statLabel}>Ghicite</Text>
+            <Text style={styles.statLabel}>Cucerite</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <MaterialCommunityIcons name="skip-next-circle" size={24} color={COLORS.skip} />
+            <MaterialCommunityIcons name="shield-off" size={24} color={COLORS.skipGlow} />
             <Text style={styles.statValue}>{result.skippedWords.length}</Text>
-            <Text style={styles.statLabel}>Sărite</Text>
+            <Text style={styles.statLabel}>Retrase</Text>
           </View>
         </View>
       </View>
@@ -52,10 +52,10 @@ export const RoundResultScreen = ({ route, navigation }: any) => {
       <ScrollView style={styles.wordList} showsVerticalScrollIndicator={false}>
         {result.guessedWords.length > 0 && (
           <View style={styles.wordSection}>
-            <Text style={styles.wordSectionTitle}>Cuvinte Ghicite</Text>
+            <Text style={styles.wordSectionTitle}>Cuvinte Cucerite</Text>
             {result.guessedWords.map((word: string, i: number) => (
               <View key={i} style={styles.wordItem}>
-                <MaterialCommunityIcons name="check" size={18} color={COLORS.correct} />
+                <MaterialCommunityIcons name="sword" size={16} color={COLORS.correctGlow} />
                 <Text style={styles.wordText}>{word}</Text>
               </View>
             ))}
@@ -64,10 +64,10 @@ export const RoundResultScreen = ({ route, navigation }: any) => {
 
         {result.skippedWords.length > 0 && (
           <View style={styles.wordSection}>
-            <Text style={styles.wordSectionTitle}>Cuvinte Sărite</Text>
+            <Text style={styles.wordSectionTitle}>Cuvinte Retrase</Text>
             {result.skippedWords.map((word: string, i: number) => (
               <View key={i} style={styles.wordItem}>
-                <MaterialCommunityIcons name="close" size={18} color={COLORS.skip} />
+                <MaterialCommunityIcons name="shield-off" size={16} color={COLORS.skipGlow} />
                 <Text style={[styles.wordText, { color: COLORS.textSecondary }]}>{word}</Text>
               </View>
             ))}
@@ -77,25 +77,35 @@ export const RoundResultScreen = ({ route, navigation }: any) => {
 
       {/* Current Standings */}
       <View style={styles.standings}>
-        <Text style={styles.standingsTitle}>Clasament</Text>
+        <Text style={styles.standingsTitle}>Ierarhia Breslelor</Text>
         {[...teams].sort((a, b) => b.score - a.score).map((t, i) => (
           <View key={t.id} style={styles.standingItem}>
             <Text style={styles.standingPos}>{i + 1}.</Text>
             <View style={[styles.standingDot, { backgroundColor: t.color }]} />
             <Text style={styles.standingName}>{t.name}</Text>
-            <Text style={[styles.standingScore, { color: t.color }]}>{t.score}</Text>
+            <Text style={[styles.standingScore, { color: t.color }]}>
+              {t.score} <Text style={styles.standingExp}>exp</Text>
+            </Text>
           </View>
         ))}
       </View>
 
       <View style={styles.footer}>
         <TouchableOpacity
-          style={styles.nextButton}
+          style={styles.nextButtonWrap}
           onPress={() => navigation.replace('Game')}
           activeOpacity={0.8}
         >
-          <Text style={styles.nextButtonText}>Runda Următoare</Text>
-          <MaterialCommunityIcons name="arrow-right" size={24} color="#FFF" />
+          <LinearGradient
+            colors={[COLORS.goldDim, COLORS.gold]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.nextButton}
+          >
+            <MaterialCommunityIcons name="sword-cross" size={22} color="#FFF" />
+            <Text style={styles.nextButtonText}>Urmatoarea Misiune</Text>
+            <MaterialCommunityIcons name="arrow-right" size={22} color="#FFF" />
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     </LinearGradient>
@@ -111,12 +121,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: SIZES.lg,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
-    fontWeight: '600',
   },
   teamName: {
     fontSize: SIZES.xxl,
-    fontWeight: '900',
+    fontFamily: FONTS.displayBlack,
     marginTop: 4,
   },
   scoreContainer: {
@@ -124,23 +134,25 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   scoreBadge: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 104,
+    height: 104,
+    borderRadius: 52,
     borderWidth: 3,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: COLORS.backgroundLight,
     marginBottom: 20,
   },
   scoreValue: {
     fontSize: SIZES.xxxl,
-    fontWeight: '900',
+    fontFamily: FONTS.displayBlack,
   },
   scoreLabel: {
     fontSize: SIZES.xs,
-    color: COLORS.textSecondary,
-    fontWeight: '600',
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.gold,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   statsRow: {
     flexDirection: 'row',
@@ -153,16 +165,17 @@ const styles = StyleSheet.create({
   statDivider: {
     width: 1,
     height: 40,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: COLORS.gold + '30',
   },
   statValue: {
     fontSize: SIZES.xl,
-    fontWeight: '800',
+    fontFamily: FONTS.bodyBlack,
     color: COLORS.text,
     marginTop: 4,
   },
   statLabel: {
     fontSize: SIZES.xs,
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textSecondary,
   },
   wordList: {
@@ -174,8 +187,8 @@ const styles = StyleSheet.create({
   },
   wordSectionTitle: {
     fontSize: SIZES.sm,
-    color: COLORS.textSecondary,
-    fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.gold,
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 1,
@@ -188,24 +201,26 @@ const styles = StyleSheet.create({
   },
   wordText: {
     fontSize: SIZES.md,
+    fontFamily: FONTS.body,
     color: COLORS.text,
-    fontWeight: '500',
   },
   standings: {
     paddingHorizontal: SIZES.padding,
     paddingVertical: 12,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: COLORS.backgroundLight,
     marginHorizontal: SIZES.padding,
     borderRadius: SIZES.radius,
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: COLORS.gold + '25',
   },
   standingsTitle: {
     fontSize: SIZES.sm,
-    color: COLORS.textSecondary,
-    fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.gold,
     marginBottom: 8,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 2,
   },
   standingItem: {
     flexDirection: 'row',
@@ -214,8 +229,8 @@ const styles = StyleSheet.create({
   },
   standingPos: {
     fontSize: SIZES.md,
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textSecondary,
-    fontWeight: '700',
     width: 24,
   },
   standingDot: {
@@ -227,30 +242,42 @@ const styles = StyleSheet.create({
   standingName: {
     flex: 1,
     fontSize: SIZES.md,
+    fontFamily: FONTS.bodyBold,
     color: COLORS.text,
-    fontWeight: '600',
   },
   standingScore: {
     fontSize: SIZES.lg,
-    fontWeight: '800',
+    fontFamily: FONTS.bodyBlack,
+  },
+  standingExp: {
+    fontSize: SIZES.xs,
+    fontFamily: FONTS.body,
+    color: COLORS.textSecondary,
   },
   footer: {
     paddingHorizontal: SIZES.padding,
     paddingBottom: 40,
     paddingTop: 10,
   },
+  nextButtonWrap: {
+    borderRadius: SIZES.radius,
+    overflow: 'hidden',
+    elevation: 8,
+    shadowColor: COLORS.gold,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
   nextButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: COLORS.primary,
     paddingVertical: 18,
-    borderRadius: SIZES.radius,
   },
   nextButtonText: {
     fontSize: SIZES.lg,
-    fontWeight: '700',
-    color: COLORS.text,
+    fontFamily: FONTS.displayBlack,
+    color: '#FFF',
   },
 });

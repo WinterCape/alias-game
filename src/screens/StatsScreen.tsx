@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, SIZES } from '../constants/theme';
+import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useStats, GameRecord } from '../hooks/useStats';
 
 const StatCard = ({
@@ -25,7 +25,7 @@ const StatCard = ({
   color: string;
 }) => (
   <View style={styles.statCard}>
-    <View style={[styles.statIconWrap, { backgroundColor: color + '20' }]}>
+    <View style={[styles.statIconWrap, { backgroundColor: color + '18' }]}>
       <MaterialCommunityIcons name={icon as any} size={22} color={color} />
     </View>
     <Text style={styles.statValue}>{value}</Text>
@@ -42,10 +42,12 @@ const GameHistoryItem = ({ game, index }: { game: GameRecord; index: number }) =
   return (
     <View style={styles.historyItem}>
       <View style={styles.historyLeft}>
-        <Text style={styles.historyIndex}>#{index + 1}</Text>
+        <View style={styles.historyIndexWrap}>
+          <Text style={styles.historyIndex}>#{index + 1}</Text>
+        </View>
         <View>
           <View style={styles.historyWinnerRow}>
-            <MaterialCommunityIcons name="trophy" size={14} color="#FFD700" />
+            <MaterialCommunityIcons name="crown" size={14} color={COLORS.gold} />
             <Text style={styles.historyWinner}>{game.winner}</Text>
             <Text style={styles.historyWinnerScore}>{game.winnerScore}p</Text>
           </View>
@@ -58,7 +60,7 @@ const GameHistoryItem = ({ game, index }: { game: GameRecord; index: number }) =
           {' / '}
           <Text style={{ color: COLORS.skip }}>{game.totalWordsSkipped}</Text>
         </Text>
-        <Text style={styles.historyRounds}>{game.totalRounds} runde</Text>
+        <Text style={styles.historyRounds}>{game.totalRounds} misiuni</Text>
       </View>
     </View>
   );
@@ -70,12 +72,12 @@ export const StatsScreen = ({ navigation }: any) => {
 
   const handleReset = () => {
     Alert.alert(
-      'Resetare Statistici',
-      'Ești sigur că vrei să ștergi toate statisticile? Această acțiune nu poate fi anulată.',
+      'Sterge Cronicile',
+      'Ești sigur că vrei să ștergi toate cronicile? Această acțiune nu poate fi anulată.',
       [
         { text: 'Anulează', style: 'cancel' },
         {
-          text: 'Resetează',
+          text: 'Șterge',
           style: 'destructive',
           onPress: resetStats,
         },
@@ -96,30 +98,43 @@ export const StatsScreen = ({ navigation }: any) => {
         )
       : 0;
 
+  const tabConfig = [
+    { key: 'overview' as const, label: 'Rezumat', icon: 'book-open-variant' },
+    { key: 'history' as const, label: 'Bătălii', icon: 'sword-cross' },
+    { key: 'leaders' as const, label: 'Sala Faimei', icon: 'trophy' },
+  ];
+
   return (
-    <LinearGradient colors={['#0F0C29', '#302B63', '#24243E']} style={styles.container}>
+    <LinearGradient colors={['#0D0A1A', '#161230', '#0D0A1A']} style={styles.container}>
       <StatusBar barStyle="light-content" />
 
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons name="arrow-left" size={22} color={COLORS.gold} />
         </TouchableOpacity>
-        <Text style={styles.title}>Statistici</Text>
-        <TouchableOpacity onPress={handleReset} style={styles.backBtn}>
-          <MaterialCommunityIcons name="delete-outline" size={22} color={COLORS.textSecondary} />
+        <Text style={styles.title}>Cronici</Text>
+        <TouchableOpacity onPress={handleReset} style={styles.resetBtn}>
+          <MaterialCommunityIcons name="delete-outline" size={20} color={COLORS.textSecondary} />
         </TouchableOpacity>
       </View>
 
       {/* Tabs */}
       <View style={styles.tabRow}>
-        {(['overview', 'history', 'leaders'] as const).map((t) => (
+        {tabConfig.map((t) => (
           <TouchableOpacity
-            key={t}
-            style={[styles.tab, tab === t && styles.tabActive]}
-            onPress={() => setTab(t)}
+            key={t.key}
+            style={[styles.tab, tab === t.key && styles.tabActive]}
+            onPress={() => setTab(t.key)}
+            activeOpacity={0.7}
           >
-            <Text style={[styles.tabText, tab === t && styles.tabTextActive]}>
-              {t === 'overview' ? 'Sumar' : t === 'history' ? 'Istoric' : 'Clasament'}
+            <MaterialCommunityIcons
+              name={t.icon as any}
+              size={14}
+              color={tab === t.key ? COLORS.gold : COLORS.textSecondary}
+              style={{ marginRight: 5 }}
+            />
+            <Text style={[styles.tabText, tab === t.key && styles.tabTextActive]}>
+              {t.label}
             </Text>
           </TouchableOpacity>
         ))}
@@ -134,48 +149,50 @@ export const StatsScreen = ({ navigation }: any) => {
           <>
             <View style={styles.statGrid}>
               <StatCard
-                icon="gamepad-variant"
-                label="Jocuri"
+                icon="sword"
+                label="Aventuri"
                 value={stats.gamesPlayed}
-                color={COLORS.primary}
+                color={COLORS.gold}
               />
               <StatCard
-                icon="check-circle"
-                label="Ghicite"
+                icon="shield-check"
+                label="Cucerite"
                 value={stats.totalWordsGuessed}
                 color={COLORS.correct}
               />
               <StatCard
-                icon="skip-next-circle"
-                label="Sărite"
+                icon="shield-off"
+                label="Retrase"
                 value={stats.totalWordsSkipped}
                 color={COLORS.skip}
               />
               <StatCard
-                icon="timer"
-                label="Runde"
+                icon="map-marker-path"
+                label="Misiuni"
                 value={stats.totalRoundsPlayed}
                 color={COLORS.warning}
               />
               <StatCard
                 icon="trending-up"
-                label="Media / Rundă"
+                label="Media / Misiune"
                 value={stats.averageWordsPerRound}
-                color="#54A0FF"
+                color={COLORS.goldBright}
               />
               <StatCard
                 icon="percent"
-                label="Rata Ghicit"
+                label="Rata Cucerire"
                 value={`${guessRate}%`}
-                color="#43E97B"
+                color={COLORS.correctGlow}
               />
             </View>
 
             {stats.bestRoundScore > 0 && (
               <View style={styles.bestRound}>
-                <MaterialCommunityIcons name="star" size={24} color="#FFD700" />
+                <View style={styles.bestRoundIconWrap}>
+                  <MaterialCommunityIcons name="star-four-points" size={26} color={COLORS.goldBright} />
+                </View>
                 <View style={styles.bestRoundText}>
-                  <Text style={styles.bestRoundTitle}>Cel Mai Bun Scor într-o Rundă</Text>
+                  <Text style={styles.bestRoundTitle}>Cea Mai Glorioasă Misiune</Text>
                   <Text style={styles.bestRoundValue}>
                     {stats.bestRoundScore} puncte
                   </Text>
@@ -190,13 +207,13 @@ export const StatsScreen = ({ navigation }: any) => {
             {stats.recentGames.length === 0 ? (
               <View style={styles.emptyState}>
                 <MaterialCommunityIcons
-                  name="gamepad-variant-outline"
+                  name="script-text-outline"
                   size={64}
-                  color={COLORS.textSecondary}
+                  color={COLORS.goldDim}
                 />
-                <Text style={styles.emptyText}>Niciun joc încă</Text>
+                <Text style={styles.emptyText}>Nicio aventură încă</Text>
                 <Text style={styles.emptySubtext}>
-                  Joacă primul joc pentru a vedea istoricul
+                  Pornește prima aventură pentru a scrie cronicile
                 </Text>
               </View>
             ) : (
@@ -212,30 +229,38 @@ export const StatsScreen = ({ navigation }: any) => {
             {sortedWins.length === 0 ? (
               <View style={styles.emptyState}>
                 <MaterialCommunityIcons
-                  name="trophy-outline"
+                  name="sword-cross"
                   size={64}
-                  color={COLORS.textSecondary}
+                  color={COLORS.goldDim}
                 />
-                <Text style={styles.emptyText}>Niciun câștigător încă</Text>
+                <Text style={styles.emptyText}>Niciun campion încă</Text>
                 <Text style={styles.emptySubtext}>
-                  Termină un joc pentru a vedea clasamentul
+                  Termină o aventură pentru a intra în Sala Faimei
                 </Text>
               </View>
             ) : (
               sortedWins.map(([name, wins], i) => (
-                <View key={name} style={styles.leaderItem}>
+                <View key={name} style={[styles.leaderItem, i === 0 && styles.leaderItemFirst]}>
                   <View style={styles.leaderLeft}>
                     {i === 0 && (
-                      <MaterialCommunityIcons name="trophy" size={24} color="#FFD700" />
+                      <View style={styles.leaderMedalWrap}>
+                        <MaterialCommunityIcons name="trophy" size={24} color={COLORS.goldBright} />
+                      </View>
                     )}
                     {i === 1 && (
-                      <MaterialCommunityIcons name="medal" size={24} color="#C0C0C0" />
+                      <View style={styles.leaderMedalWrap}>
+                        <MaterialCommunityIcons name="medal" size={24} color="#C0C0C0" />
+                      </View>
                     )}
                     {i === 2 && (
-                      <MaterialCommunityIcons name="medal" size={24} color="#CD7F32" />
+                      <View style={styles.leaderMedalWrap}>
+                        <MaterialCommunityIcons name="medal" size={24} color="#CD7F32" />
+                      </View>
                     )}
                     {i > 2 && <Text style={styles.leaderIndex}>{i + 1}</Text>}
-                    <Text style={styles.leaderName}>{name}</Text>
+                    <Text style={[styles.leaderName, i === 0 && styles.leaderNameFirst]}>
+                      {name}
+                    </Text>
                   </View>
                   <View style={styles.leaderRight}>
                     <Text style={styles.leaderWins}>{wins}</Text>
@@ -267,45 +292,71 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(212,168,83,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(212,168,83,0.25)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  resetBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(212,168,83,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(212,168,83,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   title: {
-    fontSize: SIZES.xl,
-    fontWeight: '800',
-    color: COLORS.text,
+    fontSize: SIZES.xxl,
+    fontFamily: FONTS.displayBlack,
+    color: COLORS.gold,
+    letterSpacing: 1,
   },
+
+  /* ---------- Tabs ---------- */
   tabRow: {
     flexDirection: 'row',
     marginHorizontal: SIZES.padding,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 12,
+    backgroundColor: 'rgba(212,168,83,0.04)',
+    borderRadius: SIZES.radius,
     padding: 4,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(212,168,83,0.08)',
   },
   tab: {
     flex: 1,
+    flexDirection: 'row',
     paddingVertical: 10,
     alignItems: 'center',
-    borderRadius: 10,
+    justifyContent: 'center',
+    borderRadius: SIZES.radius - 2,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   tabActive: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: 'rgba(212,168,83,0.10)',
+    borderColor: COLORS.gold,
   },
   tabText: {
     fontSize: SIZES.sm,
-    fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textSecondary,
   },
   tabTextActive: {
-    color: COLORS.text,
+    color: COLORS.gold,
   },
+
+  /* ---------- Scroll ---------- */
   scroll: { flex: 1 },
   scrollContent: {
     padding: SIZES.padding,
     paddingBottom: 40,
   },
+
+  /* ---------- Stat grid ---------- */
   statGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -313,56 +364,68 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: '47%',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: SIZES.radius,
+    backgroundColor: 'rgba(212,168,83,0.04)',
+    borderRadius: SIZES.cardRadius,
     padding: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(212,168,83,0.10)',
   },
   statIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
   },
   statValue: {
     fontSize: SIZES.xxl,
-    fontWeight: '900',
-    color: COLORS.text,
+    fontFamily: FONTS.displayBlack,
+    color: COLORS.gold,
   },
   statLabel: {
     fontSize: SIZES.xs,
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textSecondary,
-    fontWeight: '600',
     marginTop: 2,
   },
+
+  /* ---------- Best round ---------- */
   bestRound: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,215,0,0.08)',
-    borderRadius: SIZES.radius,
+    backgroundColor: 'rgba(212,168,83,0.06)',
+    borderRadius: SIZES.cardRadius,
     padding: 16,
     marginTop: 16,
     gap: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,215,0,0.2)',
+    borderColor: 'rgba(212,168,83,0.20)',
+  },
+  bestRoundIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(212,168,83,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   bestRoundText: {
     flex: 1,
   },
   bestRoundTitle: {
     fontSize: SIZES.sm,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
-    fontWeight: '600',
   },
   bestRoundValue: {
     fontSize: SIZES.xl,
-    fontWeight: '900',
-    color: '#FFD700',
+    fontFamily: FONTS.displayBlack,
+    color: COLORS.goldBright,
     marginTop: 2,
   },
+
+  /* ---------- Empty state ---------- */
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -370,36 +433,43 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: SIZES.lg,
-    fontWeight: '700',
-    color: COLORS.text,
+    fontFamily: FONTS.display,
+    color: COLORS.parchment,
     marginTop: 16,
   },
   emptySubtext: {
     fontSize: SIZES.md,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
     marginTop: 4,
+    textAlign: 'center',
   },
+
+  /* ---------- History items ---------- */
   historyItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 12,
+    backgroundColor: 'rgba(242,228,201,0.05)',
+    borderRadius: SIZES.cardRadius,
     padding: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(242,228,201,0.10)',
   },
   historyLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
   },
+  historyIndexWrap: {
+    width: 30,
+    alignItems: 'center',
+  },
   historyIndex: {
     fontSize: SIZES.sm,
-    color: COLORS.textSecondary,
-    fontWeight: '700',
-    width: 28,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.goldDim,
   },
   historyWinnerRow: {
     flexDirection: 'row',
@@ -408,16 +478,17 @@ const styles = StyleSheet.create({
   },
   historyWinner: {
     fontSize: SIZES.md,
-    fontWeight: '700',
-    color: COLORS.text,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.parchment,
   },
   historyWinnerScore: {
     fontSize: SIZES.sm,
-    fontWeight: '600',
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textSecondary,
   },
   historyDate: {
     fontSize: SIZES.xs,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
     marginTop: 2,
   },
@@ -426,51 +497,71 @@ const styles = StyleSheet.create({
   },
   historyDetail: {
     fontSize: SIZES.md,
-    fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
   },
   historyRounds: {
     fontSize: SIZES.xs,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
     marginTop: 2,
   },
+
+  /* ---------- Leader items ---------- */
   leaderItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 12,
+    backgroundColor: 'rgba(212,168,83,0.04)',
+    borderRadius: SIZES.cardRadius,
     padding: 16,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(212,168,83,0.10)',
+  },
+  leaderItemFirst: {
+    backgroundColor: 'rgba(212,168,83,0.08)',
+    borderColor: 'rgba(212,168,83,0.25)',
   },
   leaderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
   },
+  leaderMedalWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(212,168,83,0.10)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   leaderIndex: {
     fontSize: SIZES.md,
-    fontWeight: '800',
+    fontFamily: FONTS.bodyBlack,
     color: COLORS.textSecondary,
-    width: 24,
+    width: 32,
     textAlign: 'center',
   },
   leaderName: {
     fontSize: SIZES.lg,
-    fontWeight: '700',
-    color: COLORS.text,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.parchment,
+  },
+  leaderNameFirst: {
+    fontFamily: FONTS.display,
+    color: COLORS.goldBright,
   },
   leaderRight: {
     alignItems: 'flex-end',
   },
   leaderWins: {
     fontSize: SIZES.xl,
-    fontWeight: '900',
-    color: COLORS.primary,
+    fontFamily: FONTS.displayBlack,
+    color: COLORS.gold,
   },
   leaderWinsLabel: {
     fontSize: SIZES.xs,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
   },
 });
