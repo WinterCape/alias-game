@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
+  PanResponder,
   Dimensions,
   StatusBar,
   Vibration,
@@ -12,13 +13,37 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { COLORS, SIZES } from '../constants/theme';
+import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useGame } from '../hooks/GameContext';
 import { useTimer } from '../hooks/useTimer';
+import { useSounds } from '../hooks/useSounds';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
+const SWIPE_THRESHOLD = 80;
 
 type GamePhase = 'ready' | 'playing' | 'finished';
+
+const CardCorner = ({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) => {
+  const isTop = position === 'tl' || position === 'tr';
+  const isLeft = position === 'tl' || position === 'bl';
+  return (
+    <View
+      style={[
+        styles.cardCorner,
+        {
+          top: isTop ? -1 : undefined,
+          bottom: !isTop ? -1 : undefined,
+          left: isLeft ? -1 : undefined,
+          right: !isLeft ? -1 : undefined,
+          borderTopWidth: isTop ? 2 : 0,
+          borderBottomWidth: !isTop ? 2 : 0,
+          borderLeftWidth: isLeft ? 2 : 0,
+          borderRightWidth: !isLeft ? 2 : 0,
+        },
+      ]}
+    />
+  );
+};
 
 export const GameScreen = ({ navigation }: any) => {
   const {
@@ -33,17 +58,21 @@ export const GameScreen = ({ navigation }: any) => {
     checkWinner,
   } = useGame();
 
+  const { playCorrect, playSkip, playTick, playTimeUp, playStart } = useSounds();
   const [phase, setPhase] = useState<GamePhase>('ready');
   const [currentWord, setCurrentWord] = useState('');
   const [correctCount, setCorrectCount] = useState(0);
   const [skipCount, setSkipCount] = useState(0);
+  const isAnimating = useRef(false);
 
-  const slideAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const pan = useRef(new Animated.Value(0)).current;
+  const cardOpacity = useRef(new Animated.Value(1)).current;
   const flashAnim = useRef(new Animated.Value(0)).current;
+  const flashColorRef = useRef(COLORS.correct);
 
   const onTimerComplete = useCallback(() => {
     setPhase('finished');
+    playTimeUp();
     Vibration.vibrate([0, 500, 200, 500]);
     const result = endRound();
     const winner = checkWinner();
@@ -63,6 +92,12 @@ export const GameScreen = ({ navigation }: any) => {
   );
 
   useEffect(() => {
+    if (phase === 'playing' && timeLeft <= 10 && timeLeft > 0) {
+      playTick();
+    }
+  }, [timeLeft, phase, playTick]);
+
+  useEffect(() => {
     activateKeepAwakeAsync();
     return () => {
       deactivateKeepAwake();
@@ -74,38 +109,13 @@ export const GameScreen = ({ navigation }: any) => {
     setCurrentWord(getCurrentWord());
     setPhase('playing');
     startTimer();
+    playStart();
     setCorrectCount(0);
     setSkipCount(0);
   };
 
-  const animateCard = (direction: 'left' | 'right', callback: () => void) => {
-    const toValue = direction === 'right' ? width : -width;
-
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.sequence([
-        Animated.timing(scaleAnim, {
-          toValue: 0.95,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-      ]),
-    ]).start(() => {
-      callback();
-      slideAnim.setValue(0);
-    });
-  };
-
   const flashScreen = (color: string) => {
+    flashColorRef.current = color;
     flashAnim.setValue(1);
     Animated.timing(flashAnim, {
       toValue: 0,
@@ -114,52 +124,130 @@ export const GameScreen = ({ navigation }: any) => {
     }).start();
   };
 
-  const handleCorrect = () => {
-    if (phase !== 'playing') return;
-    flashScreen(COLORS.correct);
-    animateCard('right', () => {
+  const animateOut = (direction: 'left' | 'right', callback: () => void) => {
+    if (isAnimating.current) return;
+    isAnimating.current = true;
+    const toValue = direction === 'right' ? width * 1.5 : -width * 1.5;
+
+    Animated.parallel([
+      Animated.timing(pan, {
+        toValue,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(cardOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      callback();
+      pan.setValue(0);
+      cardOpacity.setValue(1);
+      isAnimating.current = false;
+    });
+  };
+
+  const handleCorrect = useCallback(() => {
+    if (phase !== 'playing' || isAnimating.current) return;
+    playCorrect();
+    flashScreen(COLORS.correctGlow);
+    animateOut('right', () => {
       markCorrect();
       setCorrectCount((p) => p + 1);
       setCurrentWord(getCurrentWord());
     });
-  };
+  }, [phase, markCorrect, getCurrentWord, playCorrect]);
 
-  const handleSkip = () => {
-    if (phase !== 'playing') return;
-    flashScreen(COLORS.skip);
+  const handleSkip = useCallback(() => {
+    if (phase !== 'playing' || isAnimating.current) return;
+    playSkip();
+    flashScreen(COLORS.skipGlow);
     Vibration.vibrate(100);
-    animateCard('left', () => {
+    animateOut('left', () => {
       markSkipped();
       setSkipCount((p) => p + 1);
       setCurrentWord(getCurrentWord());
     });
-  };
+  }, [phase, markSkipped, getCurrentWord, playSkip]);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 10,
+      onPanResponderMove: (_, gestureState) => {
+        if (phase !== 'playing' || isAnimating.current) return;
+        pan.setValue(gestureState.dx);
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (phase !== 'playing' || isAnimating.current) return;
+        if (gestureState.dx > SWIPE_THRESHOLD || gestureState.vx > 0.5) {
+          handleCorrect();
+        } else if (gestureState.dx < -SWIPE_THRESHOLD || gestureState.vx < -0.5) {
+          handleSkip();
+        } else {
+          Animated.spring(pan, {
+            toValue: 0,
+            useNativeDriver: true,
+            friction: 5,
+          }).start();
+        }
+      },
+    })
+  ).current;
 
   const currentTeam = teams[currentTeamIndex];
   const isUrgent = timeLeft <= 10;
 
+  const cardRotation = pan.interpolate({
+    inputRange: [-width, 0, width],
+    outputRange: ['-15deg', '0deg', '15deg'],
+    extrapolate: 'clamp',
+  });
+
+  const leftIndicatorOpacity = pan.interpolate({
+    inputRange: [-SWIPE_THRESHOLD, 0],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  const rightIndicatorOpacity = pan.interpolate({
+    inputRange: [0, SWIPE_THRESHOLD],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
+
+  const cardBorderColor = pan.interpolate({
+    inputRange: [-SWIPE_THRESHOLD, 0, SWIPE_THRESHOLD],
+    outputRange: [COLORS.skipGlow, COLORS.parchmentEdge, COLORS.correctGlow],
+    extrapolate: 'clamp',
+  });
+
   if (phase === 'ready') {
     return (
-      <LinearGradient colors={['#0F0C29', '#302B63', '#24243E']} style={styles.container}>
+      <LinearGradient colors={[...COLORS.gradientTable]} style={styles.container}>
         <StatusBar barStyle="light-content" />
         <View style={styles.readyContainer}>
-          <View style={[styles.teamBadge, { backgroundColor: currentTeam?.color + '30' }]}>
-            <MaterialCommunityIcons name="account-group" size={40} color={currentTeam?.color} />
+          <View style={[styles.teamBadge, { backgroundColor: currentTeam?.color + '25', borderColor: currentTeam?.color + '60' }]}>
+            <MaterialCommunityIcons name="shield-account" size={40} color={currentTeam?.color} />
           </View>
           <Text style={styles.readyTeamName}>{currentTeam?.name}</Text>
-          <Text style={styles.readySubtext}>Pregătiți-vă!</Text>
+          <Text style={styles.readySubtext}>Pregatiti-va, eroi!</Text>
           <Text style={styles.readyDesc}>
-            Dă telefonul jucătorului care descrie.{'\n'}
-            Restul echipei trebuie să ghicească.
+            Da telefonul jucatorului care descrie.{'\n'}
+            Restul echipei trebuie sa ghiceasca.{'\n\n'}
+            <Text style={{ color: COLORS.correctGlow, fontFamily: FONTS.bodyBold }}>Gliseaza dreapta</Text> = victorie{'\n'}
+            <Text style={{ color: COLORS.skipGlow, fontFamily: FONTS.bodyBold }}>Gliseaza stanga</Text> = retragere
           </Text>
 
           <View style={styles.scoreBoard}>
+            <Text style={styles.scoreBoardTitle}>Ierarhia Breslelor</Text>
             {teams.map((team) => (
               <View key={team.id} style={styles.scoreBoardItem}>
                 <View style={[styles.scoreDot, { backgroundColor: team.color }]} />
                 <Text style={styles.scoreBoardName}>{team.name}</Text>
                 <Text style={[styles.scoreBoardScore, { color: team.color }]}>
-                  {team.score}
+                  {team.score} <Text style={styles.scoreBoardExp}>exp</Text>
                 </Text>
               </View>
             ))}
@@ -170,7 +258,7 @@ export const GameScreen = ({ navigation }: any) => {
             onPress={handleStartRound}
             activeOpacity={0.8}
           >
-            <MaterialCommunityIcons name="play" size={32} color="#FFF" />
+            <MaterialCommunityIcons name="sword-cross" size={28} color="#FFF" />
             <Text style={styles.startRoundText}>START</Text>
           </TouchableOpacity>
         </View>
@@ -179,7 +267,7 @@ export const GameScreen = ({ navigation }: any) => {
   }
 
   return (
-    <LinearGradient colors={['#0F0C29', '#302B63', '#24243E']} style={styles.container}>
+    <LinearGradient colors={[...COLORS.gradientTable]} style={styles.container}>
       <StatusBar barStyle="light-content" />
 
       {/* Flash overlay */}
@@ -188,10 +276,10 @@ export const GameScreen = ({ navigation }: any) => {
         style={[
           styles.flashOverlay,
           {
-            backgroundColor: COLORS.correct,
+            backgroundColor: flashColorRef.current,
             opacity: flashAnim.interpolate({
               inputRange: [0, 1],
-              outputRange: [0, 0.3],
+              outputRange: [0, 0.35],
             }),
           },
         ]}
@@ -199,13 +287,13 @@ export const GameScreen = ({ navigation }: any) => {
 
       {/* Timer Bar */}
       <View style={styles.timerBarContainer}>
-        <View
+        <LinearGradient
+          colors={isUrgent ? [COLORS.danger, COLORS.skip] : [COLORS.goldDim, COLORS.gold, COLORS.goldBright]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
           style={[
             styles.timerBar,
-            {
-              width: `${progress * 100}%`,
-              backgroundColor: isUrgent ? COLORS.danger : currentTeam?.color,
-            },
+            { width: `${progress * 100}%` },
           ]}
         />
       </View>
@@ -223,26 +311,45 @@ export const GameScreen = ({ navigation }: any) => {
         </View>
         <View style={styles.headerRight}>
           <Text style={styles.scoreLabel}>
-            <Text style={{ color: COLORS.correct }}>+{correctCount}</Text>
+            <Text style={{ color: COLORS.correctGlow }}>+{correctCount}</Text>
             {'  '}
-            <Text style={{ color: COLORS.skip }}>-{skipCount}</Text>
+            <Text style={{ color: COLORS.skipGlow }}>-{skipCount}</Text>
           </Text>
         </View>
       </View>
 
-      {/* Word Card */}
+      {/* Swipe Direction Indicators */}
+      <View style={styles.swipeHintRow}>
+        <Animated.View style={[styles.swipeHint, { opacity: leftIndicatorOpacity }]}>
+          <MaterialCommunityIcons name="shield-off" size={18} color={COLORS.skipGlow} />
+          <Text style={[styles.swipeHintText, { color: COLORS.skipGlow }]}>RETRAGERE</Text>
+        </Animated.View>
+        <Animated.View style={[styles.swipeHint, { opacity: rightIndicatorOpacity }]}>
+          <Text style={[styles.swipeHintText, { color: COLORS.correctGlow }]}>VICTORIE</Text>
+          <MaterialCommunityIcons name="sword" size={18} color={COLORS.correctGlow} />
+        </Animated.View>
+      </View>
+
+      {/* Word Card with PanResponder — Parchment Card */}
       <View style={styles.wordContainer}>
         <Animated.View
+          {...panResponder.panHandlers}
           style={[
             styles.wordCard,
             {
               transform: [
-                { translateX: slideAnim },
-                { scale: scaleAnim },
+                { translateX: pan },
+                { rotate: cardRotation },
               ],
+              opacity: cardOpacity,
+              borderColor: cardBorderColor,
             },
           ]}
         >
+          <CardCorner position="tl" />
+          <CardCorner position="tr" />
+          <CardCorner position="bl" />
+          <CardCorner position="br" />
           <Text style={styles.wordText}>{currentWord}</Text>
         </Animated.View>
       </View>
@@ -250,21 +357,35 @@ export const GameScreen = ({ navigation }: any) => {
       {/* Action Buttons */}
       <View style={styles.actionContainer}>
         <TouchableOpacity
-          style={[styles.actionButton, styles.skipButton]}
           onPress={handleSkip}
           activeOpacity={0.7}
+          style={styles.actionButtonWrap}
         >
-          <MaterialCommunityIcons name="close" size={48} color="#FFF" />
-          <Text style={styles.actionLabel}>Sări</Text>
+          <LinearGradient
+            colors={['#5C1A24', COLORS.skip]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.actionButton}
+          >
+            <MaterialCommunityIcons name="shield-off" size={36} color="#FFF" />
+            <Text style={styles.actionLabel}>Retragere</Text>
+          </LinearGradient>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.actionButton, styles.correctButton]}
           onPress={handleCorrect}
           activeOpacity={0.7}
+          style={styles.actionButtonWrap}
         >
-          <MaterialCommunityIcons name="check" size={48} color="#FFF" />
-          <Text style={styles.actionLabel}>Corect</Text>
+          <LinearGradient
+            colors={['#1B4332', COLORS.correct]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.actionButton}
+          >
+            <MaterialCommunityIcons name="sword" size={36} color="#FFF" />
+            <Text style={styles.actionLabel}>Victorie!</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     </LinearGradient>
@@ -277,6 +398,8 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     zIndex: 10,
   },
+
+  /* --- Ready Phase --- */
   readyContainer: {
     flex: 1,
     alignItems: 'center',
@@ -284,27 +407,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.padding,
   },
   teamBadge: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
+    borderWidth: 2,
   },
   readyTeamName: {
     fontSize: SIZES.xxl,
-    fontWeight: '900',
+    fontFamily: FONTS.displayBlack,
     color: COLORS.text,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   readySubtext: {
     fontSize: SIZES.xl,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
+    fontFamily: FONTS.display,
+    color: COLORS.gold,
     marginBottom: 16,
   },
   readyDesc: {
     fontSize: SIZES.md,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
@@ -312,10 +437,20 @@ const styles = StyleSheet.create({
   },
   scoreBoard: {
     width: '100%',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: COLORS.backgroundLight,
     borderRadius: SIZES.radius,
+    borderWidth: 1,
+    borderColor: COLORS.gold + '30',
     padding: 16,
     marginBottom: 40,
+  },
+  scoreBoardTitle: {
+    fontSize: SIZES.xs,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.gold,
+    textTransform: 'uppercase',
+    letterSpacing: 2,
+    marginBottom: 8,
   },
   scoreBoardItem: {
     flexDirection: 'row',
@@ -331,12 +466,17 @@ const styles = StyleSheet.create({
   scoreBoardName: {
     flex: 1,
     fontSize: SIZES.md,
+    fontFamily: FONTS.bodyBold,
     color: COLORS.text,
-    fontWeight: '600',
   },
   scoreBoardScore: {
     fontSize: SIZES.lg,
-    fontWeight: '800',
+    fontFamily: FONTS.bodyBlack,
+  },
+  scoreBoardExp: {
+    fontSize: SIZES.xs,
+    fontFamily: FONTS.body,
+    color: COLORS.textSecondary,
   },
   startRoundBtn: {
     flexDirection: 'row',
@@ -347,21 +487,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 60,
     borderRadius: SIZES.radius,
     elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
   },
   startRoundText: {
     fontSize: SIZES.xl,
-    fontWeight: '900',
-    color: COLORS.text,
+    fontFamily: FONTS.displayBlack,
+    color: '#FFF',
     letterSpacing: 4,
   },
+
+  /* --- Playing Phase --- */
   timerBarContainer: {
-    height: 4,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    height: 5,
+    backgroundColor: COLORS.backgroundLight,
     marginTop: 50,
+    overflow: 'hidden',
   },
   timerBar: {
     height: '100%',
-    borderRadius: 2,
   },
   gameHeader: {
     flexDirection: 'row',
@@ -383,18 +529,18 @@ const styles = StyleSheet.create({
   },
   headerTeam: {
     fontSize: SIZES.md,
+    fontFamily: FONTS.bodyBold,
     color: COLORS.text,
-    fontWeight: '600',
   },
   timerCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: COLORS.backgroundLight,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: COLORS.gold,
   },
   timerCircleUrgent: {
     borderColor: COLORS.danger,
@@ -402,8 +548,8 @@ const styles = StyleSheet.create({
   },
   timerText: {
     fontSize: SIZES.xl,
-    fontWeight: '900',
-    color: COLORS.text,
+    fontFamily: FONTS.displayBlack,
+    color: COLORS.gold,
   },
   timerTextUrgent: {
     color: COLORS.danger,
@@ -414,8 +560,25 @@ const styles = StyleSheet.create({
   },
   scoreLabel: {
     fontSize: SIZES.lg,
-    fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
   },
+  swipeHintRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 32,
+  },
+  swipeHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  swipeHintText: {
+    fontSize: SIZES.xs,
+    fontFamily: FONTS.bodyBlack,
+    letterSpacing: 2,
+  },
+
+  /* --- Parchment Word Card --- */
   wordContainer: {
     flex: 1,
     alignItems: 'center',
@@ -424,45 +587,60 @@ const styles = StyleSheet.create({
   },
   wordCard: {
     width: width - 48,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 24,
+    backgroundColor: COLORS.parchment,
+    borderRadius: SIZES.cardRadius,
     padding: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 2,
+    borderColor: COLORS.parchmentEdge,
     minHeight: 200,
+    elevation: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+  },
+  cardCorner: {
+    position: 'absolute',
+    width: 20,
+    height: 20,
+    borderColor: COLORS.gold,
   },
   wordText: {
     fontSize: 42,
-    fontWeight: '900',
-    color: COLORS.text,
+    fontFamily: FONTS.displayBlack,
+    color: COLORS.ink,
     textAlign: 'center',
     lineHeight: 52,
   },
+
+  /* --- Action Buttons --- */
   actionContainer: {
     flexDirection: 'row',
     paddingHorizontal: SIZES.padding,
     paddingBottom: 50,
     gap: 16,
   },
-  actionButton: {
+  actionButtonWrap: {
     flex: 1,
+    borderRadius: SIZES.radius,
+    overflow: 'hidden',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+  },
+  actionButton: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 24,
-    borderRadius: SIZES.radius,
+    paddingVertical: 20,
     gap: 4,
   },
-  skipButton: {
-    backgroundColor: COLORS.skip,
-  },
-  correctButton: {
-    backgroundColor: COLORS.correct,
-  },
   actionLabel: {
-    fontSize: SIZES.md,
-    fontWeight: '700',
+    fontSize: SIZES.sm,
+    fontFamily: FONTS.bodyBold,
     color: COLORS.text,
   },
 });

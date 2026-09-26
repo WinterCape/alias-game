@@ -9,42 +9,67 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, SIZES } from '../constants/theme';
+import { COLORS, FONTS, SIZES } from '../constants/theme';
 
 const { width } = Dimensions.get('window');
 
 export const HomeScreen = ({ navigation }: any) => {
   return (
-    <LinearGradient colors={['#0F0C29', '#302B63', '#24243E']} style={styles.container}>
+    <LinearGradient colors={COLORS.gradientTable} style={styles.container}>
       <StatusBar barStyle="light-content" />
 
       <View style={styles.header}>
-        <MaterialCommunityIcons name="cards-playing-outline" size={80} color={COLORS.primary} />
+        {/* Shield emblem */}
+        <View style={styles.shield}>
+          <View style={styles.shieldInner}>
+            <Text style={styles.shieldLetter}>A</Text>
+          </View>
+          <View style={styles.shieldGlow} />
+        </View>
+
         <Text style={styles.title}>ALIAS</Text>
-        <Text style={styles.subtitle}>Jocul Cuvintelor</Text>
-        <View style={styles.flagContainer}>
-          <Text style={styles.flag}>🇷🇴</Text>
-          <Text style={styles.edition}>Ediția Română</Text>
+        <Text style={styles.subtitle}>QUEST</Text>
+
+        <View style={styles.divider}>
+          <View style={styles.dividerLine} />
+          <MaterialCommunityIcons name="cards-playing-outline" size={20} color={COLORS.goldDim} />
+          <View style={styles.dividerLine} />
         </View>
       </View>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.button, styles.playButton]}
+          style={styles.primaryBtn}
           onPress={() => navigation.navigate('Settings')}
           activeOpacity={0.8}
         >
-          <MaterialCommunityIcons name="play" size={28} color="#FFF" />
-          <Text style={styles.buttonText}>Joc Nou</Text>
+          <LinearGradient
+            colors={['#8B6914', '#D4A853', '#8B6914']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.primaryBtnGradient}
+          >
+            <MaterialCommunityIcons name="sword-cross" size={22} color={COLORS.ink} />
+            <Text style={styles.primaryBtnText}>Aventură Nouă</Text>
+          </LinearGradient>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, styles.rulesButton]}
+          style={styles.secondaryBtn}
           onPress={() => navigation.navigate('Rules')}
           activeOpacity={0.8}
         >
-          <MaterialCommunityIcons name="book-open-variant" size={24} color="#FFF" />
-          <Text style={styles.buttonText}>Reguli</Text>
+          <MaterialCommunityIcons name="script-text" size={20} color={COLORS.gold} />
+          <Text style={styles.secondaryBtnText}>Codul Eroilor</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.secondaryBtn}
+          onPress={() => navigation.navigate('Stats')}
+          activeOpacity={0.8}
+        >
+          <MaterialCommunityIcons name="trophy-variant" size={20} color={COLORS.gold} />
+          <Text style={styles.secondaryBtnText}>Cronici</Text>
         </TouchableOpacity>
       </View>
 
@@ -62,73 +87,117 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 60,
+    marginBottom: 48,
+  },
+  shield: {
+    width: 120,
+    height: 130,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  shieldInner: {
+    width: 110,
+    height: 120,
+    borderWidth: 2,
+    borderColor: COLORS.gold,
+    borderRadius: 8,
+    borderBottomLeftRadius: 55,
+    borderBottomRightRadius: 55,
+    backgroundColor: 'rgba(212,168,83,0.06)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shieldGlow: {
+    position: 'absolute',
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: 'rgba(212,168,83,0.05)',
+    zIndex: -1,
+  },
+  shieldLetter: {
+    fontFamily: FONTS.displayBlack,
+    fontSize: 64,
+    color: COLORS.gold,
+    marginTop: -4,
   },
   title: {
-    fontSize: 64,
-    fontWeight: '900',
-    color: COLORS.text,
-    letterSpacing: 12,
-    marginTop: 16,
+    fontFamily: FONTS.displayBlack,
+    fontSize: 52,
+    color: COLORS.gold,
+    letterSpacing: 10,
   },
   subtitle: {
-    fontSize: SIZES.lg,
+    fontFamily: FONTS.display,
+    fontSize: 20,
     color: COLORS.textSecondary,
-    marginTop: 8,
-    letterSpacing: 4,
+    letterSpacing: 16,
+    marginTop: 2,
   },
-  flagContainer: {
+  divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 16,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    gap: 12,
+    marginTop: 20,
   },
-  flag: {
-    fontSize: 24,
-    marginRight: 8,
-  },
-  edition: {
-    fontSize: SIZES.md,
-    color: COLORS.textSecondary,
-    fontWeight: '600',
+  dividerLine: {
+    width: 40,
+    height: 1,
+    backgroundColor: COLORS.goldDim,
+    opacity: 0.4,
   },
   buttonContainer: {
-    width: width * 0.75,
-    gap: 16,
+    width: width * 0.78,
+    gap: 12,
   },
-  button: {
+  primaryBtn: {
+    borderRadius: SIZES.radius,
+    overflow: 'hidden',
+    elevation: 8,
+    shadowColor: COLORS.gold,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+  },
+  primaryBtnGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 10,
     paddingVertical: 18,
     borderRadius: SIZES.radius,
-    gap: 12,
   },
-  playButton: {
-    backgroundColor: COLORS.primary,
-    elevation: 8,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+  primaryBtnText: {
+    fontFamily: FONTS.bodyBlack,
+    fontSize: 16,
+    color: COLORS.ink,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
-  rulesButton: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+  secondaryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    paddingVertical: 16,
+    borderRadius: SIZES.radius,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: 'rgba(212,168,83,0.2)',
+    backgroundColor: 'rgba(212,168,83,0.04)',
   },
-  buttonText: {
-    fontSize: SIZES.lg,
-    fontWeight: '700',
-    color: COLORS.text,
+  secondaryBtnText: {
+    fontFamily: FONTS.bodyBold,
+    fontSize: 15,
+    color: COLORS.textSecondary,
+    letterSpacing: 1,
   },
   version: {
     position: 'absolute',
     bottom: 40,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
-    fontSize: SIZES.sm,
+    fontSize: SIZES.xs,
+    opacity: 0.4,
   },
 });

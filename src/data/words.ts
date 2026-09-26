@@ -1,4 +1,10 @@
-import { CategoryId } from '../types';
+import { CategoryId, Difficulty } from '../types';
+
+const ALL_CATEGORIES: CategoryId[] = [
+  'general', 'animale', 'mancare', 'sporturi', 'profesii',
+  'natura', 'tehnologie', 'filme', 'muzica', 'istorie',
+  'geografie', 'scoala', 'casa', 'emotii', 'haine',
+];
 
 const WORDS: Record<CategoryId, string[]> = {
   general: [
@@ -14,6 +20,12 @@ const WORDS: Record<CategoryId, string[]> = {
     'Frumusețe', 'Adevăr', 'Speranță', 'Credință', 'Bucurie',
     'Surpriză', 'Mister', 'Legendă', 'Poveste', 'Vis',
     'Univers', 'Infinit', 'Timp', 'Spațiu', 'Dimensiune',
+    'Generozitate', 'Sacrificiu', 'Răbdare', 'Perseverență', 'Demnitate',
+    'Educație', 'Carieră', 'Pasiune', 'Destin', 'Triumf',
+    'Inovație', 'Descoperire', 'Evoluție', 'Miracol', 'Fenomen',
+    'Personalitate', 'Caracter', 'Temperament', 'Identitate', 'Conștiință',
+    'Justiție', 'Egalitate', 'Solidaritate', 'Toleranță', 'Diplomație',
+    'Ritual', 'Obicei', 'Ceremonie', 'Sărbătoare', 'Festival',
   ],
   animale: [
     'Elefant', 'Girafă', 'Crocodil', 'Flamingo', 'Pinguin',
@@ -28,6 +40,12 @@ const WORDS: Record<CategoryId, string[]> = {
     'Căprioară', 'Mistreț', 'Castor', 'Vidră', 'Focă',
     'Albină', 'Fluture', 'Libelulă', 'Furnică', 'Greiere',
     'Scorpion', 'Tarantulă', 'Veverița', 'Bursuc', 'Nevăstuică',
+    'Cămilă', 'Bizon', 'Antilopă', 'Jaguar', 'Puma',
+    'Pelican', 'Colibri', 'Tucano', 'Struț', 'Păun',
+    'Salamandră', 'Gecko', 'Piton', 'Anaconda', 'Aligator',
+    'Morsa', 'Narvali', 'Ornitorinc', 'Mangustă', 'Suricată',
+    'Capră', 'Oaie', 'Vacă', 'Porc', 'Cal',
+    'Găină', 'Rață', 'Gâscă', 'Curcan', 'Porumbel',
   ],
   mancare: [
     'Sarmale', 'Mici', 'Ciorbă', 'Mămăligă', 'Cozonac',
@@ -42,6 +60,12 @@ const WORDS: Record<CategoryId, string[]> = {
     'Pepene', 'Cireșe', 'Căpșuni', 'Zmeură', 'Afine',
     'Ardei', 'Vinete', 'Dovlecel', 'Cartofi', 'Ciuperci',
     'Miere', 'Scorțișoară', 'Vanilie', 'Ghimbir', 'Șofran',
+    'Chiftele', 'Musaca', 'Drob', 'Piftie', 'Jumări',
+    'Zacuscă', 'Murături', 'Compot', 'Dulceață', 'Gem',
+    'Shaorma', 'Kebab', 'Falafel', 'Hummus', 'Tzatziki',
+    'Fondue', 'Raclette', 'Quiche', 'Soufflé', 'Crème Brûlée',
+    'Ananas', 'Mango', 'Kiwi', 'Avocado', 'Rodie',
+    'Usturoi', 'Ceapă', 'Pătrunjel', 'Mărar', 'Busuioc',
   ],
   sporturi: [
     'Fotbal', 'Baschet', 'Tenis', 'Volei', 'Handbal',
@@ -55,7 +79,11 @@ const WORDS: Record<CategoryId, string[]> = {
     'Badminton', 'Squash', 'Ping-Pong', 'Bowling', 'Biliard',
     'Darts', 'Poker', 'Șah', 'Surfing', 'Parasailing',
     'Bungee', 'Parașutism', 'Echitație', 'Polo', 'Curling',
-    'Bobsled', 'Skeleton', 'Skeleton', 'Luge', 'Formula 1',
+    'Bobsled', 'Skeleton', 'Luge', 'Formula 1',
+    'Canotaj', 'Orientare', 'Rafting', 'Kite Surf', 'Skateboard',
+    'Crossfit', 'Yoga', 'Pilates', 'Aerobic', 'Kickbox',
+    'Baseball', 'Softball', 'Lacrosse', 'Padel', 'Pickleball',
+    'Powerlifting', 'Bodybuilding', 'Calistenie', 'Stretching', 'Spinning',
   ],
   profesii: [
     'Doctor', 'Chirurg', 'Dentist', 'Farmacist', 'Asistent',
@@ -70,6 +98,9 @@ const WORDS: Record<CategoryId, string[]> = {
     'Programator', 'Hacker', 'Analist', 'Tester', 'Administrator',
     'Pompier', 'Polițist', 'Detectiv', 'Militar', 'Spion',
     'Antrenor', 'Arbitru', 'Kinetoterapeut', 'Psiholog', 'Veterinar',
+    'Croitor', 'Bijutier', 'Brutar', 'Grădinar', 'Tâmplar',
+    'Fierar', 'Zidar', 'Zugrav', 'Geamgiu', 'Ceasornicar',
+    'Diplomat', 'Ambasador', 'Consul', 'Senator', 'Deputat',
   ],
   natura: [
     'Munte', 'Vulcan', 'Gheizer', 'Canion', 'Peșteră',
@@ -84,6 +115,9 @@ const WORDS: Record<CategoryId, string[]> = {
     'Oază', 'Deltă', 'Estuvar', 'Mlaștină', 'Izvor',
     'Stejar', 'Brad', 'Mesteacăn', 'Salcie', 'Măslin',
     'Lavandă', 'Iasomie', 'Bujor', 'Narcisă', 'Crizantemă',
+    'Ciupercă', 'Ferigă', 'Mușchi', 'Lichen', 'Bambus',
+    'Tsunami', 'Cutremur', 'Erupție', 'Inundație', 'Secetă',
+    'Stâncă', 'Prăpastie', 'Groapă', 'Defileu', 'Chei',
   ],
   tehnologie: [
     'Robot', 'Dronă', 'Satelit', 'Rachetă', 'Telescop',
@@ -98,6 +132,9 @@ const WORDS: Record<CategoryId, string[]> = {
     'Baterie', 'Solar', 'Eolian', 'Nuclear', 'Hidrogen',
     'Senzor', 'Giroscop', 'Accelerometru', 'Cameră', 'Microfon',
     'Autonom', 'Electric', 'Hibrid', 'Magnetic', 'Superconductor',
+    'Podcast', 'Vlog', 'Hashtag', 'Emoji', 'Meme',
+    'Pixel', 'Rezoluție', 'Touchscreen', 'Wireless', 'Streaming',
+    'Chatbot', 'Avatar', 'Metavers', 'Criptomonedă', 'Token',
   ],
   filme: [
     'Supererou', 'Villain', 'Cascadorie', 'Efecte Speciale', 'Premieră',
@@ -112,6 +149,8 @@ const WORDS: Record<CategoryId, string[]> = {
     'Stunt', 'Regizor', 'Producător', 'Scenarist', 'Critic',
     'Festival', 'Gala', 'Trofeu', 'Nominalizare', 'Premiu',
     'Blockbuster', 'Independent', 'Cult', 'Clasic', 'Capodoperă',
+    'Caricatură', 'Parodie', 'Satiră', 'Tragicomedie', 'Melodramă',
+    'Figurant', 'Dublură', 'Costumier', 'Machior', 'Scenograf',
   ],
   muzica: [
     'Chitară', 'Pian', 'Vioară', 'Tobe', 'Flaut',
@@ -126,6 +165,9 @@ const WORDS: Record<CategoryId, string[]> = {
     'Disc', 'Vinil', 'Casetă', 'CD', 'Streaming',
     'Nai', 'Cimpoi', 'Cobză', 'Țambal', 'Tulnic',
     'Manea', 'Doină', 'Hora', 'Sârbă', 'Vals',
+    'Orgă', 'Mandolină', 'Banjo', 'Ukulele', 'Contrabas',
+    'Tango', 'Salsa', 'Samba', 'Flamenco', 'Polcă',
+    'Simfonie', 'Sonată', 'Concerto', 'Baladă', 'Arie',
   ],
   istorie: [
     'Imperiu', 'Regat', 'Republică', 'Monarhie', 'Dictatură',
@@ -140,6 +182,9 @@ const WORDS: Record<CategoryId, string[]> = {
     'Manuscris', 'Pergament', 'Papirus', 'Tipar', 'Cronică',
     'Sabie', 'Scut', 'Armură', 'Catapultă', 'Tun',
     'Dinastie', 'Succesiune', 'Abdicare', 'Încoronare', 'Exil',
+    'Alexandru cel Mare', 'Cleopatra', 'Napoleon', 'Churchill', 'Gandhi',
+    'Cruciadă', 'Inchiziție', 'Feudalism', 'Absolutism', 'Mercantilism',
+    'Hieroglife', 'Rosetă', 'Obelisc', 'Sfinx', 'Mausoleu',
   ],
   geografie: [
     'România', 'Moldova', 'Transilvania', 'Muntenia', 'Oltenia',
@@ -154,6 +199,10 @@ const WORDS: Record<CategoryId, string[]> = {
     'Amazon', 'Nil', 'Mississippi', 'Gange', 'Volga',
     'Sahara', 'Gobi', 'Atacama', 'Kalahari', 'Antarctica',
     'Pacific', 'Atlantic', 'Indian', 'Arctic', 'Strâmtoare',
+    'Sibiu', 'Constanța', 'Oradea', 'Arad', 'Craiova',
+    'Maramureș', 'Bucovina', 'Dobrogea', 'Banat', 'Crișana',
+    'Londra', 'Paris', 'Roma', 'Berlin', 'Madrid',
+    'Tokyo', 'Beijing', 'Sydney', 'Cairo', 'Istanbul',
   ],
   scoala: [
     'Matematică', 'Fizică', 'Chimie', 'Biologie', 'Informatică',
@@ -168,6 +217,9 @@ const WORDS: Record<CategoryId, string[]> = {
     'Dicționar', 'Enciclopedie', 'Manual', 'Caiet', 'Stilou',
     'Pauză', 'Recepție', 'Absență', 'Corigent', 'Premiant',
     'Bacalaureat', 'Admitere', 'Licență', 'Masterat', 'Doctorat',
+    'Microscopul', 'Telescopul', 'Compas', 'Raportor', 'Riglă',
+    'Referat', 'Eseu', 'Disertație', 'Rezumat', 'Sinteză',
+    'Laborant', 'Asistent', 'Lector', 'Conferențiar', 'Rector',
   ],
   casa: [
     'Bucătărie', 'Dormitor', 'Sufragerie', 'Baie', 'Balcon',
@@ -182,6 +234,9 @@ const WORDS: Record<CategoryId, string[]> = {
     'Fereastră', 'Ușă', 'Acoperiș', 'Coș', 'Gard',
     'Robinet', 'Cadă', 'Duș', 'Chiuvetă', 'Toaletă',
     'Priză', 'Întrerupător', 'Bec', 'Candelabru', 'Ventilator',
+    'Șemineu', 'Sobă', 'Calorifer', 'Aer Condiționat', 'Boiler',
+    'Scară', 'Lift', 'Hol', 'Debara', 'Cămară',
+    'Grătar', 'Hamac', 'Leagăn', 'Bancă', 'Fântână',
   ],
   emotii: [
     'Bucurie', 'Tristețe', 'Furie', 'Frică', 'Surpriză',
@@ -196,6 +251,9 @@ const WORDS: Record<CategoryId, string[]> = {
     'Entuziasm', 'Motivație', 'Determinare', 'Ambiție', 'Speranță',
     'Recunoștință', 'Mulțumire', 'Satisfacție', 'Împlinire', 'Extaz',
     'Plictiseală', 'Apatie', 'Indiferență', 'Confuzie', 'Curiozitate',
+    'Adorație', 'Venerație', 'Fascinație', 'Uimire', 'Stupefacție',
+    'Regret', 'Remușcare', 'Pocăință', 'Dor', 'Tânjire',
+    'Fiertura', 'Exasperare', 'Agitație', 'Nerăbdare', 'Neliniște',
   ],
   haine: [
     'Cămașă', 'Tricou', 'Bluză', 'Pulover', 'Jachetă',
@@ -210,22 +268,48 @@ const WORDS: Record<CategoryId, string[]> = {
     'Lenjerie', 'Sutien', 'Maiou', 'Boxeri', 'Chilot',
     'Impermeabil', 'Anorac', 'Geacă', 'Capa', 'Poncho',
     'Bijuterie', 'Cercei', 'Colier', 'Brățară', 'Inel',
+    'Șnur', 'Dantelă', 'Mătase', 'Catifea', 'Bumbac',
+    'Ochelari', 'Ceas', 'Portofel', 'Geantă', 'Rucsac',
+    'Corset', 'Capișon', 'Buton', 'Manșetă', 'Guler',
   ],
 };
 
-export const getWordsByCategories = (categories: CategoryId[]): string[] => {
+export { ALL_CATEGORIES };
+
+const getWordsByDifficulty = (
+  categoryWords: string[],
+  difficulty: Difficulty | 'all'
+): string[] => {
+  if (difficulty === 'all') return categoryWords;
+  const third = Math.ceil(categoryWords.length / 3);
+  switch (difficulty) {
+    case 'easy':
+      return categoryWords.slice(0, third);
+    case 'medium':
+      return categoryWords.slice(third, third * 2);
+    case 'hard':
+      return categoryWords.slice(third * 2);
+  }
+};
+
+export const getWordsByCategories = (
+  categories: CategoryId[],
+  difficulty: Difficulty | 'all' = 'all'
+): string[] => {
   const allWords: string[] = [];
   categories.forEach((cat) => {
     if (WORDS[cat]) {
-      allWords.push(...WORDS[cat]);
+      allWords.push(...getWordsByDifficulty(WORDS[cat], difficulty));
     }
   });
   return allWords;
 };
 
-export const getShuffledWords = (categories: CategoryId[]): string[] => {
-  const words = getWordsByCategories(categories);
-  // Fisher-Yates shuffle
+export const getShuffledWords = (
+  categories: CategoryId[],
+  difficulty: Difficulty | 'all' = 'all'
+): string[] => {
+  const words = getWordsByCategories(categories, difficulty);
   for (let i = words.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [words[i], words[j]] = [words[j], words[i]];
