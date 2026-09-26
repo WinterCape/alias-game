@@ -11,16 +11,26 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, SIZES } from '../constants/theme';
 import { useGame } from '../hooks/GameContext';
+import { useStats } from '../hooks/useStats';
 
 export const GameOverScreen = ({ route, navigation }: any) => {
-  const { resetGame } = useGame();
+  const { resetGame, roundResults } = useGame();
+  const { recordGame } = useStats();
   const { teams } = route.params;
+  const hasRecorded = useRef(false);
 
   const sorted = [...teams].sort((a: any, b: any) => b.score - a.score);
   const winner = sorted[0];
 
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (!hasRecorded.current) {
+      hasRecorded.current = true;
+      recordGame(teams, roundResults);
+    }
+  }, []);
 
   useEffect(() => {
     Animated.sequence([

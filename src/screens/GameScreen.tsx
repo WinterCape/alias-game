@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
+  PanResponder,
   Dimensions,
   StatusBar,
   Vibration,
@@ -17,7 +18,8 @@ import { useGame } from '../hooks/GameContext';
 import { useTimer } from '../hooks/useTimer';
 import { useSounds } from '../hooks/useSounds';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
+const SWIPE_THRESHOLD = 80;
 
 type GamePhase = 'ready' | 'playing' | 'finished';
 
@@ -39,10 +41,12 @@ export const GameScreen = ({ navigation }: any) => {
   const [currentWord, setCurrentWord] = useState('');
   const [correctCount, setCorrectCount] = useState(0);
   const [skipCount, setSkipCount] = useState(0);
+  const isAnimating = useRef(false);
 
-  const slideAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const pan = useRef(new Animated.Value(0)).current;
+  const cardOpacity = useRef(new Animated.Value(1)).current;
   const flashAnim = useRef(new Animated.Value(0)).current;
+  const flashColorRef = useRef(COLORS.correct);
 
   const onTimerComplete = useCallback(() => {
     setPhase('finished');
@@ -65,7 +69,6 @@ export const GameScreen = ({ navigation }: any) => {
     onTimerComplete
   );
 
-  // Tick sound for last 10 seconds
   useEffect(() => {
     if (phase === 'playing' && timeLeft <= 10 && timeLeft > 0) {
       playTick();
@@ -89,34 +92,8 @@ export const GameScreen = ({ navigation }: any) => {
     setSkipCount(0);
   };
 
-  const animateCard = (direction: 'left' | 'right', callback: () => void) => {
-    const toValue = direction === 'right' ? width : -width;
-
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.sequence([
-        Animated.timing(scaleAnim, {
-          toValue: 0.95,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-      ]),
-    ]).start(() => {
-      callback();
-      slideAnim.setValue(0);
-    });
-  };
-
   const flashScreen = (color: string) => {
+    flashColorRef.current = color;
     flashAnim.setValue(1);
     Animated.timing(flashAnim, {
       toValue: 0,
@@ -125,31 +102,104 @@ export const GameScreen = ({ navigation }: any) => {
     }).start();
   };
 
-  const handleCorrect = () => {
-    if (phase !== 'playing') return;
+  const animateOut = (direction: 'left' | 'right', callback: () => void) => {
+    if (isAnimating.current) return;
+    isAnimating.current = true;
+    const toValue = direction === 'right' ? width * 1.5 : -width * 1.5;
+
+    Animated.parallel([
+      Animated.timing(pan, {
+        toValue,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(cardOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      callback();
+      pan.setValue(0);
+      cardOpacity.setValue(1);
+      isAnimating.current = false;
+    });
+  };
+
+  const handleCorrect = useCallback(() => {
+    if (phase !== 'playing' || isAnimating.current) return;
     playCorrect();
     flashScreen(COLORS.correct);
-    animateCard('right', () => {
+    animateOut('right', () => {
       markCorrect();
       setCorrectCount((p) => p + 1);
       setCurrentWord(getCurrentWord());
     });
-  };
+  }, [phase, markCorrect, getCurrentWord, playCorrect]);
 
-  const handleSkip = () => {
-    if (phase !== 'playing') return;
+  const handleSkip = useCallback(() => {
+    if (phase !== 'playing' || isAnimating.current) return;
     playSkip();
     flashScreen(COLORS.skip);
     Vibration.vibrate(100);
-    animateCard('left', () => {
+    animateOut('left', () => {
       markSkipped();
       setSkipCount((p) => p + 1);
       setCurrentWord(getCurrentWord());
     });
-  };
+  }, [phase, markSkipped, getCurrentWord, playSkip]);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 10,
+      onPanResponderMove: (_, gestureState) => {
+        if (phase !== 'playing' || isAnimating.current) return;
+        pan.setValue(gestureState.dx);
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (phase !== 'playing' || isAnimating.current) return;
+        if (gestureState.dx > SWIPE_THRESHOLD || gestureState.vx > 0.5) {
+          handleCorrect();
+        } else if (gestureState.dx < -SWIPE_THRESHOLD || gestureState.vx < -0.5) {
+          handleSkip();
+        } else {
+          Animated.spring(pan, {
+            toValue: 0,
+            useNativeDriver: true,
+            friction: 5,
+          }).start();
+        }
+      },
+    })
+  ).current;
 
   const currentTeam = teams[currentTeamIndex];
   const isUrgent = timeLeft <= 10;
+
+  const cardRotation = pan.interpolate({
+    inputRange: [-width, 0, width],
+    outputRange: ['-15deg', '0deg', '15deg'],
+    extrapolate: 'clamp',
+  });
+
+  const leftIndicatorOpacity = pan.interpolate({
+    inputRange: [-SWIPE_THRESHOLD, 0],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  const rightIndicatorOpacity = pan.interpolate({
+    inputRange: [0, SWIPE_THRESHOLD],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
+
+  const cardBorderColor = pan.interpolate({
+    inputRange: [-SWIPE_THRESHOLD, 0, SWIPE_THRESHOLD],
+    outputRange: [COLORS.skip, 'rgba(255,255,255,0.12)', COLORS.correct],
+    extrapolate: 'clamp',
+  });
 
   if (phase === 'ready') {
     return (
@@ -163,7 +213,9 @@ export const GameScreen = ({ navigation }: any) => {
           <Text style={styles.readySubtext}>Pregătiți-vă!</Text>
           <Text style={styles.readyDesc}>
             Dă telefonul jucătorului care descrie.{'\n'}
-            Restul echipei trebuie să ghicească.
+            Restul echipei trebuie să ghicească.{'\n\n'}
+            <Text style={{ color: COLORS.correct }}>Glisează dreapta</Text> = corect{'\n'}
+            <Text style={{ color: COLORS.skip }}>Glisează stânga</Text> = sari
           </Text>
 
           <View style={styles.scoreBoard}>
@@ -201,7 +253,7 @@ export const GameScreen = ({ navigation }: any) => {
         style={[
           styles.flashOverlay,
           {
-            backgroundColor: COLORS.correct,
+            backgroundColor: flashColorRef.current,
             opacity: flashAnim.interpolate({
               inputRange: [0, 1],
               outputRange: [0, 0.3],
@@ -243,16 +295,31 @@ export const GameScreen = ({ navigation }: any) => {
         </View>
       </View>
 
-      {/* Word Card */}
+      {/* Swipe Direction Indicators */}
+      <View style={styles.swipeHintRow}>
+        <Animated.View style={[styles.swipeHint, { opacity: leftIndicatorOpacity }]}>
+          <MaterialCommunityIcons name="close" size={20} color={COLORS.skip} />
+          <Text style={[styles.swipeHintText, { color: COLORS.skip }]}>SARI</Text>
+        </Animated.View>
+        <Animated.View style={[styles.swipeHint, { opacity: rightIndicatorOpacity }]}>
+          <Text style={[styles.swipeHintText, { color: COLORS.correct }]}>CORECT</Text>
+          <MaterialCommunityIcons name="check" size={20} color={COLORS.correct} />
+        </Animated.View>
+      </View>
+
+      {/* Word Card with PanResponder */}
       <View style={styles.wordContainer}>
         <Animated.View
+          {...panResponder.panHandlers}
           style={[
             styles.wordCard,
             {
               transform: [
-                { translateX: slideAnim },
-                { scale: scaleAnim },
+                { translateX: pan },
+                { rotate: cardRotation },
               ],
+              opacity: cardOpacity,
+              borderColor: cardBorderColor,
             },
           ]}
         >
@@ -260,14 +327,14 @@ export const GameScreen = ({ navigation }: any) => {
         </Animated.View>
       </View>
 
-      {/* Action Buttons */}
+      {/* Action Buttons (still available as fallback) */}
       <View style={styles.actionContainer}>
         <TouchableOpacity
           style={[styles.actionButton, styles.skipButton]}
           onPress={handleSkip}
           activeOpacity={0.7}
         >
-          <MaterialCommunityIcons name="close" size={48} color="#FFF" />
+          <MaterialCommunityIcons name="close" size={40} color="#FFF" />
           <Text style={styles.actionLabel}>Sări</Text>
         </TouchableOpacity>
 
@@ -276,7 +343,7 @@ export const GameScreen = ({ navigation }: any) => {
           onPress={handleCorrect}
           activeOpacity={0.7}
         >
-          <MaterialCommunityIcons name="check" size={48} color="#FFF" />
+          <MaterialCommunityIcons name="check" size={40} color="#FFF" />
           <Text style={styles.actionLabel}>Corect</Text>
         </TouchableOpacity>
       </View>
@@ -429,6 +496,21 @@ const styles = StyleSheet.create({
     fontSize: SIZES.lg,
     fontWeight: '700',
   },
+  swipeHintRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 32,
+  },
+  swipeHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  swipeHintText: {
+    fontSize: SIZES.sm,
+    fontWeight: '800',
+    letterSpacing: 2,
+  },
   wordContainer: {
     flex: 1,
     alignItems: 'center',
@@ -442,7 +524,7 @@ const styles = StyleSheet.create({
     padding: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.12)',
     minHeight: 200,
   },
@@ -463,7 +545,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 24,
+    paddingVertical: 20,
     borderRadius: SIZES.radius,
     gap: 4,
   },
@@ -474,7 +556,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.correct,
   },
   actionLabel: {
-    fontSize: SIZES.md,
+    fontSize: SIZES.sm,
     fontWeight: '700',
     color: COLORS.text,
   },

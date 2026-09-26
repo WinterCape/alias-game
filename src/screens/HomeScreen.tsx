@@ -46,6 +46,15 @@ export const HomeScreen = ({ navigation }: any) => {
           <MaterialCommunityIcons name="book-open-variant" size={24} color="#FFF" />
           <Text style={styles.buttonText}>Reguli</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, styles.rulesButton]}
+          onPress={() => navigation.navigate('Stats')}
+          activeOpacity={0.8}
+        >
+          <MaterialCommunityIcons name="chart-bar" size={24} color="#FFF" />
+          <Text style={styles.buttonText}>Statistici</Text>
+        </TouchableOpacity>
       </View>
 
       <Text style={styles.version}>v1.0.0</Text>

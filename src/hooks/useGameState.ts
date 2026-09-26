@@ -164,6 +164,7 @@ export const useGameState = () => {
     checkWinner,
     resetGame,
     gameStarted,
+    roundResults,
     guessedWords: guessedWordsRef,
     skippedWords: skippedWordsRef,
   };

@@ -9,6 +9,7 @@ import { TeamSetupScreen } from './src/screens/TeamSetupScreen';
 import { GameScreen } from './src/screens/GameScreen';
 import { RoundResultScreen } from './src/screens/RoundResultScreen';
 import { GameOverScreen } from './src/screens/GameOverScreen';
+import { StatsScreen } from './src/screens/StatsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +26,7 @@ export default function App() {
         >
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Rules" component={RulesScreen} />
+          <Stack.Screen name="Stats" component={StatsScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="TeamSetup" component={TeamSetupScreen} />
           <Stack.Screen name="Game" component={GameScreen} />
