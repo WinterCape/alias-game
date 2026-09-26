@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Alias - Jocul Cuvintelor",
-    "slug": "alias-game-ro",
+    "name": "Alias Quest",
+    "slug": "alias-quest",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -9,19 +9,19 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0F0C29"
+      "backgroundColor": "#0D0A1A"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.aliasgame.ro",
       "buildNumber": "1",
       "infoPlist": {
-        "CFBundleDisplayName": "Alias RO"
+        "CFBundleDisplayName": "Alias Quest"
       }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#0F0C29",
+        "backgroundColor": "#0D0A1A",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"

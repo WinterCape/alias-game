@@ -1,6 +1,9 @@
 import React from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useFonts, Alegreya_700Bold, Alegreya_900Black } from '@expo-google-fonts/alegreya';
+import { Nunito_400Regular, Nunito_700Bold, Nunito_900Black } from '@expo-google-fonts/nunito';
 import { GameProvider } from './src/hooks/GameContext';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { RulesScreen } from './src/screens/RulesScreen';
@@ -9,10 +12,28 @@ import { TeamSetupScreen } from './src/screens/TeamSetupScreen';
 import { GameScreen } from './src/screens/GameScreen';
 import { RoundResultScreen } from './src/screens/RoundResultScreen';
 import { GameOverScreen } from './src/screens/GameOverScreen';
+import { StatsScreen } from './src/screens/StatsScreen';
+import { COLORS } from './src/constants/theme';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Alegreya_700Bold,
+    Alegreya_900Black,
+    Nunito_400Regular,
+    Nunito_700Bold,
+    Nunito_900Black,
+  });
+
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, backgroundColor: COLORS.background, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator size="large" color={COLORS.gold} />
+      </View>
+    );
+  }
+
   return (
     <GameProvider>
       <NavigationContainer>
@@ -20,11 +41,12 @@ export default function App() {
           screenOptions={{
             headerShown: false,
             animation: 'slide_from_right',
-            contentStyle: { backgroundColor: '#0F0C29' },
+            contentStyle: { backgroundColor: COLORS.background },
           }}
         >
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Rules" component={RulesScreen} />
+          <Stack.Screen name="Stats" component={StatsScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="TeamSetup" component={TeamSetupScreen} />
           <Stack.Screen name="Game" component={GameScreen} />

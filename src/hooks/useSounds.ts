@@ -1,0 +1,166 @@
+import { useCallback, useEffect, useRef } from 'react';
+import { Audio } from 'expo-av';
+import { Platform } from 'react-native';
+
+// Generate WAV buffer for a simple tone
+function generateToneWav(
+  frequency: number,
+  durationMs: number,
+  volume: number = 0.5,
+  type: 'sine' | 'square' = 'sine'
+): ArrayBuffer {
+  const sampleRate = 44100;
+  const numSamples = Math.floor((sampleRate * durationMs) / 1000);
+  const numChannels = 1;
+  const bitsPerSample = 16;
+  const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;
+  const blockAlign = (numChannels * bitsPerSample) / 8;
+  const dataSize = numSamples * blockAlign;
+  const headerSize = 44;
+  const buffer = new ArrayBuffer(headerSize + dataSize);
+  const view = new DataView(buffer);
+
+  // WAV header
+  const writeString = (offset: number, str: string) => {
+    for (let i = 0; i < str.length; i++) {
+      view.setUint8(offset + i, str.charCodeAt(i));
+    }
+  };
+
+  writeString(0, 'RIFF');
+  view.setUint32(4, 36 + dataSize, true);
+  writeString(8, 'WAVE');
+  writeString(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, byteRate, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, bitsPerSample, true);
+  writeString(36, 'data');
+  view.setUint32(40, dataSize, true);
+
+  // Generate samples
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    let sample: number;
+    if (type === 'sine') {
+      sample = Math.sin(2 * Math.PI * frequency * t);
+    } else {
+      sample = Math.sin(2 * Math.PI * frequency * t) >= 0 ? 1 : -1;
+    }
+
+    // Apply envelope (fade in/out to avoid clicks)
+    const fadeLength = Math.min(numSamples * 0.1, 500);
+    let envelope = 1;
+    if (i < fadeLength) {
+      envelope = i / fadeLength;
+    } else if (i > numSamples - fadeLength) {
+      envelope = (numSamples - i) / fadeLength;
+    }
+
+    const value = Math.floor(sample * volume * envelope * 32767);
+    view.setInt16(headerSize + i * 2, value, true);
+  }
+
+  return buffer;
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  // Use btoa if available, otherwise manual encoding
+  if (typeof btoa !== 'undefined') {
+    return btoa(binary);
+  }
+  // Fallback base64 encoding
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  let result = '';
+  let i = 0;
+  while (i < binary.length) {
+    const a = binary.charCodeAt(i++);
+    const b = i < binary.length ? binary.charCodeAt(i++) : 0;
+    const c = i < binary.length ? binary.charCodeAt(i++) : 0;
+    const triplet = (a << 16) | (b << 8) | c;
+    result += chars[(triplet >> 18) & 63];
+    result += chars[(triplet >> 12) & 63];
+    result += i - 2 < binary.length ? chars[(triplet >> 6) & 63] : '=';
+    result += i - 1 < binary.length ? chars[triplet & 63] : '=';
+  }
+  return result;
+}
+
+type SoundType = 'correct' | 'skip' | 'tick' | 'timeUp' | 'gameOver' | 'start';
+
+const SOUND_CONFIGS: Record<SoundType, { freq: number; duration: number; volume: number; type: 'sine' | 'square' }> = {
+  correct: { freq: 880, duration: 150, volume: 0.4, type: 'sine' },
+  skip: { freq: 280, duration: 200, volume: 0.3, type: 'square' },
+  tick: { freq: 1000, duration: 50, volume: 0.15, type: 'sine' },
+  timeUp: { freq: 440, duration: 600, volume: 0.5, type: 'square' },
+  gameOver: { freq: 660, duration: 400, volume: 0.4, type: 'sine' },
+  start: { freq: 520, duration: 200, volume: 0.35, type: 'sine' },
+};
+
+export const useSounds = () => {
+  const soundsRef = useRef<Record<string, Audio.Sound>>({});
+  const audioReady = useRef(false);
+
+  useEffect(() => {
+    const setup = async () => {
+      try {
+        await Audio.setAudioModeAsync({
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: false,
+          shouldDuckAndroid: true,
+        });
+        audioReady.current = true;
+      } catch {
+        // Audio not available
+      }
+    };
+    setup();
+
+    return () => {
+      Object.values(soundsRef.current).forEach((sound) => {
+        sound.unloadAsync().catch(() => {});
+      });
+    };
+  }, []);
+
+  const playSound = useCallback(async (type: SoundType) => {
+    if (!audioReady.current) return;
+
+    try {
+      // Unload previous instance of this sound type
+      if (soundsRef.current[type]) {
+        await soundsRef.current[type].unloadAsync().catch(() => {});
+      }
+
+      const config = SOUND_CONFIGS[type];
+      const wavBuffer = generateToneWav(config.freq, config.duration, config.volume, config.type);
+      const base64 = arrayBufferToBase64(wavBuffer);
+      const uri = `data:audio/wav;base64,${base64}`;
+
+      const { sound } = await Audio.Sound.createAsync(
+        { uri },
+        { shouldPlay: true }
+      );
+      soundsRef.current[type] = sound;
+    } catch {
+      // Silently fail - sounds are nice-to-have
+    }
+  }, []);
+
+  return {
+    playCorrect: useCallback(() => playSound('correct'), [playSound]),
+    playSkip: useCallback(() => playSound('skip'), [playSound]),
+    playTick: useCallback(() => playSound('tick'), [playSound]),
+    playTimeUp: useCallback(() => playSound('timeUp'), [playSound]),
+    playGameOver: useCallback(() => playSound('gameOver'), [playSound]),
+    playStart: useCallback(() => playSound('start'), [playSound]),
+  };
+};

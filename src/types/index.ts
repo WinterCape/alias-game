@@ -35,12 +35,15 @@ export interface Team {
   color: string;
 }
 
+export type Difficulty = 'easy' | 'medium' | 'hard';
+
 export interface GameSettings {
-  roundDuration: number; // seconds
+  roundDuration: number;
   winningScore: number;
   numberOfTeams: number;
   selectedCategories: CategoryId[];
-  skipPenalty: boolean; // -1 point for skipping
+  difficulty: Difficulty | 'all';
+  skipPenalty: boolean;
 }
 
 export interface RoundResult {

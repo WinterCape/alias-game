@@ -1,17 +1,21 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GameSettings, Team, RoundResult, CategoryId } from '../types';
-import { getShuffledWords } from '../data/words';
+import { getShuffledWords, ALL_CATEGORIES } from '../data/words';
+
+const SETTINGS_KEY = '@alias_game_settings';
 
 const DEFAULT_SETTINGS: GameSettings = {
   roundDuration: 60,
   winningScore: 50,
   numberOfTeams: 2,
-  selectedCategories: ['general', 'animale', 'mancare', 'sporturi'],
+  selectedCategories: [...ALL_CATEGORIES],
+  difficulty: 'all',
   skipPenalty: true,
 };
 
-const DEFAULT_TEAM_NAMES = ['Echipa 1', 'Echipa 2', 'Echipa 3', 'Echipa 4'];
-const TEAM_COLORS = ['#6C63FF', '#FF6584', '#43E97B', '#FFA502'];
+const DEFAULT_TEAM_NAMES = ['Dragonii', 'Vulturii', 'Lupii', 'Corbii'];
+const TEAM_COLORS = ['#D4A853', '#9B2335', '#2D6A4F', '#5E548E'];
 
 export const useGameState = () => {
   const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
@@ -24,6 +28,18 @@ export const useGameState = () => {
 
   const guessedWordsRef = useRef<string[]>([]);
   const skippedWordsRef = useRef<string[]>([]);
+
+  // Load saved settings on mount
+  useEffect(() => {
+    AsyncStorage.getItem(SETTINGS_KEY).then((saved) => {
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setSettings((prev) => ({ ...prev, ...parsed }));
+        } catch {}
+      }
+    });
+  }, []);
 
   const initializeTeams = useCallback((teamNames?: string[]) => {
     const newTeams: Team[] = [];
@@ -41,23 +57,23 @@ export const useGameState = () => {
   }, [settings.numberOfTeams]);
 
   const startNewRound = useCallback(() => {
-    const shuffled = getShuffledWords(settings.selectedCategories);
+    const shuffled = getShuffledWords(settings.selectedCategories, settings.difficulty);
     setWords(shuffled);
     setCurrentWordIndex(0);
     guessedWordsRef.current = [];
     skippedWordsRef.current = [];
-  }, [settings.selectedCategories]);
+  }, [settings.selectedCategories, settings.difficulty]);
 
   const getCurrentWord = useCallback((): string => {
     if (currentWordIndex < words.length) {
       return words[currentWordIndex];
     }
     // Reshuffle if we run out
-    const shuffled = getShuffledWords(settings.selectedCategories);
+    const shuffled = getShuffledWords(settings.selectedCategories, settings.difficulty);
     setWords(shuffled);
     setCurrentWordIndex(0);
     return shuffled[0];
-  }, [currentWordIndex, words, settings.selectedCategories]);
+  }, [currentWordIndex, words, settings.selectedCategories, settings.difficulty]);
 
   const markCorrect = useCallback(() => {
     const word = words[currentWordIndex];
@@ -120,7 +136,11 @@ export const useGameState = () => {
   }, []);
 
   const updateSettings = useCallback((newSettings: Partial<GameSettings>) => {
-    setSettings((prev) => ({ ...prev, ...newSettings }));
+    setSettings((prev) => {
+      const updated = { ...prev, ...newSettings };
+      AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(updated)).catch(() => {});
+      return updated;
+    });
   }, []);
 
   const updateTeamName = useCallback((teamId: number, name: string) => {
@@ -145,6 +165,7 @@ export const useGameState = () => {
     checkWinner,
     resetGame,
     gameStarted,
+    roundResults,
     guessedWords: guessedWordsRef,
     skippedWords: skippedWordsRef,
   };

@@ -9,36 +9,36 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, SIZES } from '../constants/theme';
+import { COLORS, FONTS, SIZES } from '../constants/theme';
 
 const RULES = [
   {
-    icon: 'account-group' as const,
-    title: 'Formează Echipe',
-    text: 'Împărțiți-vă în 2-4 echipe. Fiecare echipă alege un nume creativ.',
+    icon: 'shield-half-full' as const,
+    title: 'Formează Bresle',
+    text: 'Împărțiți-vă în 2-4 bresle. Fiecare breaslă își alege un nume legendar.',
   },
   {
-    icon: 'message-text' as const,
-    title: 'Explică Cuvântul',
-    text: 'Un jucător din echipă descrie cuvântul afișat FĂRĂ a folosi cuvântul în sine sau derivate ale acestuia.',
+    icon: 'script-text' as const,
+    title: 'Descrie Cuvântul',
+    text: 'Un erou din breaslă descrie cuvântul afișat FĂRĂ a folosi cuvântul în sine sau derivate ale acestuia.',
   },
   {
-    icon: 'timer' as const,
+    icon: 'timer-sand' as const,
     title: 'Contra Cronometru',
-    text: 'Aveți un timp limitat pentru a ghici cât mai multe cuvinte. Fiecare cuvânt ghicit corect = 1 punct.',
+    text: 'Aveți un timp limitat pentru misiune. Fiecare cuvânt ghicit corect = 1 punct de experiență.',
   },
   {
-    icon: 'skip-next' as const,
-    title: 'Poți Sări',
-    text: 'Dacă nu poți explica un cuvânt, îl poți sări. Atenție: saritul poate fi penalizat cu -1 punct!',
+    icon: 'run-fast' as const,
+    title: 'Retragere Tactică',
+    text: 'Dacă nu poți explica un cuvânt, te poți retrage. Atenție: retragerea poate fi penalizată cu -1 punct!',
   },
   {
     icon: 'trophy' as const,
-    title: 'Câștigă!',
-    text: 'Prima echipă care ajunge la scorul stabilit câștigă jocul. De obicei 50 de puncte.',
+    title: 'Devino Campion!',
+    text: 'Prima breaslă care ajunge la experiența stabilită câștigă aventura. De obicei 50 de puncte.',
   },
   {
-    icon: 'close-circle' as const,
+    icon: 'sword-cross' as const,
     title: 'Reguli Interzise',
     text: 'Nu poți: folosi cuvântul sau părți din el, gesticula, indica obiecte din cameră, spune "rimează cu..."',
   },
@@ -46,14 +46,14 @@ const RULES = [
 
 export const RulesScreen = ({ navigation }: any) => {
   return (
-    <LinearGradient colors={['#0F0C29', '#302B63', '#24243E']} style={styles.container}>
+    <LinearGradient colors={[...COLORS.gradientTable]} style={styles.container}>
       <StatusBar barStyle="light-content" />
 
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.gold} />
         </TouchableOpacity>
-        <Text style={styles.title}>Reguli</Text>
+        <Text style={styles.title}>Codul Eroilor</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -72,7 +72,7 @@ export const RulesScreen = ({ navigation }: any) => {
                 <MaterialCommunityIcons
                   name={rule.icon}
                   size={22}
-                  color={COLORS.primary}
+                  color={COLORS.gold}
                 />
                 <Text style={styles.ruleTitle}>{rule.title}</Text>
               </View>
@@ -101,14 +101,16 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(212,168,83,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(212,168,83,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   title: {
     fontSize: SIZES.xl,
-    fontWeight: '800',
-    color: COLORS.text,
+    fontFamily: FONTS.displayBlack,
+    color: COLORS.gold,
   },
   scroll: {
     flex: 1,
@@ -119,26 +121,26 @@ const styles = StyleSheet.create({
   },
   ruleCard: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: SIZES.radius,
+    backgroundColor: 'rgba(212,168,83,0.04)',
+    borderRadius: SIZES.cardRadius,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(212,168,83,0.1)',
   },
   ruleNumber: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.goldDim,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
     marginTop: 2,
   },
   ruleNumberText: {
-    color: COLORS.text,
-    fontWeight: '800',
+    color: COLORS.parchment,
+    fontFamily: FONTS.bodyBlack,
     fontSize: SIZES.md,
   },
   ruleContent: {
@@ -152,11 +154,12 @@ const styles = StyleSheet.create({
   },
   ruleTitle: {
     fontSize: SIZES.lg,
-    fontWeight: '700',
+    fontFamily: FONTS.display,
     color: COLORS.text,
   },
   ruleText: {
     fontSize: SIZES.md,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
     lineHeight: 20,
   },
