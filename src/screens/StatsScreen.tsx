@@ -12,6 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useStats, GameRecord } from '../hooks/useStats';
+import { useI18n } from '../i18n/I18nContext';
 
 const StatCard = ({
   icon,
@@ -33,51 +34,52 @@ const StatCard = ({
   </View>
 );
 
-const GameHistoryItem = ({ game, index }: { game: GameRecord; index: number }) => {
-  const date = new Date(game.date);
-  const dateStr = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1)
-    .toString()
-    .padStart(2, '0')}.${date.getFullYear()}`;
-
-  return (
-    <View style={styles.historyItem}>
-      <View style={styles.historyLeft}>
-        <View style={styles.historyIndexWrap}>
-          <Text style={styles.historyIndex}>#{index + 1}</Text>
-        </View>
-        <View>
-          <View style={styles.historyWinnerRow}>
-            <MaterialCommunityIcons name="crown" size={14} color={COLORS.gold} />
-            <Text style={styles.historyWinner}>{game.winner}</Text>
-            <Text style={styles.historyWinnerScore}>{game.winnerScore}p</Text>
-          </View>
-          <Text style={styles.historyDate}>{dateStr}</Text>
-        </View>
-      </View>
-      <View style={styles.historyRight}>
-        <Text style={styles.historyDetail}>
-          <Text style={{ color: COLORS.correct }}>{game.totalWordsGuessed}</Text>
-          {' / '}
-          <Text style={{ color: COLORS.skip }}>{game.totalWordsSkipped}</Text>
-        </Text>
-        <Text style={styles.historyRounds}>{game.totalRounds} misiuni</Text>
-      </View>
-    </View>
-  );
-};
-
 export const StatsScreen = ({ navigation }: any) => {
   const { stats, resetStats } = useStats();
+  const { t } = useI18n();
   const [tab, setTab] = useState<'overview' | 'history' | 'leaders'>('overview');
+
+  const GameHistoryItem = ({ game, index }: { game: GameRecord; index: number }) => {
+    const date = new Date(game.date);
+    const dateStr = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}.${date.getFullYear()}`;
+
+    return (
+      <View style={styles.historyItem}>
+        <View style={styles.historyLeft}>
+          <View style={styles.historyIndexWrap}>
+            <Text style={styles.historyIndex}>#{index + 1}</Text>
+          </View>
+          <View>
+            <View style={styles.historyWinnerRow}>
+              <MaterialCommunityIcons name="crown" size={14} color={COLORS.gold} />
+              <Text style={styles.historyWinner}>{game.winner}</Text>
+              <Text style={styles.historyWinnerScore}>{game.winnerScore}p</Text>
+            </View>
+            <Text style={styles.historyDate}>{dateStr}</Text>
+          </View>
+        </View>
+        <View style={styles.historyRight}>
+          <Text style={styles.historyDetail}>
+            <Text style={{ color: COLORS.correct }}>{game.totalWordsGuessed}</Text>
+            {' / '}
+            <Text style={{ color: COLORS.skip }}>{game.totalWordsSkipped}</Text>
+          </Text>
+          <Text style={styles.historyRounds}>{game.totalRounds} {t.rounds}</Text>
+        </View>
+      </View>
+    );
+  };
 
   const handleReset = () => {
     Alert.alert(
-      'Sterge Cronicile',
-      'Ești sigur că vrei să ștergi toate cronicile? Această acțiune nu poate fi anulată.',
+      t.deleteChronicles,
+      t.deleteConfirm,
       [
-        { text: 'Anulează', style: 'cancel' },
+        { text: t.cancel, style: 'cancel' },
         {
-          text: 'Șterge',
+          text: t.reset,
           style: 'destructive',
           onPress: resetStats,
         },
@@ -99,9 +101,9 @@ export const StatsScreen = ({ navigation }: any) => {
       : 0;
 
   const tabConfig = [
-    { key: 'overview' as const, label: 'Rezumat', icon: 'book-open-variant' },
-    { key: 'history' as const, label: 'Bătălii', icon: 'sword-cross' },
-    { key: 'leaders' as const, label: 'Sala Faimei', icon: 'trophy' },
+    { key: 'overview' as const, label: t.tabSummary, icon: 'book-open-variant' },
+    { key: 'history' as const, label: t.tabBattles, icon: 'sword-cross' },
+    { key: 'leaders' as const, label: t.tabHallOfFame, icon: 'trophy' },
   ];
 
   return (
@@ -112,7 +114,7 @@ export const StatsScreen = ({ navigation }: any) => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <MaterialCommunityIcons name="arrow-left" size={22} color={COLORS.gold} />
         </TouchableOpacity>
-        <Text style={styles.title}>Cronici</Text>
+        <Text style={styles.title}>{t.chroniclesTitle}</Text>
         <TouchableOpacity onPress={handleReset} style={styles.resetBtn}>
           <MaterialCommunityIcons name="delete-outline" size={20} color={COLORS.textSecondary} />
         </TouchableOpacity>
@@ -120,21 +122,21 @@ export const StatsScreen = ({ navigation }: any) => {
 
       {/* Tabs */}
       <View style={styles.tabRow}>
-        {tabConfig.map((t) => (
+        {tabConfig.map((tc) => (
           <TouchableOpacity
-            key={t.key}
-            style={[styles.tab, tab === t.key && styles.tabActive]}
-            onPress={() => setTab(t.key)}
+            key={tc.key}
+            style={[styles.tab, tab === tc.key && styles.tabActive]}
+            onPress={() => setTab(tc.key)}
             activeOpacity={0.7}
           >
             <MaterialCommunityIcons
-              name={t.icon as any}
+              name={tc.icon as any}
               size={14}
-              color={tab === t.key ? COLORS.gold : COLORS.textSecondary}
+              color={tab === tc.key ? COLORS.gold : COLORS.textSecondary}
               style={{ marginRight: 5 }}
             />
-            <Text style={[styles.tabText, tab === t.key && styles.tabTextActive]}>
-              {t.label}
+            <Text style={[styles.tabText, tab === tc.key && styles.tabTextActive]}>
+              {tc.label}
             </Text>
           </TouchableOpacity>
         ))}
@@ -150,37 +152,37 @@ export const StatsScreen = ({ navigation }: any) => {
             <View style={styles.statGrid}>
               <StatCard
                 icon="sword"
-                label="Aventuri"
+                label={t.adventures}
                 value={stats.gamesPlayed}
                 color={COLORS.gold}
               />
               <StatCard
                 icon="shield-check"
-                label="Cucerite"
+                label={t.conqueredStat}
                 value={stats.totalWordsGuessed}
                 color={COLORS.correct}
               />
               <StatCard
                 icon="shield-off"
-                label="Retrase"
+                label={t.retreatedStat}
                 value={stats.totalWordsSkipped}
                 color={COLORS.skip}
               />
               <StatCard
                 icon="map-marker-path"
-                label="Misiuni"
+                label={t.missions}
                 value={stats.totalRoundsPlayed}
                 color={COLORS.warning}
               />
               <StatCard
                 icon="trending-up"
-                label="Media / Misiune"
+                label={t.avgPerMission}
                 value={stats.averageWordsPerRound}
                 color={COLORS.goldBright}
               />
               <StatCard
                 icon="percent"
-                label="Rata Cucerire"
+                label={t.conquestRate}
                 value={`${guessRate}%`}
                 color={COLORS.correctGlow}
               />
@@ -192,9 +194,9 @@ export const StatsScreen = ({ navigation }: any) => {
                   <MaterialCommunityIcons name="star-four-points" size={26} color={COLORS.goldBright} />
                 </View>
                 <View style={styles.bestRoundText}>
-                  <Text style={styles.bestRoundTitle}>Cea Mai Glorioasă Misiune</Text>
+                  <Text style={styles.bestRoundTitle}>{t.mostGloriousMission}</Text>
                   <Text style={styles.bestRoundValue}>
-                    {stats.bestRoundScore} puncte
+                    {stats.bestRoundScore} {t.exp}
                   </Text>
                 </View>
               </View>
@@ -211,9 +213,9 @@ export const StatsScreen = ({ navigation }: any) => {
                   size={64}
                   color={COLORS.goldDim}
                 />
-                <Text style={styles.emptyText}>Nicio aventură încă</Text>
+                <Text style={styles.emptyText}>{t.noAdventuresYet}</Text>
                 <Text style={styles.emptySubtext}>
-                  Pornește prima aventură pentru a scrie cronicile
+                  {t.noAdventuresDesc}
                 </Text>
               </View>
             ) : (
@@ -233,9 +235,9 @@ export const StatsScreen = ({ navigation }: any) => {
                   size={64}
                   color={COLORS.goldDim}
                 />
-                <Text style={styles.emptyText}>Niciun campion încă</Text>
+                <Text style={styles.emptyText}>{t.noChampionYet}</Text>
                 <Text style={styles.emptySubtext}>
-                  Termină o aventură pentru a intra în Sala Faimei
+                  {t.noChampionDesc}
                 </Text>
               </View>
             ) : (
@@ -265,7 +267,7 @@ export const StatsScreen = ({ navigation }: any) => {
                   <View style={styles.leaderRight}>
                     <Text style={styles.leaderWins}>{wins}</Text>
                     <Text style={styles.leaderWinsLabel}>
-                      {wins === 1 ? 'victorie' : 'victorii'}
+                      {wins === 1 ? t.victoryStat : t.victoriesStat}
                     </Text>
                   </View>
                 </View>

@@ -14,19 +14,22 @@ import { CATEGORIES } from '../data/categories';
 import { ALL_CATEGORIES } from '../data/words';
 import { useGame } from '../hooks/GameContext';
 import { CategoryId, Difficulty } from '../types';
+import { useI18n } from '../i18n/I18nContext';
 
 const ROUND_DURATIONS = [30, 45, 60, 90, 120];
 const WINNING_SCORES = [25, 50, 75, 100];
 const TEAM_COUNTS = [2, 3, 4];
-const DIFFICULTIES: { id: Difficulty | 'all'; label: string; icon: string }[] = [
-  { id: 'easy', label: 'Ușor', icon: 'shield-outline' },
-  { id: 'medium', label: 'Mediu', icon: 'shield-half-full' },
-  { id: 'hard', label: 'Greu', icon: 'shield' },
-  { id: 'all', label: 'Toate', icon: 'sword-cross' },
-];
 
 export const SettingsScreen = ({ navigation }: any) => {
   const { settings, updateSettings } = useGame();
+  const { t } = useI18n();
+
+  const DIFFICULTIES: { id: Difficulty | 'all'; label: string; icon: string }[] = [
+    { id: 'easy', label: t.difficultyEasy, icon: 'shield-outline' },
+    { id: 'medium', label: t.difficultyMedium, icon: 'shield-half-full' },
+    { id: 'hard', label: t.difficultyHard, icon: 'shield' },
+    { id: 'all', label: t.difficultyAll, icon: 'sword-cross' },
+  ];
 
   const allSelected = settings.selectedCategories.length === ALL_CATEGORIES.length;
 
@@ -57,7 +60,7 @@ export const SettingsScreen = ({ navigation }: any) => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.gold} />
         </TouchableOpacity>
-        <Text style={styles.title}>Pregătire de Luptă</Text>
+        <Text style={styles.title}>{t.battlePrep}</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -69,7 +72,7 @@ export const SettingsScreen = ({ navigation }: any) => {
         {/* Round Duration */}
         <View style={styles.sectionHeader}>
           <MaterialCommunityIcons name="timer-sand" size={18} color={COLORS.gold} />
-          <Text style={styles.sectionTitle}>Durata Misiunii (secunde)</Text>
+          <Text style={styles.sectionTitle}>{t.missionDuration}</Text>
         </View>
         <View style={styles.optionRow}>
           {ROUND_DURATIONS.map((d) => (
@@ -96,7 +99,7 @@ export const SettingsScreen = ({ navigation }: any) => {
         {/* Winning Score */}
         <View style={styles.sectionHeader}>
           <MaterialCommunityIcons name="star-four-points" size={18} color={COLORS.gold} />
-          <Text style={styles.sectionTitle}>Experiență pentru Victorie</Text>
+          <Text style={styles.sectionTitle}>{t.xpForVictory}</Text>
         </View>
         <View style={styles.optionRow}>
           {WINNING_SCORES.map((s) => (
@@ -123,7 +126,7 @@ export const SettingsScreen = ({ navigation }: any) => {
         {/* Number of Teams */}
         <View style={styles.sectionHeader}>
           <MaterialCommunityIcons name="shield-account" size={18} color={COLORS.gold} />
-          <Text style={styles.sectionTitle}>Număr de Bresle</Text>
+          <Text style={styles.sectionTitle}>{t.numberOfGuilds}</Text>
         </View>
         <View style={styles.optionRow}>
           {TEAM_COUNTS.map((n) => (
@@ -150,7 +153,7 @@ export const SettingsScreen = ({ navigation }: any) => {
         {/* Difficulty */}
         <View style={styles.sectionHeader}>
           <MaterialCommunityIcons name="sword" size={18} color={COLORS.gold} />
-          <Text style={styles.sectionTitle}>Dificultate</Text>
+          <Text style={styles.sectionTitle}>{t.difficulty}</Text>
         </View>
         <View style={styles.optionRow}>
           {DIFFICULTIES.map((d) => (
@@ -188,9 +191,9 @@ export const SettingsScreen = ({ navigation }: any) => {
           <View style={styles.toggleInfo}>
             <View style={styles.sectionHeader}>
               <MaterialCommunityIcons name="run-fast" size={18} color={COLORS.gold} />
-              <Text style={styles.sectionTitle}>Penalizare la Retragere</Text>
+              <Text style={styles.sectionTitle}>{t.retreatPenalty}</Text>
             </View>
-            <Text style={styles.toggleDesc}>-1 punct pentru fiecare cuvânt sărit</Text>
+            <Text style={styles.toggleDesc}>{t.retreatPenaltyDesc}</Text>
           </View>
           <View
             style={[
@@ -210,7 +213,7 @@ export const SettingsScreen = ({ navigation }: any) => {
         {/* Categories */}
         <View style={styles.sectionHeader}>
           <MaterialCommunityIcons name="map-legend" size={18} color={COLORS.gold} />
-          <Text style={styles.sectionTitle}>Tărâmuri</Text>
+          <Text style={styles.sectionTitle}>{t.realms}</Text>
         </View>
         <View style={styles.categoryGrid}>
           <TouchableOpacity
@@ -232,7 +235,7 @@ export const SettingsScreen = ({ navigation }: any) => {
                 allSelected && styles.allChipText,
               ]}
             >
-              Toate
+              {t.allRealms}
             </Text>
           </TouchableOpacity>
           {CATEGORIES.map((cat) => {
@@ -257,7 +260,7 @@ export const SettingsScreen = ({ navigation }: any) => {
                     isSelected && styles.categoryTextActive,
                   ]}
                 >
-                  {cat.name}
+                  {t.categoryNames[cat.id]}
                 </Text>
               </TouchableOpacity>
             );
@@ -272,7 +275,7 @@ export const SettingsScreen = ({ navigation }: any) => {
           onPress={() => navigation.navigate('TeamSetup')}
           activeOpacity={0.8}
         >
-          <Text style={styles.startButtonText}>Înainte!</Text>
+          <Text style={styles.startButtonText}>{t.forward}</Text>
           <MaterialCommunityIcons name="sword" size={24} color={COLORS.ink} />
         </TouchableOpacity>
       </View>

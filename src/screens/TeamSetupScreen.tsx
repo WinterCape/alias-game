@@ -11,8 +11,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useGame } from '../hooks/GameContext';
+import { useI18n } from '../i18n/I18nContext';
 
-const DEFAULT_NAMES = ['Dragonii', 'Vulturii', 'Lupii', 'Corbii'];
 const TEAM_ICONS: Array<'shield' | 'bird' | 'paw' | 'feather'> = [
   'shield',
   'bird',
@@ -22,8 +22,9 @@ const TEAM_ICONS: Array<'shield' | 'bird' | 'paw' | 'feather'> = [
 
 export const TeamSetupScreen = ({ navigation }: any) => {
   const { settings, initializeTeams } = useGame();
+  const { t } = useI18n();
   const [teamNames, setTeamNames] = useState<string[]>(
-    Array.from({ length: settings.numberOfTeams }, (_, i) => DEFAULT_NAMES[i] || `Breaslă ${i + 1}`)
+    Array.from({ length: settings.numberOfTeams }, (_, i) => t.defaultTeams[i] || `${t.guilds} ${i + 1}`)
   );
 
   const handleStart = () => {
@@ -39,12 +40,12 @@ export const TeamSetupScreen = ({ navigation }: any) => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.gold} />
         </TouchableOpacity>
-        <Text style={styles.title}>Bresle</Text>
+        <Text style={styles.title}>{t.guilds}</Text>
         <View style={{ width: 40 }} />
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.subtitle}>Alege numele breslelor tale</Text>
+        <Text style={styles.subtitle}>{t.chooseGuildNames}</Text>
 
         {teamNames.map((name, index) => {
           const teamColor = COLORS.teamColors[index] || COLORS.gold;
@@ -86,7 +87,7 @@ export const TeamSetupScreen = ({ navigation }: any) => {
           activeOpacity={0.8}
         >
           <MaterialCommunityIcons name="sword-cross" size={28} color={COLORS.parchment} />
-          <Text style={styles.startButtonText}>Începe Aventura!</Text>
+          <Text style={styles.startButtonText}>{t.startAdventure}</Text>
         </TouchableOpacity>
       </View>
     </LinearGradient>

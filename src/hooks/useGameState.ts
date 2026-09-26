@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GameSettings, Team, RoundResult, CategoryId } from '../types';
 import { getShuffledWords, ALL_CATEGORIES } from '../data/words';
+import { Language } from '../i18n/strings';
 
 const SETTINGS_KEY = '@alias_game_settings';
 
@@ -14,10 +15,12 @@ const DEFAULT_SETTINGS: GameSettings = {
   skipPenalty: true,
 };
 
-const DEFAULT_TEAM_NAMES = ['Dragonii', 'Vulturii', 'Lupii', 'Corbii'];
+import { getStrings } from '../i18n/strings';
+
 const TEAM_COLORS = ['#D4A853', '#9B2335', '#2D6A4F', '#5E548E'];
 
-export const useGameState = () => {
+export const useGameState = (language: Language = 'ro') => {
+  const defaultTeamNames = getStrings(language).defaultTeams;
   const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
   const [teams, setTeams] = useState<Team[]>([]);
   const [currentTeamIndex, setCurrentTeamIndex] = useState(0);
@@ -46,7 +49,7 @@ export const useGameState = () => {
     for (let i = 0; i < settings.numberOfTeams; i++) {
       newTeams.push({
         id: i,
-        name: teamNames?.[i] || DEFAULT_TEAM_NAMES[i],
+        name: teamNames?.[i] || defaultTeamNames[i],
         score: 0,
         color: TEAM_COLORS[i],
       });
@@ -57,23 +60,23 @@ export const useGameState = () => {
   }, [settings.numberOfTeams]);
 
   const startNewRound = useCallback(() => {
-    const shuffled = getShuffledWords(settings.selectedCategories, settings.difficulty);
+    const shuffled = getShuffledWords(settings.selectedCategories, settings.difficulty, language);
     setWords(shuffled);
     setCurrentWordIndex(0);
     guessedWordsRef.current = [];
     skippedWordsRef.current = [];
-  }, [settings.selectedCategories, settings.difficulty]);
+  }, [settings.selectedCategories, settings.difficulty, language]);
 
   const getCurrentWord = useCallback((): string => {
     if (currentWordIndex < words.length) {
       return words[currentWordIndex];
     }
     // Reshuffle if we run out
-    const shuffled = getShuffledWords(settings.selectedCategories, settings.difficulty);
+    const shuffled = getShuffledWords(settings.selectedCategories, settings.difficulty, language);
     setWords(shuffled);
     setCurrentWordIndex(0);
     return shuffled[0];
-  }, [currentWordIndex, words, settings.selectedCategories, settings.difficulty]);
+  }, [currentWordIndex, words, settings.selectedCategories, settings.difficulty, language]);
 
   const markCorrect = useCallback(() => {
     const word = words[currentWordIndex];
