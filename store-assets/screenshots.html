@@ -1,0 +1,270 @@
+<title>Alias Quest Screenshots</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:wght@700;900&family=Nunito:wght@400;700;900&display=swap">
+<style>
+  :root {
+    --bg: #0D0A1A; --bg-mid: #161230;
+    --parchment: #F2E4C9; --parchment-dark: #DDD0B0; --parchment-edge: #C4B48A;
+    --ink: #2C1810; --ink-soft: #5C4033;
+    --gold: #D4A853; --gold-bright: #F0C75E; --gold-dim: #8B6914;
+    --correct: #2D6A4F; --correct-glow: #40916C;
+    --skip: #9B2335;
+    --text: #F2E4C9; --text-sec: #A89B80;
+    color-scheme: dark;
+  }
+  body { background: #06040E; color: var(--text); font-family: 'Nunito', sans-serif; margin: 0; padding: 0; }
+  .page { max-width: 1400px; margin: 0 auto; padding: 32px 16px 60px; }
+  .page h1 { font-family: 'Alegreya', serif; font-weight: 900; font-size: 28px; color: var(--gold); text-align: center; margin: 0 0 4px; }
+  .page p { text-align: center; color: var(--text-sec); font-size: 13px; margin: 0 0 32px; }
+  .row { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+
+  /* Phone: 1290x2796 for 6.7" iPhone, we scale to 390x844 */
+  .phone { width: 390px; height: 844px; border-radius: 44px; overflow: hidden; position: relative; box-shadow: 0 0 0 3px #222, 0 20px 60px rgba(0,0,0,0.6); flex-shrink: 0; }
+  .bg { position: absolute; inset: 0; background: linear-gradient(170deg, var(--bg) 0%, var(--bg-mid) 50%, var(--bg) 100%); }
+  .bg::before { content:''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 20%, rgba(212,168,83,0.04) 0%, transparent 60%); }
+  .sc { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; padding: 54px 22px 34px; box-sizing: border-box; }
+  .lbl { font-family: 'Alegreya', serif; font-weight: 700; font-size: 12px; color: var(--gold); text-align: center; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px; }
+
+  /* Components */
+  .shield { width: 100px; height: 110px; border: 2px solid var(--gold); border-radius: 6px 6px 50px 50px; background: rgba(212,168,83,0.06); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+  .shield-a { font-family: 'Alegreya', serif; font-weight: 900; font-size: 54px; color: var(--gold); margin-top: -4px; }
+  .title { font-family: 'Alegreya', serif; font-weight: 900; font-size: 46px; color: var(--gold); text-align: center; letter-spacing: 8px; }
+  .sub { font-family: 'Alegreya', serif; font-weight: 700; font-size: 18px; color: var(--text-sec); text-align: center; letter-spacing: 14px; }
+  .divider { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 16px 0; }
+  .dline { width: 36px; height: 1px; background: var(--gold-dim); opacity: 0.4; }
+  .dicon { color: var(--gold-dim); font-size: 16px; }
+  .btn-g { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px; border-radius: 12px; background: linear-gradient(90deg, var(--gold-dim), var(--gold), var(--gold-dim)); color: var(--ink); font-weight: 900; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
+  .btn-o { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px; border-radius: 12px; background: rgba(212,168,83,0.04); border: 1px solid rgba(212,168,83,0.2); color: var(--text-sec); font-weight: 700; font-size: 14px; }
+  .btns { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
+
+  /* Game */
+  .tbar { height: 3px; background: rgba(212,168,83,0.15); border-radius: 2px; margin-bottom: 14px; overflow: hidden; }
+  .tfill { height: 100%; width: 62%; background: linear-gradient(90deg, var(--gold-dim), var(--gold), var(--gold-bright)); }
+  .gh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .guild { font-family: 'Alegreya', serif; font-weight: 700; font-size: 13px; color: var(--gold); display: flex; align-items: center; gap: 6px; }
+  .gdot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+  .tcircle { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; background: rgba(212,168,83,0.08); }
+  .tnum { font-weight: 900; font-size: 20px; color: var(--gold); }
+  .gscore { font-weight: 700; font-size: 13px; }
+  .srow { display: flex; justify-content: space-between; padding: 0 6px; margin-bottom: 2px; }
+  .sl { font-weight: 900; font-size: 9px; letter-spacing: 2px; color: var(--skip); opacity: 0.5; }
+  .sr { font-weight: 900; font-size: 9px; letter-spacing: 2px; color: var(--correct-glow); opacity: 0.5; }
+  .carea { flex: 1; display: flex; align-items: center; justify-content: center; }
+  .pcard { width: 100%; min-height: 200px; position: relative; display: flex; align-items: center; justify-content: center; padding: 44px 20px; box-sizing: border-box; background: linear-gradient(180deg, #F5E6C8, #E8D5A8, #DDD0B0); border-radius: 10px; border: 2px solid var(--parchment-edge); box-shadow: 0 8px 28px rgba(0,0,0,0.45); }
+  .co { position: absolute; width: 18px; height: 18px; }
+  .co.tl { top: 8px; left: 8px; border-top: 2px solid var(--gold-dim); border-left: 2px solid var(--gold-dim); }
+  .co.tr { top: 8px; right: 8px; border-top: 2px solid var(--gold-dim); border-right: 2px solid var(--gold-dim); }
+  .co.bl { bottom: 8px; left: 8px; border-bottom: 2px solid var(--gold-dim); border-left: 2px solid var(--gold-dim); }
+  .co.br { bottom: 8px; right: 8px; border-bottom: 2px solid var(--gold-dim); border-right: 2px solid var(--gold-dim); }
+  .cline { position: absolute; left: 14px; right: 14px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dim), var(--gold), var(--gold-dim), transparent); opacity: 0.3; }
+  .cline.t { top: 18px; } .cline.b { bottom: 18px; }
+  .cword { font-family: 'Alegreya', serif; font-weight: 900; font-size: 36px; color: var(--ink); text-align: center; }
+  .gacts { display: flex; gap: 12px; margin-top: auto; }
+  .abtn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 16px 0; border-radius: 12px; font-weight: 900; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--parchment); }
+  .askip { background: linear-gradient(135deg, #5C1A24, var(--skip)); }
+  .acorr { background: linear-gradient(135deg, #1B4332, var(--correct)); }
+  .aicon { font-size: 28px; }
+
+  /* Settings */
+  .stitle { font-family: 'Alegreya', serif; font-weight: 900; font-size: 20px; color: var(--gold); text-align: center; margin-bottom: 14px; }
+  .slbl { font-family: 'Alegreya', serif; font-weight: 700; font-size: 12px; letter-spacing: 0.12em; color: var(--gold); text-transform: uppercase; margin: 12px 0 8px; display: flex; align-items: center; gap: 6px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { padding: 8px 14px; border-radius: 8px; background: rgba(212,168,83,0.04); border: 1px solid rgba(212,168,83,0.12); font-size: 12px; color: var(--text-sec); font-weight: 700; }
+  .chip.on { background: rgba(212,168,83,0.12); border-color: var(--gold); color: var(--gold); }
+  .chip.all { border-color: var(--gold-bright); background: rgba(212,168,83,0.18); color: var(--gold-bright); font-weight: 900; }
+
+  /* Stats */
+  .tabs { display: flex; background: rgba(212,168,83,0.06); border-radius: 10px; padding: 3px; margin-bottom: 16px; }
+  .tab { flex: 1; text-align: center; padding: 9px; border-radius: 8px; font-size: 12px; font-weight: 700; color: var(--text-sec); }
+  .tab.on { background: rgba(212,168,83,0.15); color: var(--gold); border: 1px solid rgba(212,168,83,0.3); }
+  .sgrid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .scard { width: calc(50% - 5px); background: rgba(212,168,83,0.04); border-radius: 12px; padding: 14px; border: 1px solid rgba(212,168,83,0.1); box-sizing: border-box; }
+  .scard-icon { width: 32px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; font-size: 16px; }
+  .scard-val { font-family: 'Alegreya', serif; font-weight: 900; font-size: 28px; color: var(--text); }
+  .scard-lbl { font-size: 10px; color: var(--text-sec); font-weight: 700; }
+
+  /* Winner */
+  .wcenter { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .trophy { font-size: 72px; margin-bottom: 12px; }
+  .wtext { font-family: 'Alegreya', serif; font-weight: 700; font-size: 18px; color: var(--text-sec); }
+  .wname { font-family: 'Alegreya', serif; font-weight: 900; font-size: 36px; color: var(--gold); margin: 4px 0; }
+  .wscore { font-weight: 900; font-size: 20px; color: var(--text); }
+  .standings { background: rgba(212,168,83,0.04); border-radius: 12px; padding: 14px; margin: 20px 0; border: 1px solid rgba(212,168,83,0.1); }
+  .stitle2 { font-size: 10px; color: var(--text-sec); font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px; }
+  .srow2 { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(212,168,83,0.06); }
+  .srow2:last-child { border: none; }
+  .sleft { display: flex; align-items: center; gap: 8px; }
+  .sdot { width: 8px; height: 8px; border-radius: 50%; }
+  .sname { font-weight: 700; font-size: 14px; }
+  .sscore { font-family: 'Alegreya', serif; font-weight: 900; font-size: 18px; }
+
+  @media (max-width: 500px) { .phone { width: 320px; height: 693px; } .row { gap: 16px; } }
+</style>
+
+<div class="page">
+  <h1>Alias Quest — Store Screenshots</h1>
+  <p>Save each phone frame as a 1290×2796 screenshot for App Store / 1080×2340 for Google Play</p>
+
+  <div class="row">
+    <!-- 1. HOME -->
+    <div>
+      <div class="lbl">1 — Home</div>
+      <div class="phone">
+        <div class="bg"></div>
+        <div class="sc">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div class="shield"><span class="shield-a">A</span></div>
+            <div class="title">ALIAS</div>
+            <div class="sub">QUEST</div>
+            <div class="divider"><div class="dline"></div><span class="dicon">⚔</span><div class="dline"></div></div>
+          </div>
+          <div class="btns">
+            <div class="btn-g">⚔ Aventură Nouă</div>
+            <div class="btn-o">📜 Codul Eroilor</div>
+            <div class="btn-o">🏆 Cronici</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. GAME -->
+    <div>
+      <div class="lbl">2 — Game</div>
+      <div class="phone">
+        <div class="bg"></div>
+        <div class="sc">
+          <div class="tbar"><div class="tfill"></div></div>
+          <div class="gh">
+            <div class="guild"><span class="gdot"></span> Dragonii</div>
+            <div class="tcircle"><span class="tnum">42</span></div>
+            <div class="gscore"><span style="color:var(--correct-glow)">+5</span>&ensp;<span style="color:var(--skip)">-1</span></div>
+          </div>
+          <div class="srow"><span class="sl">🛡 RETRAGERE</span><span class="sr">VICTORIE ⚔</span></div>
+          <div class="carea">
+            <div class="pcard">
+              <div class="co tl"></div><div class="co tr"></div><div class="co bl"></div><div class="co br"></div>
+              <div class="cline t"></div><div class="cline b"></div>
+              <div class="cword">Cascadă</div>
+            </div>
+          </div>
+          <div class="gacts">
+            <div class="abtn askip"><span class="aicon">✖</span>Retragere</div>
+            <div class="abtn acorr"><span class="aicon">✔</span>Victorie</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. SETTINGS -->
+    <div>
+      <div class="lbl">3 — Settings</div>
+      <div class="phone">
+        <div class="bg"></div>
+        <div class="sc">
+          <div class="stitle">Pregătire de Luptă</div>
+          <div style="flex:1;overflow-y:auto">
+            <div class="slbl">⏳ Durata Misiunii</div>
+            <div class="chips"><div class="chip">30s</div><div class="chip on">60s</div><div class="chip">90s</div><div class="chip">120s</div></div>
+            <div class="slbl">⭐ Experiență pt Victorie</div>
+            <div class="chips"><div class="chip">25</div><div class="chip on">50</div><div class="chip">75</div><div class="chip">100</div></div>
+            <div class="slbl">⚔ Dificultate</div>
+            <div class="chips"><div class="chip">Ușor</div><div class="chip on">Mediu</div><div class="chip">Greu</div><div class="chip">Toate</div></div>
+            <div class="slbl">🗺 Tărâmuri</div>
+            <div class="chips">
+              <div class="chip all">🌍 Toate</div>
+              <div class="chip on">⭐ General</div><div class="chip on">🐾 Animale</div><div class="chip on">🍴 Mâncare</div>
+              <div class="chip on">⚽ Sporturi</div><div class="chip on">💼 Profesii</div><div class="chip on">🌳 Natură</div>
+              <div class="chip on">💻 Tech</div><div class="chip on">🎬 Filme</div><div class="chip on">🎶 Muzică</div>
+              <div class="chip on">🏰 Istorie</div><div class="chip on">🌎 Geografie</div><div class="chip on">🏫 Școală</div>
+            </div>
+          </div>
+          <div class="btn-g" style="margin-top:12px">⚔ Înainte!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:32px">
+    <!-- 4. STATS -->
+    <div>
+      <div class="lbl">4 — Statistics</div>
+      <div class="phone">
+        <div class="bg"></div>
+        <div class="sc">
+          <div class="stitle">Cronici</div>
+          <div class="tabs">
+            <div class="tab on">Rezumat</div>
+            <div class="tab">Bătălii</div>
+            <div class="tab">Sala Faimei</div>
+          </div>
+          <div class="sgrid">
+            <div class="scard">
+              <div class="scard-icon" style="background:rgba(212,168,83,0.12)">⚔</div>
+              <div class="scard-val">24</div>
+              <div class="scard-lbl">AVENTURI</div>
+            </div>
+            <div class="scard">
+              <div class="scard-icon" style="background:rgba(45,106,79,0.15)">🛡</div>
+              <div class="scard-val">347</div>
+              <div class="scard-lbl">CUCERITE</div>
+            </div>
+            <div class="scard">
+              <div class="scard-icon" style="background:rgba(155,35,53,0.12)">🏴</div>
+              <div class="scard-val">89</div>
+              <div class="scard-lbl">RETRASE</div>
+            </div>
+            <div class="scard">
+              <div class="scard-icon" style="background:rgba(212,168,83,0.12)">🗺</div>
+              <div class="scard-val">72</div>
+              <div class="scard-lbl">MISIUNI</div>
+            </div>
+            <div class="scard">
+              <div class="scard-icon" style="background:rgba(84,160,255,0.12)">📈</div>
+              <div class="scard-val">5</div>
+              <div class="scard-lbl">MEDIA / MISIUNE</div>
+            </div>
+            <div class="scard">
+              <div class="scard-icon" style="background:rgba(64,145,108,0.12)">📊</div>
+              <div class="scard-val">80%</div>
+              <div class="scard-lbl">RATA CUCERIRE</div>
+            </div>
+          </div>
+          <div class="standings" style="margin-top:16px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <span style="font-size:18px">⭐</span>
+              <div><div style="font-size:11px;color:var(--text-sec);font-weight:700">Cea Mai Glorioasă Misiune</div>
+              <div style="font-family:'Alegreya',serif;font-weight:900;font-size:22px;color:#FFD700">12 exp</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. GAME OVER -->
+    <div>
+      <div class="lbl">5 — Game Over</div>
+      <div class="phone">
+        <div class="bg"></div>
+        <div class="sc">
+          <div class="wcenter">
+            <div class="trophy">🏆</div>
+            <div class="wtext">Felicitări, Campion!</div>
+            <div class="wname">Dragonii</div>
+            <div class="wscore">52 exp</div>
+          </div>
+          <div class="standings">
+            <div class="stitle2">Sala Faimei</div>
+            <div class="srow2">
+              <div class="sleft"><span style="font-size:16px">🏆</span><div class="sdot" style="background:#D4A853"></div><span class="sname" style="color:var(--text)">Dragonii</span></div>
+              <span class="sscore" style="color:#D4A853">52</span>
+            </div>
+            <div class="srow2">
+              <div class="sleft"><span style="font-size:16px">🥈</span><div class="sdot" style="background:#9B2335"></div><span class="sname" style="color:var(--text)">Vulturii</span></div>
+              <span class="sscore" style="color:#9B2335">41</span>
+            </div>
+          </div>
+          <div class="btn-g" style="margin-top:auto">⚔ Aventură Nouă</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
