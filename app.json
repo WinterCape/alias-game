@@ -13,10 +13,15 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.aliasgame.ro",
+      "bundleIdentifier": "com.aliasquest.app",
       "buildNumber": "1",
       "infoPlist": {
-        "CFBundleDisplayName": "Alias Quest"
+        "CFBundleDisplayName": "Alias Quest",
+        "NSMicrophoneUsageDescription": "This app does not use the microphone.",
+        "UIBackgroundModes": []
+      },
+      "config": {
+        "usesNonExemptEncryption": false
       }
     },
     "android": {
@@ -26,8 +31,9 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.aliasgame.ro",
-      "versionCode": 1
+      "package": "com.aliasquest.app",
+      "versionCode": 1,
+      "permissions": []
     },
     "web": {
       "favicon": "./assets/favicon.png"
