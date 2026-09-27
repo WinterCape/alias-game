@@ -15,12 +15,14 @@ import { useStats } from '../hooks/useStats';
 import { useI18n } from '../i18n/I18nContext';
 import { useReviewPrompt } from '../hooks/useReviewPrompt';
 import { shareGameResults } from '../utils/share';
+import { useAchievements } from '../achievements/AchievementContext';
 
 export const GameOverScreen = ({ route, navigation }: any) => {
   const { resetGame, roundResults } = useGame();
-  const { recordGame } = useStats();
-  const { t } = useI18n();
+  const { recordGame, stats } = useStats();
+  const { lang, t } = useI18n();
   const { recordGamePlayed, showPrompt } = useReviewPrompt();
+  const { checkArenaAchievements } = useAchievements();
   const { teams } = route.params;
   const hasRecorded = useRef(false);
 
@@ -35,6 +37,18 @@ export const GameOverScreen = ({ route, navigation }: any) => {
       hasRecorded.current = true;
       recordGame(teams, roundResults);
       recordGamePlayed();
+
+      const totalGuessed = roundResults.reduce((s: number, r: any) => s + r.guessedWords.length, 0);
+      const totalSkipped = roundResults.reduce((s: number, r: any) => s + r.skippedWords.length, 0);
+      const bestRound = roundResults.reduce((best: any, r: any) => (r.guessedWords.length > best.guessedWords.length ? r : best), roundResults[0]);
+      checkArenaAchievements({
+        gamesPlayed: stats.gamesPlayed + 1,
+        totalWordsGuessed: stats.totalWordsGuessed + totalGuessed,
+        roundGuessed: bestRound?.guessedWords.length || 0,
+        roundSkipped: bestRound?.skippedWords.length || 0,
+        gameSkipped: totalSkipped,
+        language: lang,
+      });
       setTimeout(() => {
         showPrompt({
           title: t.rateTitle,
