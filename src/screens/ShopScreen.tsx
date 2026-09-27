@@ -13,6 +13,8 @@ import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useI18n } from '../i18n/I18nContext';
 import { useStore } from '../store/StoreContext';
 import { PREMIUM_PACKS, ALL_ACCESS_PRICE } from '../store/packs';
+import { useProgression } from '../progression/ProgressionContext';
+import { isPackUnlockedByLevel, getPackUnlockLevel } from '../progression/rewards';
 
 export const ShopScreen = ({ navigation }: any) => {
   const { lang } = useI18n();
@@ -23,6 +25,7 @@ export const ShopScreen = ({ navigation }: any) => {
     restorePurchases,
     hasAllAccess,
   } = useStore();
+  const { level } = useProgression();
 
   return (
     <LinearGradient
@@ -151,11 +154,14 @@ export const ShopScreen = ({ navigation }: any) => {
         {/* Pack List */}
         {PREMIUM_PACKS.map((pack) => {
           const purchased = isPurchased(pack.id);
+          const levelUnlocked = isPackUnlockedByLevel(pack.id, level);
+          const unlockLevel = getPackUnlockLevel(pack.id);
+          const isAvailable = purchased || levelUnlocked;
 
           return (
             <View
               key={pack.id}
-              style={[styles.packCard, purchased && styles.packCardPurchased]}
+              style={[styles.packCard, isAvailable && styles.packCardPurchased]}
             >
               <View style={styles.packRow}>
                 <View
@@ -194,23 +200,43 @@ export const ShopScreen = ({ navigation }: any) => {
                         {lang === 'ro' ? 'Deblocat' : 'Unlocked'}
                       </Text>
                     </View>
+                  ) : levelUnlocked ? (
+                    <View style={styles.levelUnlockedBadge}>
+                      <MaterialCommunityIcons
+                        name="shield-star"
+                        size={14}
+                        color="#fff"
+                      />
+                      <Text style={styles.levelUnlockedText}>
+                        {lang === 'ro' ? `Nivel ${unlockLevel}` : `Lvl ${unlockLevel}`}
+                      </Text>
+                    </View>
                   ) : (
-                    <TouchableOpacity
-                      style={styles.priceButton}
-                      onPress={() => purchasePack(pack.id)}
-                      activeOpacity={0.8}
-                    >
-                      <LinearGradient
-                        colors={['#8B6914', '#D4A853', '#8B6914']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.priceButtonGradient}
+                    <View style={styles.packActionStack}>
+                      <TouchableOpacity
+                        style={styles.priceButton}
+                        onPress={() => purchasePack(pack.id)}
+                        activeOpacity={0.8}
                       >
-                        <Text style={styles.priceButtonText}>
-                          {pack.price}
+                        <LinearGradient
+                          colors={['#8B6914', '#D4A853', '#8B6914']}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                          style={styles.priceButtonGradient}
+                        >
+                          <Text style={styles.priceButtonText}>
+                            {pack.price}
+                          </Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                      {unlockLevel !== null && (
+                        <Text style={styles.orLevelText}>
+                          {lang === 'ro'
+                            ? `sau Nivel ${unlockLevel}`
+                            : `or Level ${unlockLevel}`}
                         </Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
+                      )}
+                    </View>
                   )}
                 </View>
               </View>
@@ -478,6 +504,34 @@ const styles = StyleSheet.create({
     fontSize: SIZES.xs,
     color: '#fff',
     letterSpacing: 0.5,
+  },
+
+  // Level Unlocked Badge
+  levelUnlockedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#2d8a4e',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  levelUnlockedText: {
+    fontFamily: FONTS.bodyBold,
+    fontSize: SIZES.xs,
+    color: '#fff',
+    letterSpacing: 0.5,
+  },
+
+  // Pack action stack (price + "or Level X")
+  packActionStack: {
+    alignItems: 'center',
+  },
+  orLevelText: {
+    fontFamily: FONTS.body,
+    fontSize: 10,
+    color: COLORS.textSecondary,
+    marginTop: 4,
   },
 
   bottomSpacer: {
