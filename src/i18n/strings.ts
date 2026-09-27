@@ -84,6 +84,16 @@ export interface Strings {
   // Categories
   categoryNames: Record<CategoryId, string>;
 
+  // Share
+  shareResults: string;
+  shareText: string;
+
+  // Rate
+  rateTitle: string;
+  rateMessage: string;
+  rateLater: string;
+  rateNow: string;
+
   // Language picker
   language: string;
 }
@@ -175,6 +185,12 @@ export const RO: Strings = {
     emotii: 'Emoții',
     haine: 'Haine',
   },
+  shareResults: 'Distribuie Rezultatul',
+  shareText: '🏆 {winner} a câștigat cu {score} exp în Alias Quest!\n\n⚔️ Descarcă și tu: ',
+  rateTitle: 'Îți place Alias Quest?',
+  rateMessage: 'Dacă te distrezi, lasă-ne o recenzie! Ne ajută enorm.',
+  rateLater: 'Mai târziu',
+  rateNow: 'Recenzie',
   language: 'Limba',
 };
 
@@ -265,6 +281,12 @@ export const EN: Strings = {
     emotii: 'Emotions',
     haine: 'Clothing',
   },
+  shareResults: 'Share Results',
+  shareText: '🏆 {winner} won with {score} xp in Alias Quest!\n\n⚔️ Download it too: ',
+  rateTitle: 'Enjoying Alias Quest?',
+  rateMessage: 'If you\'re having fun, leave us a review! It helps a lot.',
+  rateLater: 'Later',
+  rateNow: 'Rate',
   language: 'Language',
 };
 
