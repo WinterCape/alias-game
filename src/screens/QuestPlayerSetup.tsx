@@ -16,7 +16,7 @@ import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useI18n } from '../i18n/I18nContext';
 
 const PLAYER_COLORS = [
-  '#D4A853',
+  '#4EA8DE',
   '#9B2335',
   '#2D6A4F',
   '#5E548E',
@@ -61,7 +61,7 @@ export const QuestPlayerSetup = ({ navigation, route }: any) => {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.gold} />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.quest} />
           </TouchableOpacity>
           <Text style={styles.title}>{t.players}</Text>
           <View style={{ width: 40 }} />
@@ -89,7 +89,7 @@ export const QuestPlayerSetup = ({ navigation, route }: any) => {
                 onChangeText={setInputValue}
                 onSubmitEditing={handleAddPlayer}
                 returnKeyType="done"
-                selectionColor={COLORS.gold}
+                selectionColor={COLORS.quest}
                 maxLength={20}
               />
             </View>
@@ -134,7 +134,7 @@ export const QuestPlayerSetup = ({ navigation, route }: any) => {
           {/* Min Players Warning */}
           {playerNames.length > 0 && playerNames.length < 3 && (
             <View style={styles.warningRow}>
-              <MaterialCommunityIcons name="alert-circle-outline" size={16} color={COLORS.gold} />
+              <MaterialCommunityIcons name="alert-circle-outline" size={16} color={COLORS.quest} />
               <Text style={styles.warningText}>{t.minPlayers}</Text>
             </View>
           )}
@@ -142,7 +142,7 @@ export const QuestPlayerSetup = ({ navigation, route }: any) => {
           {/* Empty state */}
           {playerNames.length === 0 && (
             <View style={styles.emptyState}>
-              <MaterialCommunityIcons name="account-group" size={48} color={COLORS.gold + '40'} />
+              <MaterialCommunityIcons name="account-group" size={48} color={COLORS.quest + '40'} />
               <Text style={styles.emptyText}>{t.addPlayer}</Text>
             </View>
           )}
@@ -191,16 +191,16 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(212,168,83,0.08)',
+    backgroundColor: 'rgba(78,168,222,0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(212,168,83,0.2)',
+    borderColor: 'rgba(78,168,222,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   title: {
     fontSize: SIZES.xl,
     fontFamily: FONTS.displayBlack,
-    color: COLORS.gold,
+    color: COLORS.quest,
   },
   scrollContent: {
     paddingHorizontal: SIZES.padding,
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.backgroundLight,
     borderRadius: SIZES.radius,
     borderWidth: 1,
-    borderColor: COLORS.gold + '30',
+    borderColor: COLORS.quest + '30',
     paddingHorizontal: 14,
   },
   inputIcon: {
@@ -254,10 +254,10 @@ const styles = StyleSheet.create({
   playerCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(212,168,83,0.04)',
+    backgroundColor: 'rgba(78,168,222,0.04)',
     borderRadius: SIZES.cardRadius,
     borderWidth: 1,
-    borderColor: COLORS.gold + '20',
+    borderColor: COLORS.quest + '20',
     padding: 14,
     marginBottom: 10,
   },
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   warningText: {
     fontSize: SIZES.sm,
     fontFamily: FONTS.bodyBold,
-    color: COLORS.gold,
+    color: COLORS.quest,
   },
   emptyState: {
     alignItems: 'center',
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     elevation: 0,
     shadowOpacity: 0,
     borderWidth: 1,
-    borderColor: COLORS.gold + '15',
+    borderColor: COLORS.quest + '15',
   },
   startButtonText: {
     fontSize: SIZES.xl,

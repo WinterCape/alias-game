@@ -79,7 +79,10 @@ export const HomeScreen = ({ navigation }: any) => {
             style={styles.primaryBtnGradient}
           >
             <MaterialCommunityIcons name="sword-cross" size={22} color={COLORS.ink} />
-            <Text style={styles.primaryBtnText}>{t.arenaMode}</Text>
+            <View style={styles.modeBtnContent}>
+              <Text style={styles.primaryBtnText}>{t.arenaMode}</Text>
+              <Text style={[styles.modeDesc, { color: COLORS.inkSoft }]}>{t.arenaDesc}</Text>
+            </View>
           </LinearGradient>
         </TouchableOpacity>
 
@@ -90,13 +93,16 @@ export const HomeScreen = ({ navigation }: any) => {
           activeOpacity={0.8}
         >
           <LinearGradient
-            colors={['#1B4332', '#2D6A4F', '#1B4332']}
+            colors={['#2B7AAD', '#4EA8DE', '#2B7AAD']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.primaryBtnGradient}
           >
-            <MaterialCommunityIcons name="book-open-page-variant" size={22} color={COLORS.parchment} />
-            <Text style={[styles.primaryBtnText, { color: COLORS.parchment }]}>{t.questMode}</Text>
+            <MaterialCommunityIcons name="book-open-page-variant" size={22} color="#FFF" />
+            <View style={styles.modeBtnContent}>
+              <Text style={[styles.primaryBtnText, { color: '#FFF' }]}>{t.questMode}</Text>
+              <Text style={[styles.modeDesc, { color: 'rgba(255,255,255,0.6)' }]}>{t.questDesc}</Text>
+            </View>
           </LinearGradient>
         </TouchableOpacity>
 
@@ -265,6 +271,14 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingVertical: 18,
     borderRadius: SIZES.radius,
+  },
+  modeBtnContent: {
+    flex: 1,
+  },
+  modeDesc: {
+    fontFamily: FONTS.body,
+    fontSize: SIZES.xs,
+    marginTop: 2,
   },
   primaryBtnText: {
     fontFamily: FONTS.bodyBlack,
