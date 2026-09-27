@@ -27,6 +27,7 @@ export interface Strings {
   // Team Setup
   guilds: string;
   chooseGuildNames: string;
+  shuffleNames: string;
   startAdventure: string;
   defaultTeams: string[];
 
@@ -118,6 +119,7 @@ export const RO: Strings = {
   forward: 'Înainte!',
   guilds: 'Bresle',
   chooseGuildNames: 'Alege numele breslelor tale',
+  shuffleNames: 'Amestecă numele',
   startAdventure: 'Începe Aventura!',
   defaultTeams: ['Dragonii', 'Vulturii', 'Lupii', 'Corbii'],
   prepareHeroes: 'Pregătiți-vă, eroi!',
@@ -214,6 +216,7 @@ export const EN: Strings = {
   forward: 'Onward!',
   guilds: 'Guilds',
   chooseGuildNames: 'Choose your guild names',
+  shuffleNames: 'Shuffle names',
   startAdventure: 'Begin the Quest!',
   defaultTeams: ['Dragons', 'Eagles', 'Wolves', 'Ravens'],
   prepareHeroes: 'Prepare yourselves, heroes!',
@@ -310,6 +313,7 @@ export const ES: Strings = {
   forward: '¡Adelante!',
   guilds: 'Gremios',
   chooseGuildNames: 'Elige los nombres de tus gremios',
+  shuffleNames: 'Mezclar nombres',
   startAdventure: '¡Comenzar la Aventura!',
   defaultTeams: ['Dragones', 'Águilas', 'Lobos', 'Cuervos'],
   prepareHeroes: '¡Prepárense, héroes!',
@@ -406,6 +410,7 @@ export const FR: Strings = {
   forward: 'En avant !',
   guilds: 'Guildes',
   chooseGuildNames: 'Choisissez les noms de vos guildes',
+  shuffleNames: 'Mélanger les noms',
   startAdventure: 'Commencer la Quête !',
   defaultTeams: ['Dragons', 'Aigles', 'Loups', 'Corbeaux'],
   prepareHeroes: 'Préparez-vous, héros !',
@@ -502,6 +507,7 @@ export const RU: Strings = {
   forward: 'Вперёд!',
   guilds: 'Гильдии',
   chooseGuildNames: 'Выберите названия своих гильдий',
+  shuffleNames: 'Перемешать имена',
   startAdventure: 'Начать Приключение!',
   defaultTeams: ['Драконы', 'Орлы', 'Волки', 'Вороны'],
   prepareHeroes: 'Приготовьтесь, герои!',

@@ -12,6 +12,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useGame } from '../hooks/GameContext';
 import { useI18n } from '../i18n/I18nContext';
+import { generateFunnyTeamNames } from '../utils/funnyNames';
 
 const TEAM_ICONS: Array<'shield' | 'bird' | 'paw' | 'feather'> = [
   'shield',
@@ -22,10 +23,14 @@ const TEAM_ICONS: Array<'shield' | 'bird' | 'paw' | 'feather'> = [
 
 export const TeamSetupScreen = ({ navigation }: any) => {
   const { settings, initializeTeams } = useGame();
-  const { t } = useI18n();
+  const { lang, t } = useI18n();
   const [teamNames, setTeamNames] = useState<string[]>(
-    Array.from({ length: settings.numberOfTeams }, (_, i) => t.defaultTeams[i] || `${t.guilds} ${i + 1}`)
+    generateFunnyTeamNames(settings.numberOfTeams, lang)
   );
+
+  const handleShuffle = () => {
+    setTeamNames(generateFunnyTeamNames(settings.numberOfTeams, lang));
+  };
 
   const handleStart = () => {
     initializeTeams(teamNames);
@@ -45,7 +50,17 @@ export const TeamSetupScreen = ({ navigation }: any) => {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.subtitle}>{t.chooseGuildNames}</Text>
+        <View style={styles.subtitleRow}>
+          <Text style={styles.subtitle}>{t.chooseGuildNames}</Text>
+          <TouchableOpacity
+            style={styles.shuffleBtn}
+            onPress={handleShuffle}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons name="dice-multiple" size={18} color={COLORS.gold} />
+            <Text style={styles.shuffleText}>{t.shuffleNames}</Text>
+          </TouchableOpacity>
+        </View>
 
         {teamNames.map((name, index) => {
           const teamColor = COLORS.teamColors[index] || COLORS.gold;
@@ -124,12 +139,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.padding,
     paddingTop: 20,
   },
+  subtitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
   subtitle: {
     fontSize: SIZES.md,
     fontFamily: FONTS.body,
     color: COLORS.textSecondary,
-    marginBottom: 24,
-    textAlign: 'center',
+    flex: 1,
+  },
+  shuffleBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: 'rgba(212,168,83,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(212,168,83,0.2)',
+  },
+  shuffleText: {
+    fontFamily: FONTS.bodyBold,
+    fontSize: SIZES.sm,
+    color: COLORS.gold,
   },
   teamCard: {
     flexDirection: 'row',
