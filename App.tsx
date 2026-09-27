@@ -14,6 +14,8 @@ import { RoundResultScreen } from './src/screens/RoundResultScreen';
 import { GameOverScreen } from './src/screens/GameOverScreen';
 import { StatsScreen } from './src/screens/StatsScreen';
 import { I18nProvider } from './src/i18n/I18nContext';
+import { StoreProvider } from './src/store/StoreContext';
+import { ShopScreen } from './src/screens/ShopScreen';
 import { COLORS } from './src/constants/theme';
 
 const Stack = createNativeStackNavigator();
@@ -37,6 +39,7 @@ export default function App() {
 
   return (
     <I18nProvider>
+    <StoreProvider>
     <GameProvider>
       <NavigationContainer>
         <Stack.Navigator
@@ -49,6 +52,7 @@ export default function App() {
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Rules" component={RulesScreen} />
           <Stack.Screen name="Stats" component={StatsScreen} />
+          <Stack.Screen name="Shop" component={ShopScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="TeamSetup" component={TeamSetupScreen} />
           <Stack.Screen name="Game" component={GameScreen} />
@@ -57,6 +61,7 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </GameProvider>
+    </StoreProvider>
     </I18nProvider>
   );
 }
