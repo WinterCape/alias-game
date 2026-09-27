@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GameSettings, Team, RoundResult, CategoryId } from '../types';
 import { getShuffledWords, ALL_CATEGORIES } from '../data/words';
 import { Language } from '../i18n/strings';
+import { PackId } from '../store/packs';
 
 const SETTINGS_KEY = '@alias_game_settings';
 
@@ -19,7 +20,7 @@ import { getStrings } from '../i18n/strings';
 
 const TEAM_COLORS = ['#D4A853', '#9B2335', '#2D6A4F', '#5E548E'];
 
-export const useGameState = (language: Language = 'ro') => {
+export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] = []) => {
   const defaultTeamNames = getStrings(language).defaultTeams;
   const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
   const [teams, setTeams] = useState<Team[]>([]);
@@ -60,23 +61,23 @@ export const useGameState = (language: Language = 'ro') => {
   }, [settings.numberOfTeams]);
 
   const startNewRound = useCallback(() => {
-    const shuffled = getShuffledWords(settings.selectedCategories, settings.difficulty, language);
+    const shuffled = getShuffledWords(settings.selectedCategories, settings.difficulty, language, unlockedPacks);
     setWords(shuffled);
     setCurrentWordIndex(0);
     guessedWordsRef.current = [];
     skippedWordsRef.current = [];
-  }, [settings.selectedCategories, settings.difficulty, language]);
+  }, [settings.selectedCategories, settings.difficulty, language, unlockedPacks]);
 
   const getCurrentWord = useCallback((): string => {
     if (currentWordIndex < words.length) {
       return words[currentWordIndex];
     }
     // Reshuffle if we run out
-    const shuffled = getShuffledWords(settings.selectedCategories, settings.difficulty, language);
+    const shuffled = getShuffledWords(settings.selectedCategories, settings.difficulty, language, unlockedPacks);
     setWords(shuffled);
     setCurrentWordIndex(0);
     return shuffled[0];
-  }, [currentWordIndex, words, settings.selectedCategories, settings.difficulty, language]);
+  }, [currentWordIndex, words, settings.selectedCategories, settings.difficulty, language, unlockedPacks]);
 
   const markCorrect = useCallback(() => {
     const word = words[currentWordIndex];

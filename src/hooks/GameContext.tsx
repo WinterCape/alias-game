@@ -1,6 +1,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useGameState } from './useGameState';
 import { useI18n } from '../i18n/I18nContext';
+import { useStore } from '../store/StoreContext';
 
 type GameContextType = ReturnType<typeof useGameState>;
 
@@ -8,7 +9,8 @@ const GameContext = createContext<GameContextType | null>(null);
 
 export const GameProvider = ({ children }: { children: ReactNode }) => {
   const { lang } = useI18n();
-  const gameState = useGameState(lang);
+  const { unlockedPacks } = useStore();
+  const gameState = useGameState(lang, unlockedPacks);
   return (
     <GameContext.Provider value={gameState}>{children}</GameContext.Provider>
   );

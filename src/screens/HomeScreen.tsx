@@ -81,6 +81,15 @@ export const HomeScreen = ({ navigation }: any) => {
 
         <TouchableOpacity
           style={styles.secondaryBtn}
+          onPress={() => navigation.navigate('Shop')}
+          activeOpacity={0.8}
+        >
+          <MaterialCommunityIcons name="treasure-chest" size={20} color={COLORS.gold} />
+          <Text style={styles.secondaryBtnText}>{lang === 'ro' ? 'Magazinul Eroilor' : "Hero's Shop"}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.secondaryBtn}
           onPress={() => navigation.navigate('Rules')}
           activeOpacity={0.8}
         >
