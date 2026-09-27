@@ -20,6 +20,9 @@ import { QuestSettingsScreen } from './src/screens/QuestSettingsScreen';
 import { QuestPlayerSetup } from './src/screens/QuestPlayerSetup';
 import { QuestGameScreen } from './src/screens/QuestGameScreen';
 import { QuestScoresScreen } from './src/screens/QuestScoresScreen';
+import { AchievementProvider } from './src/achievements/AchievementContext';
+import { AchievementsScreen } from './src/screens/AchievementsScreen';
+import { AchievementToast } from './src/components/AchievementToast';
 import { COLORS } from './src/constants/theme';
 
 const Stack = createNativeStackNavigator();
@@ -44,6 +47,7 @@ export default function App() {
   return (
     <I18nProvider>
     <StoreProvider>
+    <AchievementProvider>
     <GameProvider>
       <NavigationContainer>
         <Stack.Navigator
@@ -66,9 +70,12 @@ export default function App() {
           <Stack.Screen name="QuestPlayerSetup" component={QuestPlayerSetup} />
           <Stack.Screen name="QuestGame" component={QuestGameScreen} />
           <Stack.Screen name="QuestScores" component={QuestScoresScreen} />
+          <Stack.Screen name="Achievements" component={AchievementsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GameProvider>
+    <AchievementToast />
+    </AchievementProvider>
     </StoreProvider>
     </I18nProvider>
   );

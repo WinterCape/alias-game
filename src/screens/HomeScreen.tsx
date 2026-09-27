@@ -111,6 +111,15 @@ export const HomeScreen = ({ navigation }: any) => {
 
         <TouchableOpacity
           style={styles.secondaryBtn}
+          onPress={() => navigation.navigate('Achievements')}
+          activeOpacity={0.8}
+        >
+          <MaterialCommunityIcons name="medal" size={20} color={COLORS.gold} />
+          <Text style={styles.secondaryBtnText}>{lang === 'ro' ? 'Realizări' : lang === 'es' ? 'Logros' : lang === 'fr' ? 'Succès' : lang === 'ru' ? 'Достижения' : 'Achievements'}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.secondaryBtn}
           onPress={() => navigation.navigate('Rules')}
           activeOpacity={0.8}
         >
