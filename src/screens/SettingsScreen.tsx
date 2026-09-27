@@ -15,14 +15,18 @@ import { ALL_CATEGORIES } from '../data/words';
 import { useGame } from '../hooks/GameContext';
 import { CategoryId, Difficulty } from '../types';
 import { useI18n } from '../i18n/I18nContext';
-
-const ROUND_DURATIONS = [30, 45, 60, 90, 120];
-const WINNING_SCORES = [25, 50, 75, 100];
-const TEAM_COUNTS = [2, 3, 4];
+import { useProgression } from '../progression/ProgressionContext';
+import { getUnlockedTimerOptions, getUnlockedScoreOptions, getMaxTeams } from '../progression/rewards';
 
 export const SettingsScreen = ({ navigation }: any) => {
   const { settings, updateSettings } = useGame();
   const { t } = useI18n();
+  const { level } = useProgression();
+
+  const ROUND_DURATIONS = getUnlockedTimerOptions(level);
+  const WINNING_SCORES = getUnlockedScoreOptions(level);
+  const maxTeams = getMaxTeams(level);
+  const TEAM_COUNTS = Array.from({ length: maxTeams - 1 }, (_, i) => i + 2);
 
   const DIFFICULTIES: { id: Difficulty | 'all'; label: string; icon: string }[] = [
     { id: 'easy', label: t.difficultyEasy, icon: 'shield-outline' },

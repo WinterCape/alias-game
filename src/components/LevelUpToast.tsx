@@ -5,6 +5,7 @@ import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useProgression } from '../progression/ProgressionContext';
 import { getRankForLevel } from '../progression/ranks';
 import { useI18n } from '../i18n/I18nContext';
+import { getRewardsForLevel } from '../progression/rewards';
 
 const LEVEL_UP_LABEL: Record<string, string> = {
   ro: 'NIVEL NOU!',
@@ -68,6 +69,7 @@ export const LevelUpToast = () => {
   if (!didLevelUp) return null;
 
   const rank = getRankForLevel(level);
+  const rewards = getRewardsForLevel(level);
 
   return (
     <Animated.View
@@ -101,6 +103,18 @@ export const LevelUpToast = () => {
 
       {/* Level number */}
       <Text style={styles.levelNumber}>Level {level}</Text>
+
+      {/* Reward line(s) */}
+      {rewards.map((reward) => (
+        <View key={reward.value} style={styles.rewardRow}>
+          <MaterialCommunityIcons
+            name={reward.icon as any}
+            size={16}
+            color={COLORS.goldBright}
+          />
+          <Text style={styles.rewardText}>{reward.name[lang]}</Text>
+        </View>
+      ))}
 
       {/* XP sparkle */}
       <Text style={styles.sparkle}>&#10022; +XP &#10022;</Text>
@@ -166,10 +180,22 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     marginBottom: 8,
   },
+  rewardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
+  rewardText: {
+    fontFamily: FONTS.bodyBold,
+    fontSize: SIZES.sm,
+    color: COLORS.goldBright,
+  },
   sparkle: {
     fontFamily: FONTS.body,
     fontSize: SIZES.sm,
     color: COLORS.goldDim,
     letterSpacing: 2,
+    marginTop: 2,
   },
 });
