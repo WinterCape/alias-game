@@ -13,11 +13,14 @@ import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useGame } from '../hooks/GameContext';
 import { useStats } from '../hooks/useStats';
 import { useI18n } from '../i18n/I18nContext';
+import { useReviewPrompt } from '../hooks/useReviewPrompt';
+import { shareGameResults } from '../utils/share';
 
 export const GameOverScreen = ({ route, navigation }: any) => {
   const { resetGame, roundResults } = useGame();
   const { recordGame } = useStats();
   const { t } = useI18n();
+  const { recordGamePlayed, showPrompt } = useReviewPrompt();
   const { teams } = route.params;
   const hasRecorded = useRef(false);
 
@@ -31,6 +34,15 @@ export const GameOverScreen = ({ route, navigation }: any) => {
     if (!hasRecorded.current) {
       hasRecorded.current = true;
       recordGame(teams, roundResults);
+      recordGamePlayed();
+      setTimeout(() => {
+        showPrompt({
+          title: t.rateTitle,
+          message: t.rateMessage,
+          later: t.rateLater,
+          now: t.rateNow,
+        });
+      }, 2000);
     }
   }, []);
 
@@ -49,6 +61,10 @@ export const GameOverScreen = ({ route, navigation }: any) => {
       }),
     ]).start();
   }, []);
+
+  const handleShare = () => {
+    shareGameResults(winner.name, winner.score, teams, t.shareText);
+  };
 
   const handleNewGame = () => {
     resetGame();
@@ -103,6 +119,15 @@ export const GameOverScreen = ({ route, navigation }: any) => {
       </Animated.View>
 
       <View style={styles.footer}>
+        <TouchableOpacity
+          style={styles.shareBtn}
+          onPress={handleShare}
+          activeOpacity={0.8}
+        >
+          <MaterialCommunityIcons name="share-variant" size={20} color={COLORS.gold} />
+          <Text style={styles.shareBtnText}>{t.shareResults}</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.newGameWrap}
           onPress={handleNewGame}
@@ -223,6 +248,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.padding,
     paddingBottom: 40,
     paddingTop: 30,
+    gap: 12,
+  },
+  shareBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: SIZES.radius,
+    borderWidth: 1,
+    borderColor: 'rgba(212,168,83,0.25)',
+    backgroundColor: 'rgba(212,168,83,0.06)',
+  },
+  shareBtnText: {
+    fontFamily: FONTS.bodyBold,
+    fontSize: SIZES.md,
+    color: COLORS.gold,
   },
   newGameWrap: {
     borderRadius: SIZES.radius,
