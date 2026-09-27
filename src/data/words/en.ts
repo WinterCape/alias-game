@@ -252,7 +252,7 @@ export const WORDS_EN: Record<CategoryId, string[]> = {
     'Mediterranean', 'Caribbean', 'Polynesia', 'Scandinavia', 'Patagonia',
     'Volga', 'Euphrates', 'Tigris', 'Zambezi', 'Mekong',
     'Atacama', 'Kalahari', 'Mojave', 'Thar', 'Karakum',
-    'Archipelago', 'Isthmus', 'Atoll', 'Fjord', 'Tributary',
+    'Estuary', 'Isthmus', 'Atoll', 'Lagoon', 'Tributary',
   ],
   scoala: [
     // Easy
