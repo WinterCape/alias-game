@@ -23,6 +23,8 @@ import { QuestScoresScreen } from './src/screens/QuestScoresScreen';
 import { AchievementProvider } from './src/achievements/AchievementContext';
 import { AchievementsScreen } from './src/screens/AchievementsScreen';
 import { AchievementToast } from './src/components/AchievementToast';
+import { ProgressionProvider } from './src/progression/ProgressionContext';
+import { LevelUpToast } from './src/components/LevelUpToast';
 import { COLORS } from './src/constants/theme';
 
 const Stack = createNativeStackNavigator();
@@ -48,6 +50,7 @@ export default function App() {
     <I18nProvider>
     <StoreProvider>
     <AchievementProvider>
+    <ProgressionProvider>
     <GameProvider>
       <NavigationContainer>
         <Stack.Navigator
@@ -74,6 +77,8 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </GameProvider>
+    <LevelUpToast />
+    </ProgressionProvider>
     <AchievementToast />
     </AchievementProvider>
     </StoreProvider>

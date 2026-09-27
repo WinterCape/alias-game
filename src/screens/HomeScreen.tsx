@@ -12,6 +12,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useI18n } from '../i18n/I18nContext';
 import { Language } from '../i18n/strings';
+import { ProfileCard } from '../components/ProfileCard';
 
 const { width } = Dimensions.get('window');
 
@@ -64,6 +65,8 @@ export const HomeScreen = ({ navigation }: any) => {
           <View style={styles.dividerLine} />
         </View>
       </View>
+
+      <ProfileCard />
 
       <View style={styles.buttonContainer}>
         {/* Arena Mode */}
