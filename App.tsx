@@ -13,6 +13,7 @@ import { GameScreen } from './src/screens/GameScreen';
 import { RoundResultScreen } from './src/screens/RoundResultScreen';
 import { GameOverScreen } from './src/screens/GameOverScreen';
 import { StatsScreen } from './src/screens/StatsScreen';
+import { I18nProvider } from './src/i18n/I18nContext';
 import { COLORS } from './src/constants/theme';
 
 const Stack = createNativeStackNavigator();
@@ -35,6 +36,7 @@ export default function App() {
   }
 
   return (
+    <I18nProvider>
     <GameProvider>
       <NavigationContainer>
         <Stack.Navigator
@@ -55,5 +57,6 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </GameProvider>
+    </I18nProvider>
   );
 }

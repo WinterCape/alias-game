@@ -17,6 +17,7 @@ import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useGame } from '../hooks/GameContext';
 import { useTimer } from '../hooks/useTimer';
 import { useSounds } from '../hooks/useSounds';
+import { useI18n } from '../i18n/I18nContext';
 
 const { width } = Dimensions.get('window');
 const SWIPE_THRESHOLD = 80;
@@ -58,6 +59,7 @@ export const GameScreen = ({ navigation }: any) => {
     checkWinner,
   } = useGame();
 
+  const { t } = useI18n();
   const { playCorrect, playSkip, playTick, playTimeUp, playStart } = useSounds();
   const [phase, setPhase] = useState<GamePhase>('ready');
   const [currentWord, setCurrentWord] = useState('');
@@ -232,22 +234,21 @@ export const GameScreen = ({ navigation }: any) => {
             <MaterialCommunityIcons name="shield-account" size={40} color={currentTeam?.color} />
           </View>
           <Text style={styles.readyTeamName}>{currentTeam?.name}</Text>
-          <Text style={styles.readySubtext}>Pregatiti-va, eroi!</Text>
+          <Text style={styles.readySubtext}>{t.prepareHeroes}</Text>
           <Text style={styles.readyDesc}>
-            Da telefonul jucatorului care descrie.{'\n'}
-            Restul echipei trebuie sa ghiceasca.{'\n\n'}
-            <Text style={{ color: COLORS.correctGlow, fontFamily: FONTS.bodyBold }}>Gliseaza dreapta</Text> = victorie{'\n'}
-            <Text style={{ color: COLORS.skipGlow, fontFamily: FONTS.bodyBold }}>Gliseaza stanga</Text> = retragere
+            {t.givePhone}{'\n\n'}
+            <Text style={{ color: COLORS.correctGlow, fontFamily: FONTS.bodyBold }}>{t.swipeRightCorrect}</Text>{'\n'}
+            <Text style={{ color: COLORS.skipGlow, fontFamily: FONTS.bodyBold }}>{t.swipeLeftSkip}</Text>
           </Text>
 
           <View style={styles.scoreBoard}>
-            <Text style={styles.scoreBoardTitle}>Ierarhia Breslelor</Text>
+            <Text style={styles.scoreBoardTitle}>{t.guildRanking}</Text>
             {teams.map((team) => (
               <View key={team.id} style={styles.scoreBoardItem}>
                 <View style={[styles.scoreDot, { backgroundColor: team.color }]} />
                 <Text style={styles.scoreBoardName}>{team.name}</Text>
                 <Text style={[styles.scoreBoardScore, { color: team.color }]}>
-                  {team.score} <Text style={styles.scoreBoardExp}>exp</Text>
+                  {team.score} <Text style={styles.scoreBoardExp}>{t.exp}</Text>
                 </Text>
               </View>
             ))}
@@ -259,7 +260,7 @@ export const GameScreen = ({ navigation }: any) => {
             activeOpacity={0.8}
           >
             <MaterialCommunityIcons name="sword-cross" size={28} color="#FFF" />
-            <Text style={styles.startRoundText}>START</Text>
+            <Text style={styles.startRoundText}>{t.start}</Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -322,10 +323,10 @@ export const GameScreen = ({ navigation }: any) => {
       <View style={styles.swipeHintRow}>
         <Animated.View style={[styles.swipeHint, { opacity: leftIndicatorOpacity }]}>
           <MaterialCommunityIcons name="shield-off" size={18} color={COLORS.skipGlow} />
-          <Text style={[styles.swipeHintText, { color: COLORS.skipGlow }]}>RETRAGERE</Text>
+          <Text style={[styles.swipeHintText, { color: COLORS.skipGlow }]}>{t.retreat.toUpperCase()}</Text>
         </Animated.View>
         <Animated.View style={[styles.swipeHint, { opacity: rightIndicatorOpacity }]}>
-          <Text style={[styles.swipeHintText, { color: COLORS.correctGlow }]}>VICTORIE</Text>
+          <Text style={[styles.swipeHintText, { color: COLORS.correctGlow }]}>{t.victory.toUpperCase()}</Text>
           <MaterialCommunityIcons name="sword" size={18} color={COLORS.correctGlow} />
         </Animated.View>
       </View>
@@ -368,7 +369,7 @@ export const GameScreen = ({ navigation }: any) => {
             style={styles.actionButton}
           >
             <MaterialCommunityIcons name="shield-off" size={36} color="#FFF" />
-            <Text style={styles.actionLabel}>Retragere</Text>
+            <Text style={styles.actionLabel}>{t.retreat}</Text>
           </LinearGradient>
         </TouchableOpacity>
 
@@ -384,7 +385,7 @@ export const GameScreen = ({ navigation }: any) => {
             style={styles.actionButton}
           >
             <MaterialCommunityIcons name="sword" size={36} color="#FFF" />
-            <Text style={styles.actionLabel}>Victorie!</Text>
+            <Text style={styles.actionLabel}>{t.victory}</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>

@@ -11,10 +11,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useGame } from '../hooks/GameContext';
+import { useI18n } from '../i18n/I18nContext';
 
 export const RoundResultScreen = ({ route, navigation }: any) => {
   const { result } = route.params;
   const { teams } = useGame();
+  const { t } = useI18n();
   const team = teams[result.teamId];
 
   return (
@@ -22,7 +24,7 @@ export const RoundResultScreen = ({ route, navigation }: any) => {
       <StatusBar barStyle="light-content" />
 
       <View style={styles.header}>
-        <Text style={styles.title}>Rezultat Misiune</Text>
+        <Text style={styles.title}>{t.roundResult}</Text>
         <Text style={[styles.teamName, { color: team?.color }]}>{team?.name}</Text>
       </View>
 
@@ -31,20 +33,20 @@ export const RoundResultScreen = ({ route, navigation }: any) => {
           <Text style={[styles.scoreValue, { color: team?.color }]}>
             {result.score > 0 ? '+' : ''}{result.score}
           </Text>
-          <Text style={styles.scoreLabel}>exp</Text>
+          <Text style={styles.scoreLabel}>{t.exp}</Text>
         </View>
 
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
             <MaterialCommunityIcons name="sword" size={24} color={COLORS.correctGlow} />
             <Text style={styles.statValue}>{result.guessedWords.length}</Text>
-            <Text style={styles.statLabel}>Cucerite</Text>
+            <Text style={styles.statLabel}>{t.conquered}</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <MaterialCommunityIcons name="shield-off" size={24} color={COLORS.skipGlow} />
             <Text style={styles.statValue}>{result.skippedWords.length}</Text>
-            <Text style={styles.statLabel}>Retrase</Text>
+            <Text style={styles.statLabel}>{t.retreated}</Text>
           </View>
         </View>
       </View>
@@ -52,7 +54,7 @@ export const RoundResultScreen = ({ route, navigation }: any) => {
       <ScrollView style={styles.wordList} showsVerticalScrollIndicator={false}>
         {result.guessedWords.length > 0 && (
           <View style={styles.wordSection}>
-            <Text style={styles.wordSectionTitle}>Cuvinte Cucerite</Text>
+            <Text style={styles.wordSectionTitle}>{t.wordsConquered}</Text>
             {result.guessedWords.map((word: string, i: number) => (
               <View key={i} style={styles.wordItem}>
                 <MaterialCommunityIcons name="sword" size={16} color={COLORS.correctGlow} />
@@ -64,7 +66,7 @@ export const RoundResultScreen = ({ route, navigation }: any) => {
 
         {result.skippedWords.length > 0 && (
           <View style={styles.wordSection}>
-            <Text style={styles.wordSectionTitle}>Cuvinte Retrase</Text>
+            <Text style={styles.wordSectionTitle}>{t.wordsRetreated}</Text>
             {result.skippedWords.map((word: string, i: number) => (
               <View key={i} style={styles.wordItem}>
                 <MaterialCommunityIcons name="shield-off" size={16} color={COLORS.skipGlow} />
@@ -77,14 +79,14 @@ export const RoundResultScreen = ({ route, navigation }: any) => {
 
       {/* Current Standings */}
       <View style={styles.standings}>
-        <Text style={styles.standingsTitle}>Ierarhia Breslelor</Text>
-        {[...teams].sort((a, b) => b.score - a.score).map((t, i) => (
-          <View key={t.id} style={styles.standingItem}>
+        <Text style={styles.standingsTitle}>{t.guildRanking}</Text>
+        {[...teams].sort((a, b) => b.score - a.score).map((tt, i) => (
+          <View key={tt.id} style={styles.standingItem}>
             <Text style={styles.standingPos}>{i + 1}.</Text>
-            <View style={[styles.standingDot, { backgroundColor: t.color }]} />
-            <Text style={styles.standingName}>{t.name}</Text>
-            <Text style={[styles.standingScore, { color: t.color }]}>
-              {t.score} <Text style={styles.standingExp}>exp</Text>
+            <View style={[styles.standingDot, { backgroundColor: tt.color }]} />
+            <Text style={styles.standingName}>{tt.name}</Text>
+            <Text style={[styles.standingScore, { color: tt.color }]}>
+              {tt.score} <Text style={styles.standingExp}>{t.exp}</Text>
             </Text>
           </View>
         ))}
@@ -103,7 +105,7 @@ export const RoundResultScreen = ({ route, navigation }: any) => {
             style={styles.nextButton}
           >
             <MaterialCommunityIcons name="sword-cross" size={22} color="#FFF" />
-            <Text style={styles.nextButtonText}>Urmatoarea Misiune</Text>
+            <Text style={styles.nextButtonText}>{t.nextMission}</Text>
             <MaterialCommunityIcons name="arrow-right" size={22} color="#FFF" />
           </LinearGradient>
         </TouchableOpacity>
