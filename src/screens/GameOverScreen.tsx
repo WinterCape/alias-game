@@ -12,10 +12,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useGame } from '../hooks/GameContext';
 import { useStats } from '../hooks/useStats';
+import { useI18n } from '../i18n/I18nContext';
 
 export const GameOverScreen = ({ route, navigation }: any) => {
   const { resetGame, roundResults } = useGame();
   const { recordGame } = useStats();
+  const { t } = useI18n();
   const { teams } = route.params;
   const hasRecorded = useRef(false);
 
@@ -64,17 +66,17 @@ export const GameOverScreen = ({ route, navigation }: any) => {
         <View style={styles.trophyGlow}>
           <MaterialCommunityIcons name="trophy" size={80} color={COLORS.gold} />
         </View>
-        <Text style={styles.congratsText}>Felicitari, Campion!</Text>
+        <Text style={styles.congratsText}>{t.congratsChampion}</Text>
         <Text style={[styles.winnerName, { color: winner.color }]}>
           {winner.name}
         </Text>
         <Text style={styles.winnerScore}>
-          {winner.score} <Text style={styles.winnerExp}>exp</Text>
+          {winner.score} <Text style={styles.winnerExp}>{t.exp}</Text>
         </Text>
       </Animated.View>
 
       <Animated.View style={[styles.standings, { opacity: fadeAnim }]}>
-        <Text style={styles.standingsTitle}>Sala Faimei</Text>
+        <Text style={styles.standingsTitle}>{t.hallOfFame}</Text>
         {sorted.map((team: any, index: number) => (
           <View key={team.id} style={styles.standingRow}>
             <View style={styles.standingLeft}>
@@ -94,7 +96,7 @@ export const GameOverScreen = ({ route, navigation }: any) => {
               <Text style={styles.standingName}>{team.name}</Text>
             </View>
             <Text style={[styles.standingScore, { color: team.color }]}>
-              {team.score} <Text style={styles.standingExp}>exp</Text>
+              {team.score} <Text style={styles.standingExp}>{t.exp}</Text>
             </Text>
           </View>
         ))}
@@ -113,7 +115,7 @@ export const GameOverScreen = ({ route, navigation }: any) => {
             style={styles.newGameButton}
           >
             <MaterialCommunityIcons name="sword-cross" size={24} color="#FFF" />
-            <Text style={styles.newGameText}>Aventura Noua</Text>
+            <Text style={styles.newGameText}>{t.newAdventureShort}</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>

@@ -10,41 +10,20 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
+import { useI18n } from '../i18n/I18nContext';
 
-const RULES = [
-  {
-    icon: 'shield-half-full' as const,
-    title: 'Formează Bresle',
-    text: 'Împărțiți-vă în 2-4 bresle. Fiecare breaslă își alege un nume legendar.',
-  },
-  {
-    icon: 'script-text' as const,
-    title: 'Descrie Cuvântul',
-    text: 'Un erou din breaslă descrie cuvântul afișat FĂRĂ a folosi cuvântul în sine sau derivate ale acestuia.',
-  },
-  {
-    icon: 'timer-sand' as const,
-    title: 'Contra Cronometru',
-    text: 'Aveți un timp limitat pentru misiune. Fiecare cuvânt ghicit corect = 1 punct de experiență.',
-  },
-  {
-    icon: 'run-fast' as const,
-    title: 'Retragere Tactică',
-    text: 'Dacă nu poți explica un cuvânt, te poți retrage. Atenție: retragerea poate fi penalizată cu -1 punct!',
-  },
-  {
-    icon: 'trophy' as const,
-    title: 'Devino Campion!',
-    text: 'Prima breaslă care ajunge la experiența stabilită câștigă aventura. De obicei 50 de puncte.',
-  },
-  {
-    icon: 'sword-cross' as const,
-    title: 'Reguli Interzise',
-    text: 'Nu poți: folosi cuvântul sau părți din el, gesticula, indica obiecte din cameră, spune "rimează cu..."',
-  },
+const RULE_ICONS: Array<'shield-half-full' | 'script-text' | 'timer-sand' | 'run-fast' | 'trophy' | 'sword-cross'> = [
+  'shield-half-full',
+  'script-text',
+  'timer-sand',
+  'run-fast',
+  'trophy',
+  'sword-cross',
 ];
 
 export const RulesScreen = ({ navigation }: any) => {
+  const { t } = useI18n();
+
   return (
     <LinearGradient colors={[...COLORS.gradientTable]} style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -53,7 +32,7 @@ export const RulesScreen = ({ navigation }: any) => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.gold} />
         </TouchableOpacity>
-        <Text style={styles.title}>Codul Eroilor</Text>
+        <Text style={styles.title}>{t.heroCode}</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -62,7 +41,7 @@ export const RulesScreen = ({ navigation }: any) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {RULES.map((rule, index) => (
+        {t.rules.map((rule, index) => (
           <View key={index} style={styles.ruleCard}>
             <View style={styles.ruleNumber}>
               <Text style={styles.ruleNumberText}>{index + 1}</Text>
@@ -70,7 +49,7 @@ export const RulesScreen = ({ navigation }: any) => {
             <View style={styles.ruleContent}>
               <View style={styles.ruleTitleRow}>
                 <MaterialCommunityIcons
-                  name={rule.icon}
+                  name={RULE_ICONS[index] || 'shield-half-full'}
                   size={22}
                   color={COLORS.gold}
                 />

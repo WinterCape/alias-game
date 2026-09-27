@@ -10,16 +10,41 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
+import { useI18n } from '../i18n/I18nContext';
+import { Language } from '../i18n/strings';
 
 const { width } = Dimensions.get('window');
 
+const LANGUAGES: { id: Language; label: string; flag: string }[] = [
+  { id: 'ro', label: 'RO', flag: '🇷🇴' },
+  { id: 'en', label: 'EN', flag: '🇬🇧' },
+];
+
 export const HomeScreen = ({ navigation }: any) => {
+  const { lang, t, setLanguage } = useI18n();
+
   return (
     <LinearGradient colors={COLORS.gradientTable} style={styles.container}>
       <StatusBar barStyle="light-content" />
 
+      {/* Language Picker */}
+      <View style={styles.langRow}>
+        {LANGUAGES.map((l) => (
+          <TouchableOpacity
+            key={l.id}
+            style={[styles.langBtn, lang === l.id && styles.langBtnActive]}
+            onPress={() => setLanguage(l.id)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.langFlag}>{l.flag}</Text>
+            <Text style={[styles.langLabel, lang === l.id && styles.langLabelActive]}>
+              {l.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
       <View style={styles.header}>
-        {/* Shield emblem */}
         <View style={styles.shield}>
           <View style={styles.shieldInner}>
             <Text style={styles.shieldLetter}>A</Text>
@@ -50,7 +75,7 @@ export const HomeScreen = ({ navigation }: any) => {
             style={styles.primaryBtnGradient}
           >
             <MaterialCommunityIcons name="sword-cross" size={22} color={COLORS.ink} />
-            <Text style={styles.primaryBtnText}>Aventură Nouă</Text>
+            <Text style={styles.primaryBtnText}>{t.newAdventure}</Text>
           </LinearGradient>
         </TouchableOpacity>
 
@@ -60,7 +85,7 @@ export const HomeScreen = ({ navigation }: any) => {
           activeOpacity={0.8}
         >
           <MaterialCommunityIcons name="script-text" size={20} color={COLORS.gold} />
-          <Text style={styles.secondaryBtnText}>Codul Eroilor</Text>
+          <Text style={styles.secondaryBtnText}>{t.heroCode}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -69,7 +94,7 @@ export const HomeScreen = ({ navigation }: any) => {
           activeOpacity={0.8}
         >
           <MaterialCommunityIcons name="trophy-variant" size={20} color={COLORS.gold} />
-          <Text style={styles.secondaryBtnText}>Cronici</Text>
+          <Text style={styles.secondaryBtnText}>{t.chronicles}</Text>
         </TouchableOpacity>
       </View>
 
@@ -84,6 +109,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: SIZES.padding,
+  },
+  langRow: {
+    position: 'absolute',
+    top: 56,
+    right: SIZES.padding,
+    flexDirection: 'row',
+    gap: 8,
+    zIndex: 10,
+  },
+  langBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: 'rgba(212,168,83,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(212,168,83,0.12)',
+  },
+  langBtnActive: {
+    backgroundColor: 'rgba(212,168,83,0.15)',
+    borderColor: COLORS.gold,
+  },
+  langFlag: {
+    fontSize: 16,
+  },
+  langLabel: {
+    fontFamily: FONTS.bodyBold,
+    fontSize: 12,
+    color: COLORS.textSecondary,
+  },
+  langLabelActive: {
+    color: COLORS.gold,
   },
   header: {
     alignItems: 'center',
