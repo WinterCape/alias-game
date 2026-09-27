@@ -8,9 +8,6 @@ import {
 } from '../src/data/words';
 import { WORDS_RO } from '../src/data/words/ro';
 import { WORDS_EN } from '../src/data/words/en';
-import { PACK_PARTY18 } from '../src/data/packs/party18';
-import { PACK_POPCULTURE } from '../src/data/packs/popculture';
-import { PACK_MYTHOLOGY } from '../src/data/packs/mythology';
 import { CATEGORIES, getCategoryById } from '../src/data/categories';
 import { RO, EN, getStrings, Language } from '../src/i18n/strings';
 import { PREMIUM_PACKS, PackId } from '../src/store/packs';
@@ -269,8 +266,7 @@ describe('Difficulty Filtering', () => {
 // 5. Premium Packs
 // ---------------------------------------------------------------------------
 describe('Premium Packs', () => {
-  const activePacks: PackId[] = ['party18', 'popculture', 'mythology'];
-  const placeholderPacks: PackId[] = ['science', 'business', 'traditions'];
+  const activePacks: PackId[] = ['party18', 'popculture', 'mythology', 'science', 'business', 'traditions'];
 
   test('PREMIUM_PACKS has correct PackId for each entry', () => {
     const expectedIds: PackId[] = [
@@ -307,16 +303,6 @@ describe('Premium Packs', () => {
     }
   );
 
-  test.each(placeholderPacks)(
-    'getPremiumWords returns empty array for placeholder pack "%s"',
-    (packId) => {
-      const roWords = getPremiumWords(packId, 'all', 'ro');
-      const enWords = getPremiumWords(packId, 'all', 'en');
-      expect(roWords).toEqual([]);
-      expect(enWords).toEqual([]);
-    }
-  );
-
   test('pack productIds are unique', () => {
     const productIds = PREMIUM_PACKS.map((p) => p.productId);
     const unique = new Set(productIds);
@@ -337,22 +323,11 @@ describe('Premium Packs', () => {
     }
   });
 
-  test('pack wordCount matches actual word count for active packs', () => {
-    const packData: Record<PackId, Record<Language, string[]>> = {
-      party18: PACK_PARTY18,
-      popculture: PACK_POPCULTURE,
-      mythology: PACK_MYTHOLOGY,
-      science: { ro: [], en: [] },
-      business: { ro: [], en: [] },
-      traditions: { ro: [], en: [] },
-    };
-
+  test('pack wordCount matches actual word count for all packs', () => {
     for (const pack of PREMIUM_PACKS) {
-      if (activePacks.includes(pack.id)) {
-        const data = packData[pack.id];
-        expect(data.ro.length).toBe(pack.wordCount.ro);
-        expect(data.en.length).toBe(pack.wordCount.en);
-      }
+      const data = PREMIUM_WORD_PACKS[pack.id];
+      expect(data.ro.length).toBe(pack.wordCount.ro);
+      expect(data.en.length).toBe(pack.wordCount.en);
     }
   });
 });

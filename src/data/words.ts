@@ -6,6 +6,9 @@ import { WORDS_EN } from './words/en';
 import { PACK_PARTY18 } from './packs/party18';
 import { PACK_POPCULTURE } from './packs/popculture';
 import { PACK_MYTHOLOGY } from './packs/mythology';
+import { PACK_SCIENCE } from './packs/science';
+import { PACK_BUSINESS } from './packs/business';
+import { PACK_TRADITIONS } from './packs/traditions';
 
 const ALL_CATEGORIES: CategoryId[] = [
   'general', 'animale', 'mancare', 'sporturi', 'profesii',
@@ -22,9 +25,9 @@ const PREMIUM_WORD_PACKS: Record<PackId, Record<Language, string[]>> = {
   party18: PACK_PARTY18,
   popculture: PACK_POPCULTURE,
   mythology: PACK_MYTHOLOGY,
-  science: { ro: [], en: [] },
-  business: { ro: [], en: [] },
-  traditions: { ro: [], en: [] },
+  science: PACK_SCIENCE,
+  business: PACK_BUSINESS,
+  traditions: PACK_TRADITIONS,
 };
 
 export { ALL_CATEGORIES, PREMIUM_WORD_PACKS };
