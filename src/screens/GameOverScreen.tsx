@@ -16,6 +16,7 @@ import { useI18n } from '../i18n/I18nContext';
 import { useReviewPrompt } from '../hooks/useReviewPrompt';
 import { shareGameResults } from '../utils/share';
 import { useAchievements } from '../achievements/AchievementContext';
+import { useProgression } from '../progression/ProgressionContext';
 
 export const GameOverScreen = ({ route, navigation }: any) => {
   const { resetGame, roundResults } = useGame();
@@ -23,6 +24,7 @@ export const GameOverScreen = ({ route, navigation }: any) => {
   const { lang, t } = useI18n();
   const { recordGamePlayed, showPrompt } = useReviewPrompt();
   const { checkArenaAchievements } = useAchievements();
+  const { recordArenaResult } = useProgression();
   const { teams } = route.params;
   const hasRecorded = useRef(false);
 
@@ -48,6 +50,15 @@ export const GameOverScreen = ({ route, navigation }: any) => {
         roundSkipped: bestRound?.skippedWords.length || 0,
         gameSkipped: totalSkipped,
         language: lang,
+      });
+
+      // Count flawless rounds (rounds where skippedWords is empty)
+      const flawlessRounds = roundResults.filter((r: any) => r.skippedWords.length === 0).length;
+
+      recordArenaResult({
+        wordsGuessed: totalGuessed,
+        won: true,  // GameOver screen only shows for winners
+        flawlessRounds,
       });
       setTimeout(() => {
         showPrompt({
