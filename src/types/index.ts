@@ -53,6 +53,25 @@ export interface RoundResult {
   score: number;
 }
 
+// Quest Mode (Storyteller)
+export type GameMode = 'arena' | 'quest';
+
+export interface Player {
+  id: number;
+  name: string;
+  score: number;
+  color: string;
+}
+
+export interface QuestTurn {
+  storytellerId: number;
+  word: string;
+  category: CategoryId;
+  guessedById: number | null;
+  hintsUsed: number;
+  skipped: boolean;
+}
+
 export type RootStackParamList = {
   Home: undefined;
   Settings: undefined;
