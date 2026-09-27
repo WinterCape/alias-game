@@ -62,7 +62,7 @@ export const QuestSettingsScreen = ({ navigation }: any) => {
 
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.gold} />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.quest} />
         </TouchableOpacity>
         <Text style={styles.title}>{t.questMode}</Text>
         <View style={{ width: 40 }} />
@@ -70,7 +70,7 @@ export const QuestSettingsScreen = ({ navigation }: any) => {
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.sectionHeader}>
-          <MaterialCommunityIcons name="star-four-points" size={18} color={COLORS.gold} />
+          <MaterialCommunityIcons name="star-four-points" size={18} color={COLORS.quest} />
           <Text style={styles.sectionTitle}>{t.pointsToWin}</Text>
         </View>
         <View style={styles.optionRow}>
@@ -86,7 +86,7 @@ export const QuestSettingsScreen = ({ navigation }: any) => {
         </View>
 
         <View style={styles.sectionHeader}>
-          <MaterialCommunityIcons name="sword" size={18} color={COLORS.gold} />
+          <MaterialCommunityIcons name="sword" size={18} color={COLORS.quest} />
           <Text style={styles.sectionTitle}>{t.difficulty}</Text>
         </View>
         <View style={styles.optionRow}>
@@ -99,7 +99,7 @@ export const QuestSettingsScreen = ({ navigation }: any) => {
               <MaterialCommunityIcons
                 name={d.icon as any}
                 size={16}
-                color={difficulty === d.id ? COLORS.gold : COLORS.textSecondary}
+                color={difficulty === d.id ? COLORS.quest : COLORS.textSecondary}
               />
               <Text style={[styles.chipText, difficulty === d.id && styles.chipTextActive]}>{d.label}</Text>
             </TouchableOpacity>
@@ -107,7 +107,7 @@ export const QuestSettingsScreen = ({ navigation }: any) => {
         </View>
 
         <View style={styles.sectionHeader}>
-          <MaterialCommunityIcons name="map-legend" size={18} color={COLORS.gold} />
+          <MaterialCommunityIcons name="map-legend" size={18} color={COLORS.quest} />
           <Text style={styles.sectionTitle}>{t.realms}</Text>
         </View>
         <View style={styles.catGrid}>
@@ -115,8 +115,8 @@ export const QuestSettingsScreen = ({ navigation }: any) => {
             style={[styles.chip, styles.allChip, allSelected && styles.allChipActive]}
             onPress={toggleAll}
           >
-            <MaterialCommunityIcons name="earth" size={18} color={allSelected ? COLORS.goldBright : COLORS.textSecondary} />
-            <Text style={[styles.chipText, allSelected && { color: COLORS.goldBright, fontFamily: FONTS.bodyBlack }]}>{t.allRealms}</Text>
+            <MaterialCommunityIcons name="earth" size={18} color={allSelected ? COLORS.questBright : COLORS.textSecondary} />
+            <Text style={[styles.chipText, allSelected && { color: COLORS.questBright, fontFamily: FONTS.bodyBlack }]}>{t.allRealms}</Text>
           </TouchableOpacity>
           {CATEGORIES.map((cat) => {
             const selected = selectedCategories.includes(cat.id);
@@ -126,7 +126,7 @@ export const QuestSettingsScreen = ({ navigation }: any) => {
                 style={[styles.chip, selected && styles.chipActive]}
                 onPress={() => toggleCategory(cat.id)}
               >
-                <MaterialCommunityIcons name={cat.icon as any} size={16} color={selected ? COLORS.goldBright : COLORS.textSecondary} />
+                <MaterialCommunityIcons name={cat.icon as any} size={16} color={selected ? COLORS.questBright : COLORS.textSecondary} />
                 <Text style={[styles.chipText, selected && styles.chipTextActive]}>{t.categoryNames[cat.id]}</Text>
               </TouchableOpacity>
             );
@@ -147,22 +147,22 @@ export const QuestSettingsScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: SIZES.padding, paddingTop: 60, paddingBottom: 16 },
-  backBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(212,168,83,0.08)', borderWidth: 1, borderColor: 'rgba(212,168,83,0.2)', alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: SIZES.xl, fontFamily: FONTS.displayBlack, color: COLORS.gold },
+  backBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(78,168,222,0.08)', borderWidth: 1, borderColor: 'rgba(78,168,222,0.2)', alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: SIZES.xl, fontFamily: FONTS.displayBlack, color: COLORS.quest },
   scroll: { flex: 1 },
   scrollContent: { padding: SIZES.padding, paddingBottom: 100 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 20, marginBottom: 12 },
   sectionTitle: { fontSize: SIZES.lg, fontFamily: FONTS.display, color: COLORS.text },
   optionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  chip: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, backgroundColor: 'rgba(212,168,83,0.04)', borderWidth: 1, borderColor: 'rgba(212,168,83,0.1)', flexDirection: 'row', alignItems: 'center', gap: 6 },
-  chipActive: { backgroundColor: 'rgba(212,168,83,0.15)', borderColor: COLORS.gold },
+  chip: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, backgroundColor: 'rgba(78,168,222,0.04)', borderWidth: 1, borderColor: 'rgba(78,168,222,0.1)', flexDirection: 'row', alignItems: 'center', gap: 6 },
+  chipActive: { backgroundColor: 'rgba(78,168,222,0.15)', borderColor: COLORS.quest },
   chipText: { fontSize: SIZES.sm, fontFamily: FONTS.bodyBold, color: COLORS.textSecondary },
-  chipTextActive: { color: COLORS.gold },
+  chipTextActive: { color: COLORS.quest },
   diffChip: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   catGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  allChip: { borderStyle: 'dashed' as any, borderColor: 'rgba(212,168,83,0.25)' },
-  allChipActive: { backgroundColor: 'rgba(212,168,83,0.2)', borderColor: COLORS.goldBright, borderStyle: 'solid' as any },
+  allChip: { borderStyle: 'dashed' as any, borderColor: 'rgba(78,168,222,0.25)' },
+  allChipActive: { backgroundColor: 'rgba(78,168,222,0.2)', borderColor: COLORS.questBright, borderStyle: 'solid' as any },
   footer: { paddingHorizontal: SIZES.padding, paddingBottom: 40, paddingTop: 10 },
-  startBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLORS.gold, paddingVertical: 18, borderRadius: SIZES.radius },
+  startBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLORS.quest, paddingVertical: 18, borderRadius: SIZES.radius },
   startBtnText: { fontSize: SIZES.lg, fontFamily: FONTS.displayBlack, color: COLORS.ink },
 });

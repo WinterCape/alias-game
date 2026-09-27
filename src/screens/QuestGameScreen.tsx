@@ -22,7 +22,7 @@ import { generateHints } from '../utils/hints';
 const { width } = Dimensions.get('window');
 
 const PLAYER_COLORS = [
-  '#D4A853',
+  '#4EA8DE',
   '#9B2335',
   '#2D6A4F',
   '#5E548E',
@@ -290,7 +290,7 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
 
         {/* Category badge */}
         <View style={styles.categoryBadge}>
-          <MaterialCommunityIcons name="tag" size={14} color={COLORS.gold} />
+          <MaterialCommunityIcons name="tag" size={14} color={COLORS.quest} />
           <Text style={styles.categoryText}>{categoryName}</Text>
         </View>
 
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
   storytellerLabel: {
     fontSize: SIZES.md,
     fontFamily: FONTS.bodyBold,
-    color: COLORS.gold,
+    color: COLORS.quest,
     textTransform: 'uppercase',
     letterSpacing: 3,
     marginBottom: 4,
@@ -433,14 +433,14 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.backgroundLight,
     borderRadius: SIZES.radius,
     borderWidth: 1,
-    borderColor: COLORS.gold + '30',
+    borderColor: COLORS.quest + '30',
     padding: 16,
     marginBottom: 40,
   },
   miniScoreTitle: {
     fontSize: SIZES.xs,
     fontFamily: FONTS.bodyBold,
-    color: COLORS.gold,
+    color: COLORS.quest,
     textTransform: 'uppercase',
     letterSpacing: 2,
     marginBottom: 10,
@@ -588,12 +588,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderWidth: 1,
-    borderColor: COLORS.gold + '30',
+    borderColor: COLORS.quest + '30',
   },
   turnBadgeText: {
     fontSize: SIZES.sm,
     fontFamily: FONTS.bodyBold,
-    color: COLORS.gold,
+    color: COLORS.quest,
   },
   playingContent: {
     paddingHorizontal: SIZES.padding,
@@ -626,7 +626,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 20,
     height: 20,
-    borderColor: COLORS.gold,
+    borderColor: COLORS.quest,
   },
   decorLine: {
     width: '60%',
@@ -649,7 +649,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'center',
     gap: 6,
-    backgroundColor: COLORS.gold + '15',
+    backgroundColor: COLORS.quest + '15',
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 6,
@@ -658,7 +658,7 @@ const styles = StyleSheet.create({
   categoryText: {
     fontSize: SIZES.sm,
     fontFamily: FONTS.bodyBold,
-    color: COLORS.gold,
+    color: COLORS.quest,
   },
 
   /* --- Instruction --- */
@@ -675,7 +675,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.backgroundLight,
     borderRadius: SIZES.radius,
     borderWidth: 1,
-    borderColor: COLORS.gold + '20',
+    borderColor: COLORS.quest + '20',
     padding: 14,
     marginBottom: 24,
   },
@@ -688,7 +688,7 @@ const styles = StyleSheet.create({
   hintsTitle: {
     fontSize: SIZES.sm,
     fontFamily: FONTS.bodyBold,
-    color: COLORS.gold,
+    color: COLORS.quest,
     textTransform: 'uppercase',
     letterSpacing: 2,
   },
@@ -710,11 +710,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderWidth: 1,
-    borderColor: COLORS.gold + '10',
+    borderColor: COLORS.quest + '10',
   },
   hintSlotRevealed: {
-    backgroundColor: COLORS.gold + '10',
-    borderColor: COLORS.gold + '30',
+    backgroundColor: COLORS.quest + '10',
+    borderColor: COLORS.quest + '30',
   },
   hintContent: {
     flexDirection: 'row',
@@ -725,7 +725,7 @@ const styles = StyleSheet.create({
   hintType: {
     fontSize: SIZES.sm,
     fontFamily: FONTS.bodyBold,
-    color: COLORS.gold,
+    color: COLORS.quest,
     minWidth: 90,
   },
   hintValue: {
@@ -739,14 +739,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: COLORS.gold,
+    backgroundColor: COLORS.quest,
     borderRadius: 10,
     paddingVertical: 12,
   },
   revealHintBtnDisabled: {
     backgroundColor: COLORS.backgroundLight,
     borderWidth: 1,
-    borderColor: COLORS.gold + '15',
+    borderColor: COLORS.quest + '15',
   },
   revealHintText: {
     fontSize: SIZES.md,
@@ -764,7 +764,7 @@ const styles = StyleSheet.create({
   guessSectionTitle: {
     fontSize: SIZES.sm,
     fontFamily: FONTS.bodyBold,
-    color: COLORS.gold,
+    color: COLORS.quest,
     textTransform: 'uppercase',
     letterSpacing: 2,
     marginBottom: 12,
@@ -779,7 +779,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: 'rgba(212,168,83,0.06)',
+    backgroundColor: 'rgba(78,168,222,0.06)',
     borderRadius: SIZES.radius,
     borderWidth: 1.5,
     paddingVertical: 14,

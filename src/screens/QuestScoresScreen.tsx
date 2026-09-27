@@ -63,7 +63,7 @@ export const QuestScoresScreen = ({ navigation, route }: any) => {
         {/* Winner Section */}
         <Animated.View style={[styles.winnerSection, { transform: [{ scale: scaleAnim }] }]}>
           <View style={styles.trophyGlow}>
-            <MaterialCommunityIcons name="trophy" size={80} color={COLORS.gold} />
+            <MaterialCommunityIcons name="trophy" size={80} color={COLORS.quest} />
           </View>
           <Text style={styles.congratsText}>{t.congratsChampion}</Text>
           <Text style={[styles.winnerName, { color: winner.color }]}>
@@ -81,7 +81,7 @@ export const QuestScoresScreen = ({ navigation, route }: any) => {
             <View key={player.id} style={styles.standingRow}>
               <View style={styles.standingLeft}>
                 {index === 0 && (
-                  <MaterialCommunityIcons name="trophy" size={20} color={COLORS.gold} />
+                  <MaterialCommunityIcons name="trophy" size={20} color={COLORS.quest} />
                 )}
                 {index === 1 && (
                   <MaterialCommunityIcons name="medal" size={20} color="#C0C0C0" />
@@ -107,7 +107,7 @@ export const QuestScoresScreen = ({ navigation, route }: any) => {
           <Text style={styles.statsTitle}>{t.questScores}</Text>
           <View style={styles.statsGrid}>
             <View style={styles.statItem}>
-              <MaterialCommunityIcons name="sword-cross" size={24} color={COLORS.gold} />
+              <MaterialCommunityIcons name="sword-cross" size={24} color={COLORS.quest} />
               <Text style={styles.statValue}>{totalTurns}</Text>
               <Text style={styles.statLabel}>{t.rounds}</Text>
             </View>
@@ -135,7 +135,7 @@ export const QuestScoresScreen = ({ navigation, route }: any) => {
           activeOpacity={0.8}
         >
           <LinearGradient
-            colors={[COLORS.goldDim, COLORS.gold]}
+            colors={[COLORS.questDim, COLORS.quest]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.newGameButton}
@@ -167,16 +167,16 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: COLORS.gold + '15',
+    backgroundColor: COLORS.quest + '15',
     borderWidth: 2,
-    borderColor: COLORS.gold + '40',
+    borderColor: COLORS.quest + '40',
     alignItems: 'center',
     justifyContent: 'center',
   },
   congratsText: {
     fontSize: SIZES.xl,
     fontFamily: FONTS.display,
-    color: COLORS.gold,
+    color: COLORS.quest,
     marginTop: 20,
   },
   winnerName: {
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   winnerExp: {
     fontSize: SIZES.md,
     fontFamily: FONTS.body,
-    color: COLORS.gold,
+    color: COLORS.quest,
   },
 
   /* --- Rankings --- */
@@ -203,13 +203,13 @@ const styles = StyleSheet.create({
     borderRadius: SIZES.radius,
     padding: SIZES.padding,
     borderWidth: 1,
-    borderColor: COLORS.gold + '25',
+    borderColor: COLORS.quest + '25',
     marginBottom: 16,
   },
   standingsTitle: {
     fontSize: SIZES.sm,
     fontFamily: FONTS.bodyBold,
-    color: COLORS.gold,
+    color: COLORS.quest,
     textTransform: 'uppercase',
     letterSpacing: 2,
     marginBottom: 16,
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.gold + '12',
+    borderBottomColor: COLORS.quest + '12',
   },
   standingLeft: {
     flexDirection: 'row',
@@ -263,12 +263,12 @@ const styles = StyleSheet.create({
     borderRadius: SIZES.radius,
     padding: SIZES.padding,
     borderWidth: 1,
-    borderColor: COLORS.gold + '25',
+    borderColor: COLORS.quest + '25',
   },
   statsTitle: {
     fontSize: SIZES.sm,
     fontFamily: FONTS.bodyBold,
-    color: COLORS.gold,
+    color: COLORS.quest,
     textTransform: 'uppercase',
     letterSpacing: 2,
     marginBottom: 16,
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   statDivider: {
     width: 1,
     height: 48,
-    backgroundColor: COLORS.gold + '20',
+    backgroundColor: COLORS.quest + '20',
   },
 
   /* --- Footer --- */
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     borderRadius: SIZES.radius,
     overflow: 'hidden',
     elevation: 8,
-    shadowColor: COLORS.gold,
+    shadowColor: COLORS.quest,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
