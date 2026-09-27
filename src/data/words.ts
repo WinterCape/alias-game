@@ -3,6 +3,9 @@ import { Language } from '../i18n/strings';
 import { PackId } from '../store/packs';
 import { WORDS_RO } from './words/ro';
 import { WORDS_EN } from './words/en';
+import { WORDS_ES } from './words/es';
+import { WORDS_FR } from './words/fr';
+import { WORDS_RU } from './words/ru';
 import { PACK_PARTY18 } from './packs/party18';
 import { PACK_POPCULTURE } from './packs/popculture';
 import { PACK_MYTHOLOGY } from './packs/mythology';
@@ -19,6 +22,9 @@ const ALL_CATEGORIES: CategoryId[] = [
 const WORD_PACKS: Record<Language, Record<CategoryId, string[]>> = {
   ro: WORDS_RO,
   en: WORDS_EN,
+  es: WORDS_ES,
+  fr: WORDS_FR,
+  ru: WORDS_RU,
 };
 
 const PREMIUM_WORD_PACKS: Record<PackId, Record<Language, string[]>> = {

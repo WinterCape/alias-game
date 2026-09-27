@@ -18,6 +18,9 @@ const { width } = Dimensions.get('window');
 const LANGUAGES: { id: Language; label: string; flag: string }[] = [
   { id: 'ro', label: 'RO', flag: '🇷🇴' },
   { id: 'en', label: 'EN', flag: '🇬🇧' },
+  { id: 'es', label: 'ES', flag: '🇪🇸' },
+  { id: 'fr', label: 'FR', flag: '🇫🇷' },
+  { id: 'ru', label: 'RU', flag: '🇷🇺' },
 ];
 
 export const HomeScreen = ({ navigation }: any) => {
