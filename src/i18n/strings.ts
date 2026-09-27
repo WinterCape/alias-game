@@ -95,6 +95,27 @@ export interface Strings {
   rateLater: string;
   rateNow: string;
 
+  // Quest Mode
+  questMode: string;
+  arenaMode: string;
+  questDesc: string;
+  arenaDesc: string;
+  addPlayer: string;
+  playerName: string;
+  removePlayer: string;
+  minPlayers: string;
+  storyteller: string;
+  describeWord: string;
+  whoGuessed: string;
+  nobodyGuessed: string;
+  revealHint: string;
+  hintsLeft: string;
+  nextTurn: string;
+  wordRevealed: string;
+  pointsToWin: string;
+  players: string;
+  questScores: string;
+
   // Language picker
   language: string;
 }
@@ -193,6 +214,25 @@ export const RO: Strings = {
   rateMessage: 'Dacă te distrezi, lasă-ne o recenzie! Ne ajută enorm.',
   rateLater: 'Mai târziu',
   rateNow: 'Recenzie',
+  questMode: 'Aventura',
+  arenaMode: 'Arena',
+  questDesc: 'Povestește și ghicește pe rând',
+  arenaDesc: 'Descrie rapid contra cronometru',
+  addPlayer: 'Adaugă jucător',
+  playerName: 'Numele jucătorului',
+  removePlayer: 'Elimină',
+  minPlayers: 'Minim 3 jucători',
+  storyteller: 'Povestitor',
+  describeWord: 'Descrie acest cuvânt celorlalți!',
+  whoGuessed: 'Cine a ghicit?',
+  nobodyGuessed: 'Nimeni nu a ghicit',
+  revealHint: 'Indiciu',
+  hintsLeft: 'indicii rămase',
+  nextTurn: 'Runda următoare',
+  wordRevealed: 'Cuvântul era:',
+  pointsToWin: 'Puncte pentru victorie',
+  players: 'Jucători',
+  questScores: 'Clasament',
   language: 'Limba',
 };
 
@@ -290,6 +330,25 @@ export const EN: Strings = {
   rateMessage: 'If you\'re having fun, leave us a review! It helps a lot.',
   rateLater: 'Later',
   rateNow: 'Rate',
+  questMode: 'Quest',
+  arenaMode: 'Arena',
+  questDesc: 'Take turns storytelling and guessing',
+  arenaDesc: 'Describe fast against the clock',
+  addPlayer: 'Add player',
+  playerName: 'Player name',
+  removePlayer: 'Remove',
+  minPlayers: 'Minimum 3 players',
+  storyteller: 'Storyteller',
+  describeWord: 'Describe this word to the others!',
+  whoGuessed: 'Who guessed it?',
+  nobodyGuessed: 'Nobody guessed',
+  revealHint: 'Hint',
+  hintsLeft: 'hints left',
+  nextTurn: 'Next turn',
+  wordRevealed: 'The word was:',
+  pointsToWin: 'Points to win',
+  players: 'Players',
+  questScores: 'Scoreboard',
   language: 'Language',
 };
 
@@ -387,6 +446,25 @@ export const ES: Strings = {
   rateMessage: 'Si te estás divirtiendo, ¡déjanos una reseña! Nos ayuda mucho.',
   rateLater: 'Más tarde',
   rateNow: 'Valorar',
+  questMode: 'Aventura',
+  arenaMode: 'Arena',
+  questDesc: 'Cuenta y adivina por turnos',
+  arenaDesc: 'Describe rápido contra el reloj',
+  addPlayer: 'Añadir jugador',
+  playerName: 'Nombre del jugador',
+  removePlayer: 'Eliminar',
+  minPlayers: 'Mínimo 3 jugadores',
+  storyteller: 'Narrador',
+  describeWord: '¡Describe esta palabra a los demás!',
+  whoGuessed: '¿Quién adivinó?',
+  nobodyGuessed: 'Nadie adivinó',
+  revealHint: 'Pista',
+  hintsLeft: 'pistas restantes',
+  nextTurn: 'Siguiente turno',
+  wordRevealed: 'La palabra era:',
+  pointsToWin: 'Puntos para ganar',
+  players: 'Jugadores',
+  questScores: 'Marcador',
   language: 'Idioma',
 };
 
@@ -484,6 +562,25 @@ export const FR: Strings = {
   rateMessage: 'Si vous vous amusez, laissez-nous un avis ! Cela nous aide énormément.',
   rateLater: 'Plus tard',
   rateNow: 'Évaluer',
+  questMode: 'Quête',
+  arenaMode: 'Arène',
+  questDesc: 'Racontez et devinez à tour de rôle',
+  arenaDesc: 'Décrivez vite contre la montre',
+  addPlayer: 'Ajouter un joueur',
+  playerName: 'Nom du joueur',
+  removePlayer: 'Supprimer',
+  minPlayers: 'Minimum 3 joueurs',
+  storyteller: 'Conteur',
+  describeWord: 'Décrivez ce mot aux autres !',
+  whoGuessed: 'Qui a deviné ?',
+  nobodyGuessed: 'Personne n\'a deviné',
+  revealHint: 'Indice',
+  hintsLeft: 'indices restants',
+  nextTurn: 'Tour suivant',
+  wordRevealed: 'Le mot était :',
+  pointsToWin: 'Points pour gagner',
+  players: 'Joueurs',
+  questScores: 'Tableau des scores',
   language: 'Langue',
 };
 
@@ -581,6 +678,25 @@ export const RU: Strings = {
   rateMessage: 'Если вам весело, оставьте отзыв! Это очень нам помогает.',
   rateLater: 'Позже',
   rateNow: 'Оценить',
+  questMode: 'Квест',
+  arenaMode: 'Арена',
+  questDesc: 'Рассказывайте и угадывайте по очереди',
+  arenaDesc: 'Описывайте быстро на время',
+  addPlayer: 'Добавить игрока',
+  playerName: 'Имя игрока',
+  removePlayer: 'Удалить',
+  minPlayers: 'Минимум 3 игрока',
+  storyteller: 'Рассказчик',
+  describeWord: 'Опишите это слово остальным!',
+  whoGuessed: 'Кто угадал?',
+  nobodyGuessed: 'Никто не угадал',
+  revealHint: 'Подсказка',
+  hintsLeft: 'подсказок осталось',
+  nextTurn: 'Следующий ход',
+  wordRevealed: 'Слово было:',
+  pointsToWin: 'Очки для победы',
+  players: 'Игроки',
+  questScores: 'Таблица',
   language: 'Язык',
 };
 

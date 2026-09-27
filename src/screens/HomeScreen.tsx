@@ -66,6 +66,7 @@ export const HomeScreen = ({ navigation }: any) => {
       </View>
 
       <View style={styles.buttonContainer}>
+        {/* Arena Mode */}
         <TouchableOpacity
           style={styles.primaryBtn}
           onPress={() => navigation.navigate('Settings')}
@@ -78,7 +79,24 @@ export const HomeScreen = ({ navigation }: any) => {
             style={styles.primaryBtnGradient}
           >
             <MaterialCommunityIcons name="sword-cross" size={22} color={COLORS.ink} />
-            <Text style={styles.primaryBtnText}>{t.newAdventure}</Text>
+            <Text style={styles.primaryBtnText}>{t.arenaMode}</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        {/* Quest Mode */}
+        <TouchableOpacity
+          style={styles.primaryBtn}
+          onPress={() => navigation.navigate('QuestSettings')}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={['#1B4332', '#2D6A4F', '#1B4332']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.primaryBtnGradient}
+          >
+            <MaterialCommunityIcons name="book-open-page-variant" size={22} color={COLORS.parchment} />
+            <Text style={[styles.primaryBtnText, { color: COLORS.parchment }]}>{t.questMode}</Text>
           </LinearGradient>
         </TouchableOpacity>
 

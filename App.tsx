@@ -16,6 +16,10 @@ import { StatsScreen } from './src/screens/StatsScreen';
 import { I18nProvider } from './src/i18n/I18nContext';
 import { StoreProvider } from './src/store/StoreContext';
 import { ShopScreen } from './src/screens/ShopScreen';
+import { QuestSettingsScreen } from './src/screens/QuestSettingsScreen';
+import { QuestPlayerSetup } from './src/screens/QuestPlayerSetup';
+import { QuestGameScreen } from './src/screens/QuestGameScreen';
+import { QuestScoresScreen } from './src/screens/QuestScoresScreen';
 import { COLORS } from './src/constants/theme';
 
 const Stack = createNativeStackNavigator();
@@ -58,6 +62,10 @@ export default function App() {
           <Stack.Screen name="Game" component={GameScreen} />
           <Stack.Screen name="RoundResult" component={RoundResultScreen} />
           <Stack.Screen name="GameOver" component={GameOverScreen} />
+          <Stack.Screen name="QuestSettings" component={QuestSettingsScreen} />
+          <Stack.Screen name="QuestPlayerSetup" component={QuestPlayerSetup} />
+          <Stack.Screen name="QuestGame" component={QuestGameScreen} />
+          <Stack.Screen name="QuestScores" component={QuestScoresScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GameProvider>
