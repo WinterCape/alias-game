@@ -365,7 +365,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   statCard: {
-    width: '47%',
+    flexGrow: 1,
+    flexBasis: '40%',
     backgroundColor: 'rgba(212,168,83,0.04)',
     borderRadius: SIZES.cardRadius,
     padding: 16,

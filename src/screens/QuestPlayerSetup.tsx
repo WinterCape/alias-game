@@ -14,6 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useI18n } from '../i18n/I18nContext';
+import { Player } from '../types';
 
 const PLAYER_COLORS = [
   '#4EA8DE',
@@ -28,7 +29,7 @@ const PLAYER_COLORS = [
 
 export const QuestPlayerSetup = ({ navigation, route }: any) => {
   const { t } = useI18n();
-  const { onStart, settings } = route.params;
+  const { settings } = route.params;
   const [playerNames, setPlayerNames] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState('');
 
@@ -45,8 +46,13 @@ export const QuestPlayerSetup = ({ navigation, route }: any) => {
 
   const handleStart = () => {
     if (playerNames.length < 3) return;
-    onStart(playerNames);
-    navigation.navigate('QuestGame', { playerNames, settings });
+    const players: Player[] = playerNames.map((name, i) => ({
+      id: i,
+      name,
+      score: 0,
+      color: PLAYER_COLORS[i % PLAYER_COLORS.length],
+    }));
+    navigation.navigate('QuestGame', { players, settings });
   };
 
   const canStart = playerNames.length >= 3;

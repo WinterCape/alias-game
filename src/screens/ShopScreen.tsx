@@ -101,7 +101,7 @@ export const ShopScreen = ({ navigation }: any) => {
                   </Text>
                   <Text style={styles.allAccessDesc}>
                     {lang === 'ro'
-                      ? 'Deblocheaza toate pachetele de cuvinte'
+                      ? 'Deblochează toate pachetele de cuvinte'
                       : 'Unlock all word packs'}
                   </Text>
                 </View>
