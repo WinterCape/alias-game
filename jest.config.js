@@ -19,7 +19,8 @@ module.exports = {
   moduleNameMapper: {
     '^react-native$': '<rootDir>/__mocks__/react-native.ts',
     '^@react-native-async-storage/async-storage$': '<rootDir>/__mocks__/async-storage.ts',
-    '^expo-av$': '<rootDir>/__mocks__/expo-av.ts',
+    '^expo-audio$': '<rootDir>/__mocks__/expo-audio.ts',
+    '^expo-file-system$': '<rootDir>/__mocks__/expo-file-system.ts',
     '^expo-keep-awake$': '<rootDir>/__mocks__/expo-keep-awake.ts',
     '^expo-store-review$': '<rootDir>/__mocks__/expo-store-review.ts',
     '^expo-linear-gradient$': '<rootDir>/__mocks__/expo-linear-gradient.ts',

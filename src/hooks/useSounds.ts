@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { Audio } from 'expo-av';
-import { Platform } from 'react-native';
+import { AudioPlayer, createAudioPlayer, setAudioModeAsync } from 'expo-audio';
+import { File, Paths } from 'expo-file-system';
 
 // Generate WAV buffer for a simple tone
 function generateToneWav(
@@ -67,33 +67,6 @@ function generateToneWav(
   return buffer;
 }
 
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let binary = '';
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  // Use btoa if available, otherwise manual encoding
-  if (typeof btoa !== 'undefined') {
-    return btoa(binary);
-  }
-  // Fallback base64 encoding
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-  let result = '';
-  let i = 0;
-  while (i < binary.length) {
-    const a = binary.charCodeAt(i++);
-    const b = i < binary.length ? binary.charCodeAt(i++) : 0;
-    const c = i < binary.length ? binary.charCodeAt(i++) : 0;
-    const triplet = (a << 16) | (b << 8) | c;
-    result += chars[(triplet >> 18) & 63];
-    result += chars[(triplet >> 12) & 63];
-    result += i - 2 < binary.length ? chars[(triplet >> 6) & 63] : '=';
-    result += i - 1 < binary.length ? chars[triplet & 63] : '=';
-  }
-  return result;
-}
-
 type SoundType = 'correct' | 'skip' | 'tick' | 'timeUp' | 'gameOver' | 'start';
 
 const SOUND_CONFIGS: Record<SoundType, { freq: number; duration: number; volume: number; type: 'sine' | 'square' }> = {
@@ -106,16 +79,16 @@ const SOUND_CONFIGS: Record<SoundType, { freq: number; duration: number; volume:
 };
 
 export const useSounds = () => {
-  const soundsRef = useRef<Record<string, Audio.Sound>>({});
+  const playersRef = useRef<Partial<Record<SoundType, AudioPlayer>>>({});
   const audioReady = useRef(false);
 
   useEffect(() => {
     const setup = async () => {
       try {
-        await Audio.setAudioModeAsync({
-          playsInSilentModeIOS: true,
-          staysActiveInBackground: false,
-          shouldDuckAndroid: true,
+        await setAudioModeAsync({
+          playsInSilentMode: true,
+          shouldPlayInBackground: false,
+          interruptionMode: 'duckOthers',
         });
         audioReady.current = true;
       } catch {
@@ -125,9 +98,12 @@ export const useSounds = () => {
     setup();
 
     return () => {
-      Object.values(soundsRef.current).forEach((sound) => {
-        sound.unloadAsync().catch(() => {});
+      Object.values(playersRef.current).forEach((player) => {
+        try {
+          player?.remove();
+        } catch {}
       });
+      playersRef.current = {};
     };
   }, []);
 
@@ -135,21 +111,21 @@ export const useSounds = () => {
     if (!audioReady.current) return;
 
     try {
-      // Unload previous instance of this sound type
-      if (soundsRef.current[type]) {
-        await soundsRef.current[type].unloadAsync().catch(() => {});
+      let player = playersRef.current[type];
+      if (!player) {
+        // Write the generated tone to a cache file once, then reuse the player
+        const config = SOUND_CONFIGS[type];
+        const wavBuffer = generateToneWav(config.freq, config.duration, config.volume, config.type);
+        const file = new File(Paths.cache, `sound-${type}.wav`);
+        if (!file.exists) {
+          file.create();
+          file.write(new Uint8Array(wavBuffer));
+        }
+        player = createAudioPlayer({ uri: file.uri });
+        playersRef.current[type] = player;
       }
-
-      const config = SOUND_CONFIGS[type];
-      const wavBuffer = generateToneWav(config.freq, config.duration, config.volume, config.type);
-      const base64 = arrayBufferToBase64(wavBuffer);
-      const uri = `data:audio/wav;base64,${base64}`;
-
-      const { sound } = await Audio.Sound.createAsync(
-        { uri },
-        { shouldPlay: true }
-      );
-      soundsRef.current[type] = sound;
+      await player.seekTo(0);
+      player.play();
     } catch {
       // Silently fail - sounds are nice-to-have
     }
