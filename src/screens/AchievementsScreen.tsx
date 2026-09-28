@@ -15,7 +15,7 @@ import { ACHIEVEMENTS, AchievementId } from '../achievements/definitions';
 import { useI18n } from '../i18n/I18nContext';
 
 const TITLE: Record<string, string> = {
-  ro: 'Realizari',
+  ro: 'Realizări',
   en: 'Achievements',
   es: 'Logros',
   fr: 'Succes',

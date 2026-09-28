@@ -24,6 +24,8 @@ const SWIPE_THRESHOLD = 80;
 
 type GamePhase = 'ready' | 'playing' | 'finished';
 
+const CORNER_INSET = 8;
+
 const CardCorner = ({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) => {
   const isTop = position === 'tl' || position === 'tr';
   const isLeft = position === 'tl' || position === 'bl';
@@ -32,14 +34,19 @@ const CardCorner = ({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) => {
       style={[
         styles.cardCorner,
         {
-          top: isTop ? -1 : undefined,
-          bottom: !isTop ? -1 : undefined,
-          left: isLeft ? -1 : undefined,
-          right: !isLeft ? -1 : undefined,
+          // Inset from the edge so the bracket sits inside the card's rounded corner
+          top: isTop ? CORNER_INSET : undefined,
+          bottom: !isTop ? CORNER_INSET : undefined,
+          left: isLeft ? CORNER_INSET : undefined,
+          right: !isLeft ? CORNER_INSET : undefined,
           borderTopWidth: isTop ? 2 : 0,
           borderBottomWidth: !isTop ? 2 : 0,
           borderLeftWidth: isLeft ? 2 : 0,
           borderRightWidth: !isLeft ? 2 : 0,
+          borderTopLeftRadius: position === 'tl' ? 4 : 0,
+          borderTopRightRadius: position === 'tr' ? 4 : 0,
+          borderBottomLeftRadius: position === 'bl' ? 4 : 0,
+          borderBottomRightRadius: position === 'br' ? 4 : 0,
         },
       ]}
     />
