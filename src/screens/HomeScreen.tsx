@@ -5,16 +5,15 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
-  Dimensions,
+  ScrollView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useI18n } from '../i18n/I18nContext';
 import { Language } from '../i18n/strings';
 import { ProfileCard } from '../components/ProfileCard';
-
-const { width } = Dimensions.get('window');
 
 const LANGUAGES: { id: Language; label: string; flag: string }[] = [
   { id: 'ro', label: 'RO', flag: '🇷🇴' },
@@ -26,127 +25,137 @@ const LANGUAGES: { id: Language; label: string; flag: string }[] = [
 
 export const HomeScreen = ({ navigation }: any) => {
   const { lang, t, setLanguage } = useI18n();
+  const insets = useSafeAreaInsets();
 
   return (
     <LinearGradient colors={COLORS.gradientTable} style={styles.container}>
       <StatusBar barStyle="light-content" />
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 16 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Language Picker */}
+        <View style={styles.langRow}>
+          {LANGUAGES.map((l) => (
+            <TouchableOpacity
+              key={l.id}
+              style={[styles.langBtn, lang === l.id && styles.langBtnActive]}
+              onPress={() => setLanguage(l.id)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.langFlag}>{l.flag}</Text>
+              <Text style={[styles.langLabel, lang === l.id && styles.langLabelActive]}>
+                {l.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      {/* Language Picker */}
-      <View style={styles.langRow}>
-        {LANGUAGES.map((l) => (
-          <TouchableOpacity
-            key={l.id}
-            style={[styles.langBtn, lang === l.id && styles.langBtnActive]}
-            onPress={() => setLanguage(l.id)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.langFlag}>{l.flag}</Text>
-            <Text style={[styles.langLabel, lang === l.id && styles.langLabelActive]}>
-              {l.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <View style={styles.header}>
-        <View style={styles.shield}>
-          <View style={styles.shieldInner}>
-            <Text style={styles.shieldLetter}>A</Text>
+        <View style={styles.header}>
+          <View style={styles.shield}>
+            <View style={styles.shieldInner}>
+              <Text style={styles.shieldLetter}>A</Text>
+            </View>
+            <View style={styles.shieldGlow} />
           </View>
-          <View style={styles.shieldGlow} />
+
+          <Text style={styles.title}>ALIAS</Text>
+          <Text style={styles.subtitle}>QUEST</Text>
+
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <MaterialCommunityIcons name="cards-playing-outline" size={20} color={COLORS.goldDim} />
+            <View style={styles.dividerLine} />
+          </View>
         </View>
 
-        <Text style={styles.title}>ALIAS</Text>
-        <Text style={styles.subtitle}>QUEST</Text>
-
-        <View style={styles.divider}>
-          <View style={styles.dividerLine} />
-          <MaterialCommunityIcons name="cards-playing-outline" size={20} color={COLORS.goldDim} />
-          <View style={styles.dividerLine} />
+        <View style={styles.profileWrap}>
+          <ProfileCard />
         </View>
-      </View>
 
-      <ProfileCard />
-
-      <View style={styles.buttonContainer}>
-        {/* Arena Mode */}
-        <TouchableOpacity
-          style={styles.primaryBtn}
-          onPress={() => navigation.navigate('Settings')}
-          activeOpacity={0.8}
-        >
-          <LinearGradient
-            colors={['#8B6914', '#D4A853', '#8B6914']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.primaryBtnGradient}
+        <View style={styles.buttonContainer}>
+          {/* Arena Mode */}
+          <TouchableOpacity
+            style={styles.primaryBtn}
+            onPress={() => navigation.navigate('Settings')}
+            activeOpacity={0.8}
           >
-            <MaterialCommunityIcons name="sword-cross" size={22} color={COLORS.ink} />
-            <View style={styles.modeBtnContent}>
-              <Text style={styles.primaryBtnText}>{t.arenaMode}</Text>
-              <Text style={[styles.modeDesc, { color: COLORS.inkSoft }]}>{t.arenaDesc}</Text>
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
+            <LinearGradient
+              colors={['#8B6914', '#D4A853', '#8B6914']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.primaryBtnGradient}
+            >
+              <MaterialCommunityIcons name="sword-cross" size={22} color={COLORS.ink} />
+              <View style={styles.modeBtnContent}>
+                <Text style={styles.primaryBtnText}>{t.arenaMode}</Text>
+                <Text style={[styles.modeDesc, { color: COLORS.inkSoft }]}>{t.arenaDesc}</Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
 
-        {/* Quest Mode */}
-        <TouchableOpacity
-          style={styles.primaryBtn}
-          onPress={() => navigation.navigate('QuestSettings')}
-          activeOpacity={0.8}
-        >
-          <LinearGradient
-            colors={['#2B7AAD', '#4EA8DE', '#2B7AAD']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.primaryBtnGradient}
+          {/* Quest Mode */}
+          <TouchableOpacity
+            style={styles.primaryBtn}
+            onPress={() => navigation.navigate('QuestSettings')}
+            activeOpacity={0.8}
           >
-            <MaterialCommunityIcons name="book-open-page-variant" size={22} color="#FFF" />
-            <View style={styles.modeBtnContent}>
-              <Text style={[styles.primaryBtnText, { color: '#FFF' }]}>{t.questMode}</Text>
-              <Text style={[styles.modeDesc, { color: 'rgba(255,255,255,0.6)' }]}>{t.questDesc}</Text>
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
+            <LinearGradient
+              colors={['#2B7AAD', '#4EA8DE', '#2B7AAD']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.primaryBtnGradient}
+            >
+              <MaterialCommunityIcons name="book-open-page-variant" size={22} color="#FFF" />
+              <View style={styles.modeBtnContent}>
+                <Text style={[styles.primaryBtnText, { color: '#FFF' }]}>{t.questMode}</Text>
+                <Text style={[styles.modeDesc, { color: 'rgba(255,255,255,0.6)' }]}>{t.questDesc}</Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.secondaryBtn}
-          onPress={() => navigation.navigate('Shop')}
-          activeOpacity={0.8}
-        >
-          <MaterialCommunityIcons name="treasure-chest" size={20} color={COLORS.gold} />
-          <Text style={styles.secondaryBtnText}>{lang === 'ro' ? 'Magazinul Eroilor' : "Hero's Shop"}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.secondaryBtn}
+            onPress={() => navigation.navigate('Shop')}
+            activeOpacity={0.8}
+          >
+            <MaterialCommunityIcons name="treasure-chest" size={20} color={COLORS.gold} />
+            <Text style={styles.secondaryBtnText}>{lang === 'ro' ? 'Magazinul Eroilor' : "Hero's Shop"}</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.secondaryBtn}
-          onPress={() => navigation.navigate('Achievements')}
-          activeOpacity={0.8}
-        >
-          <MaterialCommunityIcons name="medal" size={20} color={COLORS.gold} />
-          <Text style={styles.secondaryBtnText}>{lang === 'ro' ? 'Realizări' : lang === 'es' ? 'Logros' : lang === 'fr' ? 'Succès' : lang === 'ru' ? 'Достижения' : 'Achievements'}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.secondaryBtn}
+            onPress={() => navigation.navigate('Achievements')}
+            activeOpacity={0.8}
+          >
+            <MaterialCommunityIcons name="medal" size={20} color={COLORS.gold} />
+            <Text style={styles.secondaryBtnText}>{lang === 'ro' ? 'Realizări' : lang === 'es' ? 'Logros' : lang === 'fr' ? 'Succès' : lang === 'ru' ? 'Достижения' : 'Achievements'}</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.secondaryBtn}
-          onPress={() => navigation.navigate('Rules')}
-          activeOpacity={0.8}
-        >
-          <MaterialCommunityIcons name="script-text" size={20} color={COLORS.gold} />
-          <Text style={styles.secondaryBtnText}>{t.heroCode}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.secondaryBtn}
+            onPress={() => navigation.navigate('Rules')}
+            activeOpacity={0.8}
+          >
+            <MaterialCommunityIcons name="script-text" size={20} color={COLORS.gold} />
+            <Text style={styles.secondaryBtnText}>{t.heroCode}</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.secondaryBtn}
-          onPress={() => navigation.navigate('Stats')}
-          activeOpacity={0.8}
-        >
-          <MaterialCommunityIcons name="trophy-variant" size={20} color={COLORS.gold} />
-          <Text style={styles.secondaryBtnText}>{t.chronicles}</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={styles.secondaryBtn}
+            onPress={() => navigation.navigate('Stats')}
+            activeOpacity={0.8}
+          >
+            <MaterialCommunityIcons name="trophy-variant" size={20} color={COLORS.gold} />
+            <Text style={styles.secondaryBtnText}>{t.chronicles}</Text>
+          </TouchableOpacity>
+        </View>
 
-      <Text style={styles.version}>v1.0.0</Text>
+        <Text style={styles.version}>v1.0.0</Text>
+      </ScrollView>
     </LinearGradient>
   );
 };
@@ -154,24 +163,26 @@ export const HomeScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: SIZES.padding,
   },
   langRow: {
-    position: 'absolute',
-    top: 56,
-    right: SIZES.padding,
     flexDirection: 'row',
-    gap: 8,
-    zIndex: 10,
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 6,
+    marginBottom: 16,
   },
   langBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     borderRadius: 20,
     backgroundColor: 'rgba(212,168,83,0.04)',
     borderWidth: 1,
@@ -182,7 +193,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.gold,
   },
   langFlag: {
-    fontSize: 16,
+    fontSize: 14,
   },
   langLabel: {
     fontFamily: FONTS.bodyBold,
@@ -194,44 +205,44 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 48,
+    marginBottom: 24,
   },
   shield: {
-    width: 120,
-    height: 130,
+    width: 100,
+    height: 108,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: 12,
   },
   shieldInner: {
-    width: 110,
-    height: 120,
+    width: 92,
+    height: 100,
     borderWidth: 2,
     borderColor: COLORS.gold,
     borderRadius: 8,
-    borderBottomLeftRadius: 55,
-    borderBottomRightRadius: 55,
+    borderBottomLeftRadius: 46,
+    borderBottomRightRadius: 46,
     backgroundColor: 'rgba(212,168,83,0.06)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   shieldGlow: {
     position: 'absolute',
-    width: 160,
-    height: 160,
-    borderRadius: 80,
+    width: 136,
+    height: 136,
+    borderRadius: 68,
     backgroundColor: 'rgba(212,168,83,0.05)',
     zIndex: -1,
   },
   shieldLetter: {
     fontFamily: FONTS.displayBlack,
-    fontSize: 64,
+    fontSize: 54,
     color: COLORS.gold,
     marginTop: -4,
   },
   title: {
     fontFamily: FONTS.displayBlack,
-    fontSize: 52,
+    fontSize: 46,
     color: COLORS.gold,
     letterSpacing: 10,
   },
@@ -246,7 +257,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    marginTop: 20,
+    marginTop: 14,
   },
   dividerLine: {
     width: 40,
@@ -254,8 +265,14 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.goldDim,
     opacity: 0.4,
   },
+  profileWrap: {
+    width: '100%',
+    maxWidth: 420,
+    marginBottom: 14,
+  },
   buttonContainer: {
-    width: width * 0.78,
+    width: '100%',
+    maxWidth: 420,
     gap: 12,
   },
   primaryBtn: {
@@ -271,8 +288,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
-    paddingVertical: 18,
+    gap: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     borderRadius: SIZES.radius,
   },
   modeBtnContent: {
@@ -295,7 +313,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    paddingVertical: 16,
+    paddingVertical: 14,
     borderRadius: SIZES.radius,
     borderWidth: 1,
     borderColor: 'rgba(212,168,83,0.2)',
@@ -308,8 +326,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   version: {
-    position: 'absolute',
-    bottom: 40,
+    marginTop: 16,
     fontFamily: FONTS.body,
     color: COLORS.textSecondary,
     fontSize: SIZES.xs,
