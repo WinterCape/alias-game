@@ -17,22 +17,10 @@ import { Player, QuestTurn, CategoryId } from '../types';
 import { QuestSettings } from '../hooks/useQuestGame';
 import { useConfirmLeave } from '../hooks/useConfirmLeave';
 import { getShuffledWords } from '../data/words';
-import { CATEGORIES } from '../data/categories';
 import { useStore } from '../store/StoreContext';
 import { generateHints } from '../utils/hints';
 
 const { width } = Dimensions.get('window');
-
-const PLAYER_COLORS = [
-  '#4EA8DE',
-  '#9B2335',
-  '#2D6A4F',
-  '#5E548E',
-  '#E91E63',
-  '#FF9800',
-  '#00BCD4',
-  '#4CAF50',
-];
 
 const CORNER_INSET = 8;
 
@@ -99,16 +87,8 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
 
   const currentWord = words[wordIndex] || '';
 
-  // Find category for current word
-  const currentCategory = useMemo((): CategoryId => {
-    if (!currentWord) return 'general';
-    // Check each category's words to find which one contains the current word
-    for (const cat of CATEGORIES) {
-      // We do a simple heuristic: check the category name matching isn't perfect
-      // since we don't have a reverse-lookup, default to 'general'
-    }
-    return 'general';
-  }, [currentWord]);
+  // There is no word-to-category lookup yet, so every word is shown as 'general'
+  const currentCategory: CategoryId = 'general';
 
   const categoryName = t.categoryNames[currentCategory] || t.categoryNames.general;
 
