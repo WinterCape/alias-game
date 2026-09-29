@@ -17,6 +17,11 @@ export interface Strings {
   packUnlocked: string;
   levelShort: string;
   orLevel: string;
+  shopUnavailableTitle: string;
+  shopUnavailableMessage: string;
+  purchaseFailedTitle: string;
+  purchaseFailedMessage: string;
+  purchasesRestored: string;
   chronicles: string;
 
   // Settings
@@ -148,6 +153,11 @@ export const RO: Strings = {
   packUnlocked: 'Deblocat',
   levelShort: 'Nivel',
   orLevel: 'sau Nivel',
+  shopUnavailableTitle: 'Magazin indisponibil',
+  shopUnavailableMessage: 'Cumpărăturile nu sunt disponibile acum. Încearcă mai târziu.',
+  purchaseFailedTitle: 'Cumpărarea nu s-a finalizat',
+  purchaseFailedMessage: 'Încearcă din nou sau restaurează cumpărăturile.',
+  purchasesRestored: 'Cumpărături restaurate',
   chronicles: 'Cronici',
   battlePrep: 'Pregătire de Luptă',
   missionDuration: 'Durata Misiunii (secunde)',
@@ -278,6 +288,11 @@ export const EN: Strings = {
   packUnlocked: 'Unlocked',
   levelShort: 'Lvl',
   orLevel: 'or Level',
+  shopUnavailableTitle: 'Shop unavailable',
+  shopUnavailableMessage: 'Purchases aren\'t available right now. Please try again later.',
+  purchaseFailedTitle: 'Purchase didn\'t go through',
+  purchaseFailedMessage: 'Please try again, or restore your purchases.',
+  purchasesRestored: 'Purchases restored',
   chronicles: 'Chronicles',
   battlePrep: 'Battle Preparation',
   missionDuration: 'Mission Duration (seconds)',
@@ -408,6 +423,11 @@ export const ES: Strings = {
   packUnlocked: 'Desbloqueado',
   levelShort: 'Nv.',
   orLevel: 'o nivel',
+  shopUnavailableTitle: 'Tienda no disponible',
+  shopUnavailableMessage: 'Las compras no están disponibles ahora. Inténtalo más tarde.',
+  purchaseFailedTitle: 'La compra no se completó',
+  purchaseFailedMessage: 'Inténtalo de nuevo o restaura tus compras.',
+  purchasesRestored: 'Compras restauradas',
   chronicles: 'Crónicas',
   battlePrep: 'Preparación de Batalla',
   missionDuration: 'Duración de la Misión (segundos)',
@@ -538,6 +558,11 @@ export const FR: Strings = {
   packUnlocked: 'Débloqué',
   levelShort: 'Niv.',
   orLevel: 'ou niveau',
+  shopUnavailableTitle: 'Boutique indisponible',
+  shopUnavailableMessage: 'Les achats ne sont pas disponibles pour le moment. Réessaie plus tard.',
+  purchaseFailedTitle: 'L\'achat n\'a pas abouti',
+  purchaseFailedMessage: 'Réessaie ou restaure tes achats.',
+  purchasesRestored: 'Achats restaurés',
   chronicles: 'Chroniques',
   battlePrep: 'Préparation au Combat',
   missionDuration: 'Durée de la Mission (secondes)',
@@ -668,6 +693,11 @@ export const RU: Strings = {
   packUnlocked: 'Открыто',
   levelShort: 'Ур.',
   orLevel: 'или уровень',
+  shopUnavailableTitle: 'Магазин недоступен',
+  shopUnavailableMessage: 'Покупки сейчас недоступны. Попробуй позже.',
+  purchaseFailedTitle: 'Покупка не завершена',
+  purchaseFailedMessage: 'Попробуй ещё раз или восстанови покупки.',
+  purchasesRestored: 'Покупки восстановлены',
   chronicles: 'Хроники',
   battlePrep: 'Подготовка к Битве',
   missionDuration: 'Длительность Миссии (секунды)',

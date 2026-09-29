@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { PackId, PREMIUM_PACKS, ALL_ACCESS_PRODUCT_ID } from './packs';
+import { getFallbackStoreMode, getStoreMode, PurchaseResult, StoreMode } from './storeMode';
 
 const PURCHASES_KEY = '@alias_quest_purchases';
 const RC_API_KEY_IOS = 'YOUR_REVENUECAT_IOS_KEY';
@@ -15,28 +16,30 @@ interface PurchaseState {
 
 interface StoreContextType extends PurchaseState {
   isPurchased: (packId: PackId) => boolean;
-  purchasePack: (packId: PackId) => Promise<boolean>;
-  purchaseAllAccess: () => Promise<boolean>;
-  restorePurchases: () => Promise<void>;
+  purchasePack: (packId: PackId) => Promise<PurchaseResult>;
+  purchaseAllAccess: () => Promise<PurchaseResult>;
+  restorePurchases: () => Promise<PurchaseResult>;
 }
 
 const StoreContext = createContext<StoreContextType | null>(null);
 
 let Purchases: any = null;
 let rcInitialized = false;
+let storeMode: StoreMode = getFallbackStoreMode(__DEV__);
 
 const initRevenueCat = async () => {
   if (rcInitialized) return;
+  const apiKey = Platform.OS === 'ios' ? RC_API_KEY_IOS : RC_API_KEY_ANDROID;
+  storeMode = getStoreMode(apiKey, __DEV__);
+  if (storeMode !== 'live') return;
   try {
     const rc = require('react-native-purchases');
     Purchases = rc.default || rc;
-    const apiKey = Platform.OS === 'ios' ? RC_API_KEY_IOS : RC_API_KEY_ANDROID;
-    if (!apiKey.startsWith('YOUR_')) {
-      await Purchases.configure({ apiKey });
-      rcInitialized = true;
-    }
+    await Purchases.configure({ apiKey });
+    rcInitialized = true;
   } catch {
-    // RevenueCat not available (dev mode) — purchases will use local storage
+    // RevenueCat could not start: simulate in development, never unlock for free in release
+    storeMode = getFallbackStoreMode(__DEV__);
   }
 };
 
@@ -95,6 +98,10 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
     init();
   }, []);
 
+  // Latest state for async purchase handlers, which outlive the render they started in
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
   const savePurchases = useCallback(async (packs: PackId[], allAccess: boolean) => {
     const data = { unlockedPacks: packs, hasAllAccess: allAccess };
     await AsyncStorage.setItem(PURCHASES_KEY, JSON.stringify(data)).catch(() => {});
@@ -107,98 +114,117 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
     [state.hasAllAccess, state.unlockedPacks]
   );
 
-  const purchasePack = useCallback(
-    async (packId: PackId): Promise<boolean> => {
-      const pack = PREMIUM_PACKS.find((p) => p.id === packId);
-      if (!pack) return false;
-
-      if (rcInitialized && Purchases) {
-        try {
-          const offerings = await Purchases.getOfferings();
-          const product = offerings.current?.availablePackages.find(
-            (p: any) => p.product.identifier === pack.productId
-          );
-          if (product) {
-            const { customerInfo } = await Purchases.purchasePackage(product);
-            if (customerInfo.entitlements.active[packId]) {
-              const newPacks = [...state.unlockedPacks, packId];
-              setState((prev) => ({ ...prev, unlockedPacks: newPacks }));
-              await savePurchases(newPacks, state.hasAllAccess);
-              return true;
-            }
-          }
-        } catch (e: any) {
-          if (!e.userCancelled) {
-            console.warn('Purchase failed:', e);
-          }
-          return false;
-        }
-      } else {
-        // Dev mode: simulate purchase
-        const newPacks = [...state.unlockedPacks, packId];
-        setState((prev) => ({ ...prev, unlockedPacks: newPacks }));
-        await savePurchases(newPacks, state.hasAllAccess);
-        return true;
-      }
-
-      return false;
+  const unlockPack = useCallback(
+    async (packId: PackId) => {
+      const current = stateRef.current;
+      const unlockedPacks = current.unlockedPacks.includes(packId)
+        ? current.unlockedPacks
+        : [...current.unlockedPacks, packId];
+      const next = { ...current, unlockedPacks };
+      stateRef.current = next;
+      setState(next);
+      await savePurchases(unlockedPacks, next.hasAllAccess);
     },
-    [state.unlockedPacks, state.hasAllAccess, savePurchases]
+    [savePurchases]
   );
 
-  const purchaseAllAccess = useCallback(async (): Promise<boolean> => {
-    if (rcInitialized && Purchases) {
+  const purchasePack = useCallback(
+    async (packId: PackId): Promise<PurchaseResult> => {
+      const pack = PREMIUM_PACKS.find((p) => p.id === packId);
+      if (!pack) return 'failed';
+
+      if (storeMode === 'simulated') {
+        await unlockPack(packId);
+        return 'success';
+      }
+      if (storeMode !== 'live' || !rcInitialized || !Purchases) return 'unavailable';
+
       try {
         const offerings = await Purchases.getOfferings();
         const product = offerings.current?.availablePackages.find(
-          (p: any) => p.product.identifier === ALL_ACCESS_PRODUCT_ID
+          (p: any) => p.product.identifier === pack.productId
         );
-        if (product) {
-          const { customerInfo } = await Purchases.purchasePackage(product);
-          if (customerInfo.entitlements.active['all_access']) {
-            const allPacks = PREMIUM_PACKS.map((p) => p.id);
-            setState({ unlockedPacks: allPacks, hasAllAccess: true, isLoading: false });
-            await savePurchases(allPacks, true);
-            return true;
-          }
+        if (!product) {
+          console.warn('Purchase failed: product not found in offerings:', pack.productId);
+          return 'failed';
         }
+        const { customerInfo } = await Purchases.purchasePackage(product);
+        if (customerInfo.entitlements.active[packId]) {
+          await unlockPack(packId);
+          return 'success';
+        }
+        console.warn('Purchase completed but entitlement is not active:', packId);
+        return 'failed';
       } catch (e: any) {
-        if (!e.userCancelled) {
-          console.warn('Purchase failed:', e);
-        }
-        return false;
+        if (e?.userCancelled) return 'cancelled';
+        console.warn('Purchase failed:', e);
+        return 'failed';
       }
-    } else {
-      // Dev mode: simulate
-      const allPacks = PREMIUM_PACKS.map((p) => p.id);
-      setState({ unlockedPacks: allPacks, hasAllAccess: true, isLoading: false });
-      await savePurchases(allPacks, true);
-      return true;
-    }
+    },
+    [unlockPack]
+  );
 
-    return false;
+  const unlockAllAccess = useCallback(async () => {
+    const allPacks = PREMIUM_PACKS.map((p) => p.id);
+    setState({ unlockedPacks: allPacks, hasAllAccess: true, isLoading: false });
+    await savePurchases(allPacks, true);
   }, [savePurchases]);
 
-  const restorePurchases = useCallback(async () => {
-    if (rcInitialized && Purchases) {
-      try {
-        const info = await Purchases.restorePurchases();
-        const packs: PackId[] = [];
-        let allAccess = false;
+  const purchaseAllAccess = useCallback(async (): Promise<PurchaseResult> => {
+    if (storeMode === 'simulated') {
+      await unlockAllAccess();
+      return 'success';
+    }
+    if (storeMode !== 'live' || !rcInitialized || !Purchases) return 'unavailable';
 
-        PREMIUM_PACKS.forEach((pack) => {
-          if (info.entitlements.active[pack.id]) {
-            packs.push(pack.id);
-          }
-        });
+    try {
+      const offerings = await Purchases.getOfferings();
+      const product = offerings.current?.availablePackages.find(
+        (p: any) => p.product.identifier === ALL_ACCESS_PRODUCT_ID
+      );
+      if (!product) {
+        console.warn('Purchase failed: product not found in offerings:', ALL_ACCESS_PRODUCT_ID);
+        return 'failed';
+      }
+      const { customerInfo } = await Purchases.purchasePackage(product);
+      if (customerInfo.entitlements.active['all_access']) {
+        await unlockAllAccess();
+        return 'success';
+      }
+      console.warn('Purchase completed but entitlement is not active: all_access');
+      return 'failed';
+    } catch (e: any) {
+      if (e?.userCancelled) return 'cancelled';
+      console.warn('Purchase failed:', e);
+      return 'failed';
+    }
+  }, [unlockAllAccess]);
 
-        if (info.entitlements.active['all_access']) {
-          allAccess = true;
+  const restorePurchases = useCallback(async (): Promise<PurchaseResult> => {
+    if (storeMode === 'simulated') return 'success';
+    if (storeMode !== 'live' || !rcInitialized || !Purchases) return 'unavailable';
+
+    try {
+      const info = await Purchases.restorePurchases();
+      const packs: PackId[] = [];
+      let allAccess = false;
+
+      PREMIUM_PACKS.forEach((pack) => {
+        if (info.entitlements.active[pack.id]) {
+          packs.push(pack.id);
         }
+      });
 
-        setState({ unlockedPacks: packs, hasAllAccess: allAccess, isLoading: false });
-        await savePurchases(packs, allAccess);
-      } catch {}
+      if (info.entitlements.active['all_access']) {
+        allAccess = true;
+      }
+
+      setState({ unlockedPacks: packs, hasAllAccess: allAccess, isLoading: false });
+      await savePurchases(packs, allAccess);
+      return 'success';
+    } catch (e) {
+      console.warn('Restore failed:', e);
+      return 'failed';
     }
   }, [savePurchases]);
 

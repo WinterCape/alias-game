@@ -6,13 +6,15 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useI18n } from '../i18n/I18nContext';
 import { useStore } from '../store/StoreContext';
-import { PREMIUM_PACKS, ALL_ACCESS_PRICE } from '../store/packs';
+import { PREMIUM_PACKS, ALL_ACCESS_PRICE, PackId } from '../store/packs';
+import { PurchaseResult } from '../store/storeMode';
 import { useProgression } from '../progression/ProgressionContext';
 import { isPackUnlockedByLevel, getPackUnlockLevel } from '../progression/rewards';
 
@@ -26,6 +28,21 @@ export const ShopScreen = ({ navigation }: any) => {
     hasAllAccess,
   } = useStore();
   const { level } = useProgression();
+
+  // Tell the player when a purchase or restore did not go through
+  const showResult = (result: PurchaseResult, successMessage?: string) => {
+    if (result === 'unavailable') {
+      Alert.alert(t.shopUnavailableTitle, t.shopUnavailableMessage);
+    } else if (result === 'failed') {
+      Alert.alert(t.purchaseFailedTitle, t.purchaseFailedMessage);
+    } else if (result === 'success' && successMessage) {
+      Alert.alert(successMessage);
+    }
+  };
+
+  const handlePurchasePack = async (packId: PackId) => showResult(await purchasePack(packId));
+  const handlePurchaseAllAccess = async () => showResult(await purchaseAllAccess());
+  const handleRestore = async () => showResult(await restorePurchases(), t.purchasesRestored);
 
   return (
     <LinearGradient
@@ -54,7 +71,7 @@ export const ShopScreen = ({ navigation }: any) => {
 
         <TouchableOpacity
           style={styles.restoreButton}
-          onPress={restorePurchases}
+          onPress={handleRestore}
           activeOpacity={0.7}
         >
           <MaterialCommunityIcons
@@ -76,7 +93,7 @@ export const ShopScreen = ({ navigation }: any) => {
             styles.allAccessCard,
             hasAllAccess && styles.allAccessCardPurchased,
           ]}
-          onPress={hasAllAccess ? undefined : purchaseAllAccess}
+          onPress={hasAllAccess ? undefined : handlePurchaseAllAccess}
           activeOpacity={hasAllAccess ? 1 : 0.8}
           disabled={hasAllAccess}
         >
@@ -211,7 +228,7 @@ export const ShopScreen = ({ navigation }: any) => {
                     <View style={styles.packActionStack}>
                       <TouchableOpacity
                         style={styles.priceButton}
-                        onPress={() => purchasePack(pack.id)}
+                        onPress={() => handlePurchasePack(pack.id)}
                         activeOpacity={0.8}
                       >
                         <LinearGradient
