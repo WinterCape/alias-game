@@ -51,6 +51,22 @@ export interface Strings {
   resume: string;
   tapToFixWords: string;
   seeWinner: string;
+  taskRounds: string;
+  taskRoundsDesc: string;
+  freqRare: string;
+  freqOften: string;
+  freqAlways: string;
+  taskList: string;
+  activeSuffix: string;
+  taskRoundTitle: string;
+  taskGroupEmotions: string;
+  taskGroupRoles: string;
+  taskGroupMoves: string;
+  taskGroupSpecial: string;
+  myTasks: string;
+  addTaskPlaceholder: string;
+  addTask: string;
+  deleteTask: string;
   chronicles: string;
 
   // Settings
@@ -216,6 +232,22 @@ export const RO: Strings = {
   resume: 'Continuă',
   tapToFixWords: 'Atinge un cuvânt pentru a-l corecta',
   seeWinner: 'Vezi câștigătorul',
+  taskRounds: 'Runde cu provocări',
+  taskRoundsDesc: 'Uneori, cel care explică primește o provocare în plus',
+  freqRare: 'Rar',
+  freqOften: 'Des',
+  freqAlways: 'Mereu',
+  taskList: 'Lista de provocări',
+  activeSuffix: 'active',
+  taskRoundTitle: 'Rundă cu provocare!',
+  taskGroupEmotions: 'Emoții',
+  taskGroupRoles: 'Roluri',
+  taskGroupMoves: 'Mișcări',
+  taskGroupSpecial: 'Reguli speciale',
+  myTasks: 'Provocările mele',
+  addTaskPlaceholder: 'Scrie propria provocare…',
+  addTask: 'Adaugă',
+  deleteTask: 'Șterge',
   chronicles: 'Cronici',
   battlePrep: 'Pregătire de Luptă',
   missionDuration: 'Durata Misiunii (secunde)',
@@ -380,6 +412,22 @@ export const EN: Strings = {
   resume: 'Resume',
   tapToFixWords: 'Tap a word to correct it',
   seeWinner: 'See the winner',
+  taskRounds: 'Task rounds',
+  taskRoundsDesc: 'Sometimes the explainer gets an extra challenge',
+  freqRare: 'Rarely',
+  freqOften: 'Often',
+  freqAlways: 'Always',
+  taskList: 'Task list',
+  activeSuffix: 'active',
+  taskRoundTitle: 'Task round!',
+  taskGroupEmotions: 'Emotions',
+  taskGroupRoles: 'Roles',
+  taskGroupMoves: 'Movements',
+  taskGroupSpecial: 'Special rules',
+  myTasks: 'My tasks',
+  addTaskPlaceholder: 'Write your own task…',
+  addTask: 'Add',
+  deleteTask: 'Delete',
   chronicles: 'Chronicles',
   battlePrep: 'Battle Preparation',
   missionDuration: 'Mission Duration (seconds)',
@@ -544,6 +592,22 @@ export const ES: Strings = {
   resume: 'Continuar',
   tapToFixWords: 'Toca una palabra para corregirla',
   seeWinner: 'Ver al ganador',
+  taskRounds: 'Rondas con reto',
+  taskRoundsDesc: 'A veces quien explica recibe un reto extra',
+  freqRare: 'A veces',
+  freqOften: 'A menudo',
+  freqAlways: 'Siempre',
+  taskList: 'Lista de retos',
+  activeSuffix: 'activos',
+  taskRoundTitle: '¡Ronda con reto!',
+  taskGroupEmotions: 'Emociones',
+  taskGroupRoles: 'Papeles',
+  taskGroupMoves: 'Movimientos',
+  taskGroupSpecial: 'Reglas especiales',
+  myTasks: 'Mis retos',
+  addTaskPlaceholder: 'Escribe tu propio reto…',
+  addTask: 'Añadir',
+  deleteTask: 'Eliminar',
   chronicles: 'Crónicas',
   battlePrep: 'Preparación de Batalla',
   missionDuration: 'Duración de la Misión (segundos)',
@@ -708,6 +772,22 @@ export const FR: Strings = {
   resume: 'Reprendre',
   tapToFixWords: 'Touche un mot pour le corriger',
   seeWinner: 'Voir le gagnant',
+  taskRounds: 'Manches à défi',
+  taskRoundsDesc: 'Parfois, celui qui explique reçoit un défi en plus',
+  freqRare: 'Rarement',
+  freqOften: 'Souvent',
+  freqAlways: 'Toujours',
+  taskList: 'Liste des défis',
+  activeSuffix: 'actifs',
+  taskRoundTitle: 'Manche à défi !',
+  taskGroupEmotions: 'Émotions',
+  taskGroupRoles: 'Rôles',
+  taskGroupMoves: 'Mouvements',
+  taskGroupSpecial: 'Règles spéciales',
+  myTasks: 'Mes défis',
+  addTaskPlaceholder: 'Écris ton propre défi…',
+  addTask: 'Ajouter',
+  deleteTask: 'Supprimer',
   chronicles: 'Chroniques',
   battlePrep: 'Préparation au Combat',
   missionDuration: 'Durée de la Mission (secondes)',
@@ -872,6 +952,22 @@ export const RU: Strings = {
   resume: 'Продолжить',
   tapToFixWords: 'Нажми на слово, чтобы исправить',
   seeWinner: 'Узнать победителя',
+  taskRounds: 'Раунды с заданием',
+  taskRoundsDesc: 'Иногда объясняющий получает дополнительное задание',
+  freqRare: 'Редко',
+  freqOften: 'Часто',
+  freqAlways: 'Всегда',
+  taskList: 'Список заданий',
+  activeSuffix: 'активных',
+  taskRoundTitle: 'Раунд с заданием!',
+  taskGroupEmotions: 'Эмоции',
+  taskGroupRoles: 'Роли',
+  taskGroupMoves: 'Движения',
+  taskGroupSpecial: 'Особые правила',
+  myTasks: 'Мои задания',
+  addTaskPlaceholder: 'Напиши своё задание…',
+  addTask: 'Добавить',
+  deleteTask: 'Удалить',
   chronicles: 'Хроники',
   battlePrep: 'Подготовка к Битве',
   missionDuration: 'Длительность Миссии (секунды)',

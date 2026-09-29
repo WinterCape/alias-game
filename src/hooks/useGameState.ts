@@ -27,6 +27,9 @@ const DEFAULT_SETTINGS: GameSettings = {
   lastWordTime: 'off',
   sharedLastWord: false,
   soundEnabled: true,
+  taskFrequency: 'off',
+  disabledTasks: [],
+  customTasks: [],
 };
 
 import { getStrings } from '../i18n/strings';
@@ -47,6 +50,13 @@ export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] 
   // Games won per team id in this session of rematches
   const [sessionWins, setSessionWins] = useState<Record<number, number>>({});
   const [savedGame, setSavedGame] = useState<SavedArenaGame | null>(null);
+
+  // Task of the previous round, so the same challenge doesn't come twice in a row
+  const lastTaskIdRef = useRef<string | null>(null);
+  const getLastTaskId = useCallback(() => lastTaskIdRef.current, []);
+  const setLastTaskId = useCallback((id: string | null) => {
+    lastTaskIdRef.current = id;
+  }, []);
 
   const guessedWordsRef = useRef<string[]>([]);
   const skippedWordsRef = useRef<string[]>([]);
@@ -286,6 +296,8 @@ export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] 
     setWordGuessed,
     endRound,
     reviseLastRound,
+    getLastTaskId,
+    setLastTaskId,
     checkWinner,
     resetGame,
     abandonGame,
