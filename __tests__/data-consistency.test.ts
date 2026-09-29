@@ -4,6 +4,8 @@ import {
   getWordsByCategories,
   getPremiumWords,
   getShuffledWords,
+  getWordCategory,
+  getWordPack,
   PREMIUM_WORD_PACKS,
 } from '../src/data/words';
 import { WORDS_RO } from '../src/data/words/ro';
@@ -397,5 +399,47 @@ describe('Cross-Language Consistency', () => {
 
       expect(diff).toBeLessThanOrEqual(tolerance);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Word -> category / pack lookup (Aventura category badge)
+// ---------------------------------------------------------------------------
+describe('Word Source Lookup', () => {
+  const LANGUAGES: Language[] = ['ro', 'en', 'es', 'fr', 'ru'];
+
+  test('every base-game word maps to a category that contains it', () => {
+    for (const lang of LANGUAGES) {
+      for (const cat of ALL_CATEGORIES) {
+        for (const word of getWordsByCategories([cat], 'all', lang)) {
+          const found = getWordCategory(word, lang);
+          expect(found).not.toBeNull();
+          expect(getWordsByCategories([found as CategoryId], 'all', lang)).toContain(word);
+        }
+      }
+    }
+  });
+
+  test('every premium pack word maps to a category or to a pack that contains it', () => {
+    for (const lang of LANGUAGES) {
+      for (const packId of Object.keys(PREMIUM_WORD_PACKS) as PackId[]) {
+        for (const word of getPremiumWords(packId, 'all', lang)) {
+          if (getWordCategory(word, lang)) continue;
+          const pack = getWordPack(word, lang);
+          expect(pack).not.toBeNull();
+          expect(getPremiumWords(pack as PackId, 'all', lang)).toContain(word);
+        }
+      }
+    }
+  });
+
+  test('a known word maps to its category', () => {
+    const roWord = WORDS_RO.animale[0];
+    expect(getWordCategory(roWord, 'ro')).toBe('animale');
+  });
+
+  test('unknown words return null', () => {
+    expect(getWordCategory('definitely-not-a-word', 'ro')).toBeNull();
+    expect(getWordPack('definitely-not-a-word', 'ro')).toBeNull();
   });
 });
