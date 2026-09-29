@@ -97,12 +97,10 @@ export const ShopScreen = ({ navigation }: any) => {
                 </View>
                 <View style={styles.allAccessTextWrap}>
                   <Text style={styles.allAccessTitle}>
-                    {lang === 'ro' ? 'Acces Total' : 'All Access'}
+                    {t.allAccess}
                   </Text>
                   <Text style={styles.allAccessDesc}>
-                    {lang === 'ro'
-                      ? 'Deblochează toate pachetele de cuvinte'
-                      : 'Unlock all word packs'}
+                    {t.allAccessDesc}
                   </Text>
                 </View>
                 <View style={styles.allAccessPriceBadge}>
@@ -123,12 +121,10 @@ export const ShopScreen = ({ navigation }: any) => {
               </View>
               <View style={styles.allAccessTextWrap}>
                 <Text style={styles.allAccessTitlePurchased}>
-                  {lang === 'ro' ? 'Acces Total' : 'All Access'}
+                  {t.allAccess}
                 </Text>
                 <Text style={styles.allAccessDescPurchased}>
-                  {lang === 'ro'
-                    ? 'Toate pachetele sunt deblocate!'
-                    : 'All packs are unlocked!'}
+                  {t.allAccessOwned}
                 </Text>
               </View>
               <View style={styles.allAccessCheckBadge}>
@@ -146,7 +142,7 @@ export const ShopScreen = ({ navigation }: any) => {
         <View style={styles.sectionDivider}>
           <View style={styles.sectionDividerLine} />
           <Text style={styles.sectionDividerText}>
-            {lang === 'ro' ? 'Pachete de Cuvinte' : 'Word Packs'}
+            {t.wordPacks}
           </Text>
           <View style={styles.sectionDividerLine} />
         </View>
@@ -184,7 +180,7 @@ export const ShopScreen = ({ navigation }: any) => {
                   </Text>
                   <Text style={styles.packWordCount}>
                     {pack.wordCount[lang]}{' '}
-                    {lang === 'ro' ? 'cuvinte' : 'words'}
+                    {t.wordsUnit}
                   </Text>
                 </View>
 
@@ -197,7 +193,7 @@ export const ShopScreen = ({ navigation }: any) => {
                         color="#fff"
                       />
                       <Text style={styles.unlockedText}>
-                        {lang === 'ro' ? 'Deblocat' : 'Unlocked'}
+                        {t.packUnlocked}
                       </Text>
                     </View>
                   ) : levelUnlocked ? (
@@ -208,7 +204,7 @@ export const ShopScreen = ({ navigation }: any) => {
                         color="#fff"
                       />
                       <Text style={styles.levelUnlockedText}>
-                        {lang === 'ro' ? `Nivel ${unlockLevel}` : `Lvl ${unlockLevel}`}
+                        {`${t.levelShort} ${unlockLevel}`}
                       </Text>
                     </View>
                   ) : (
@@ -231,9 +227,7 @@ export const ShopScreen = ({ navigation }: any) => {
                       </TouchableOpacity>
                       {unlockLevel !== null && (
                         <Text style={styles.orLevelText}>
-                          {lang === 'ro'
-                            ? `sau Nivel ${unlockLevel}`
-                            : `or Level ${unlockLevel}`}
+                          {`${t.orLevel} ${unlockLevel}`}
                         </Text>
                       )}
                     </View>
