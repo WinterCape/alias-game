@@ -83,17 +83,17 @@ export const GameScreen = ({ navigation }: any) => {
     setPhase('finished');
     playTimeUp();
     Vibration.vibrate([0, 500, 200, 500]);
-    const result = endRound();
-    const winner = checkWinner();
+    const { result, updatedTeams } = endRound();
+    const winner = checkWinner(updatedTeams);
 
     setTimeout(() => {
       if (winner) {
-        navigation.replace('GameOver', { teams });
+        navigation.replace('GameOver', { teams: updatedTeams });
       } else {
         navigation.replace('RoundResult', { result });
       }
     }, 800);
-  }, [endRound, checkWinner, navigation, teams]);
+  }, [endRound, checkWinner, navigation]);
 
   const { timeLeft, start: startTimer, progress } = useTimer(
     settings.roundDuration,

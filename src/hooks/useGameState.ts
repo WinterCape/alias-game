@@ -25,8 +25,10 @@ export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] 
   const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
   const [teams, setTeams] = useState<Team[]>([]);
   const [currentTeamIndex, setCurrentTeamIndex] = useState(0);
-  const [words, setWords] = useState<string[]>([]);
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  // Kept in refs so marking a word and reading the next one in the same
+  // handler always see the same, up-to-date position
+  const wordsRef = useRef<string[]>([]);
+  const wordIndexRef = useRef(0);
   const [roundResults, setRoundResults] = useState<RoundResult[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
 
@@ -60,42 +62,44 @@ export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] 
     setGameStarted(true);
   }, [settings.numberOfTeams]);
 
-  const startNewRound = useCallback(() => {
-    const shuffled = getShuffledWords(settings.selectedCategories, settings.difficulty, language, unlockedPacks);
-    setWords(shuffled);
-    setCurrentWordIndex(0);
-    guessedWordsRef.current = [];
-    skippedWordsRef.current = [];
+  const reshuffleWords = useCallback(() => {
+    wordsRef.current = getShuffledWords(settings.selectedCategories, settings.difficulty, language, unlockedPacks);
+    wordIndexRef.current = 0;
   }, [settings.selectedCategories, settings.difficulty, language, unlockedPacks]);
 
+  const startNewRound = useCallback(() => {
+    reshuffleWords();
+    guessedWordsRef.current = [];
+    skippedWordsRef.current = [];
+  }, [reshuffleWords]);
+
   const getCurrentWord = useCallback((): string => {
-    if (currentWordIndex < words.length) {
-      return words[currentWordIndex];
-    }
     // Reshuffle if we run out
-    const shuffled = getShuffledWords(settings.selectedCategories, settings.difficulty, language, unlockedPacks);
-    setWords(shuffled);
-    setCurrentWordIndex(0);
-    return shuffled[0];
-  }, [currentWordIndex, words, settings.selectedCategories, settings.difficulty, language, unlockedPacks]);
+    if (wordIndexRef.current >= wordsRef.current.length) {
+      reshuffleWords();
+    }
+    return wordsRef.current[wordIndexRef.current];
+  }, [reshuffleWords]);
 
   const markCorrect = useCallback(() => {
-    const word = words[currentWordIndex];
+    const word = wordsRef.current[wordIndexRef.current];
     if (word) {
       guessedWordsRef.current.push(word);
     }
-    setCurrentWordIndex((prev) => prev + 1);
-  }, [currentWordIndex, words]);
+    wordIndexRef.current += 1;
+  }, []);
 
   const markSkipped = useCallback(() => {
-    const word = words[currentWordIndex];
+    const word = wordsRef.current[wordIndexRef.current];
     if (word) {
       skippedWordsRef.current.push(word);
     }
-    setCurrentWordIndex((prev) => prev + 1);
-  }, [currentWordIndex, words]);
+    wordIndexRef.current += 1;
+  }, []);
 
-  const endRound = useCallback((): RoundResult => {
+  // Returns the teams with this round's score applied, since the state
+  // update is not visible to the caller until the next render
+  const endRound = useCallback((): { result: RoundResult; updatedTeams: Team[] } => {
     const correctCount = guessedWordsRef.current.length;
     const skippedCount = skippedWordsRef.current.length;
     const penalty = settings.skipPenalty ? skippedCount : 0;
@@ -108,31 +112,27 @@ export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] 
       score,
     };
 
-    // Update team score
-    setTeams((prev) =>
-      prev.map((team) =>
-        team.id === currentTeamIndex
-          ? { ...team, score: team.score + score }
-          : team
-      )
+    const updatedTeams = teams.map((team) =>
+      team.id === currentTeamIndex ? { ...team, score: team.score + score } : team
     );
+    setTeams(updatedTeams);
 
     setRoundResults((prev) => [...prev, result]);
     setCurrentTeamIndex((prev) => (prev + 1) % teams.length);
 
-    return result;
-  }, [currentTeamIndex, settings.skipPenalty, teams.length]);
+    return { result, updatedTeams };
+  }, [currentTeamIndex, settings.skipPenalty, teams]);
 
-  const checkWinner = useCallback((): Team | null => {
-    const winner = teams.find((t) => t.score >= settings.winningScore);
+  const checkWinner = useCallback((teamsToCheck: Team[] = teams): Team | null => {
+    const winner = teamsToCheck.find((t) => t.score >= settings.winningScore);
     return winner || null;
   }, [teams, settings.winningScore]);
 
   const resetGame = useCallback(() => {
     setTeams([]);
     setCurrentTeamIndex(0);
-    setWords([]);
-    setCurrentWordIndex(0);
+    wordsRef.current = [];
+    wordIndexRef.current = 0;
     setRoundResults([]);
     setGameStarted(false);
     guessedWordsRef.current = [];
