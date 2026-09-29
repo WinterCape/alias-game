@@ -125,14 +125,16 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
   const storyteller = players[storytellerIdx];
   const otherPlayers = players.filter((_, i) => i !== storytellerIdx);
 
-  const advanceTurn = (updatedPlayers: Player[]) => {
+  // Takes the history including the turn just played, since state updates
+  // from this render are not visible yet
+  const advanceTurn = (updatedPlayers: Player[], updatedHistory: QuestTurn[]) => {
     // Check if anyone reached winning score
     const winner = updatedPlayers.find((p) => p.score >= settings.winningScore);
     if (winner) {
       setLeaveAction(
         StackActions.replace('QuestScores', {
           players: updatedPlayers,
-          turnHistory,
+          turnHistory: updatedHistory,
         })
       );
       return;
@@ -167,9 +169,10 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
       hintsUsed: hintsRevealed,
       skipped: false,
     };
-    setTurnHistory((prev) => [...prev, turn]);
+    const updatedHistory = [...turnHistory, turn];
+    setTurnHistory(updatedHistory);
 
-    advanceTurn(updatedPlayers);
+    advanceTurn(updatedPlayers, updatedHistory);
   };
 
   const handleNobodyGuessed = () => {
@@ -194,7 +197,7 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
   };
 
   const handleNextAfterReveal = () => {
-    advanceTurn(players);
+    advanceTurn(players, turnHistory);
   };
 
   const confirmQuit = (onConfirm: () => void) => {
