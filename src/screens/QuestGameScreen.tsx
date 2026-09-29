@@ -16,7 +16,8 @@ import { useI18n } from '../i18n/I18nContext';
 import { Player, QuestTurn, CategoryId } from '../types';
 import { QuestSettings } from '../hooks/useQuestGame';
 import { useConfirmLeave } from '../hooks/useConfirmLeave';
-import { getShuffledWords } from '../data/words';
+import { getShuffledWords, getWordCategory, getWordPack } from '../data/words';
+import { PREMIUM_PACKS } from '../store/packs';
 import { useStore } from '../store/StoreContext';
 import { generateHints } from '../utils/hints';
 
@@ -87,10 +88,22 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
 
   const currentWord = words[wordIndex] || '';
 
-  // There is no word-to-category lookup yet, so every word is shown as 'general'
-  const currentCategory: CategoryId = 'general';
+  // Base-game words belong to a category; premium pack words show the pack name
+  const wordCategory = useMemo(
+    () => (currentWord ? getWordCategory(currentWord, lang) : null),
+    [currentWord, lang]
+  );
+  const wordPack = useMemo(
+    () => (currentWord && !wordCategory ? getWordPack(currentWord, lang) : null),
+    [currentWord, wordCategory, lang]
+  );
+  // Turn history stores a CategoryId, so pack words are recorded as 'general'
+  const currentCategory: CategoryId = wordCategory ?? 'general';
 
-  const categoryName = t.categoryNames[currentCategory] || t.categoryNames.general;
+  const categoryName = wordCategory
+    ? t.categoryNames[wordCategory]
+    : (wordPack && PREMIUM_PACKS.find((p) => p.id === wordPack)?.name[lang]) ||
+      t.categoryNames.general;
 
   const hints = useMemo(() => {
     if (!currentWord) return [];

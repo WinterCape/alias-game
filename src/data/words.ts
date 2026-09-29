@@ -101,3 +101,36 @@ export const getShuffledWords = (
   }
   return words;
 };
+
+// Word -> source lookups, built once per language on first use.
+// If a word appears in more than one category, the first category wins.
+const categoryIndex: Partial<Record<Language, Map<string, CategoryId>>> = {};
+const packIndex: Partial<Record<Language, Map<string, PackId>>> = {};
+
+export const getWordCategory = (word: string, language: Language = 'ro'): CategoryId | null => {
+  let index = categoryIndex[language];
+  if (!index) {
+    index = new Map();
+    for (const cat of ALL_CATEGORIES) {
+      for (const w of WORD_PACKS[language][cat] || []) {
+        if (!index.has(w)) index.set(w, cat);
+      }
+    }
+    categoryIndex[language] = index;
+  }
+  return index.get(word) ?? null;
+};
+
+export const getWordPack = (word: string, language: Language = 'ro'): PackId | null => {
+  let index = packIndex[language];
+  if (!index) {
+    index = new Map();
+    for (const packId of Object.keys(PREMIUM_WORD_PACKS) as PackId[]) {
+      for (const w of PREMIUM_WORD_PACKS[packId][language] || []) {
+        if (!index.has(w)) index.set(w, packId);
+      }
+    }
+    packIndex[language] = index;
+  }
+  return index.get(word) ?? null;
+};
