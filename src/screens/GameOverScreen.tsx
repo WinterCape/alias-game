@@ -11,6 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useGame } from '../hooks/GameContext';
+import { getGameNumber } from '../hooks/arenaSession';
 import { useStats } from '../hooks/useStats';
 import { useI18n } from '../i18n/I18nContext';
 import { useReviewPrompt } from '../hooks/useReviewPrompt';
@@ -19,7 +20,7 @@ import { useAchievements } from '../achievements/AchievementContext';
 import { useProgression } from '../progression/ProgressionContext';
 
 export const GameOverScreen = ({ route, navigation }: any) => {
-  const { resetGame, roundResults } = useGame();
+  const { resetGame, roundResults, rematch, sessionWins } = useGame();
   const { recordGame, stats } = useStats();
   const { lang, t } = useI18n();
   const { recordGamePlayed, showPrompt } = useReviewPrompt();
@@ -91,6 +92,17 @@ export const GameOverScreen = ({ route, navigation }: any) => {
     shareGameResults(winner.name, winner.score, teams, t.shareText);
   };
 
+  // Games won per team this session; shown once more than one game has been played
+  const gamesPlayed = getGameNumber(sessionWins) - 1;
+
+  const handleRematch = () => {
+    rematch();
+    navigation.reset({
+      index: 1,
+      routes: [{ name: 'Home' }, { name: 'Game' }],
+    });
+  };
+
   const handleNewGame = () => {
     resetGame();
     navigation.reset({
@@ -135,6 +147,12 @@ export const GameOverScreen = ({ route, navigation }: any) => {
               )}
               <View style={[styles.standingDot, { backgroundColor: team.color }]} />
               <Text style={styles.standingName}>{team.name}</Text>
+              {gamesPlayed > 1 && (sessionWins[team.id] ?? 0) > 0 && (
+                <View style={styles.winsBadge}>
+                  <MaterialCommunityIcons name="trophy" size={12} color={COLORS.gold} />
+                  <Text style={styles.winsText}>{sessionWins[team.id]}</Text>
+                </View>
+              )}
             </View>
             <Text style={[styles.standingScore, { color: team.color }]}>
               {team.score} <Text style={styles.standingExp}>{t.exp}</Text>
@@ -151,6 +169,15 @@ export const GameOverScreen = ({ route, navigation }: any) => {
         >
           <MaterialCommunityIcons name="share-variant" size={20} color={COLORS.gold} />
           <Text style={styles.shareBtnText}>{t.shareResults}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.shareBtn}
+          onPress={handleRematch}
+          activeOpacity={0.8}
+        >
+          <MaterialCommunityIcons name="restart" size={20} color={COLORS.gold} />
+          <Text style={styles.shareBtnText}>{t.rematch}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -285,6 +312,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(212,168,83,0.25)',
     backgroundColor: 'rgba(212,168,83,0.06)',
+  },
+  winsBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    marginLeft: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    backgroundColor: 'rgba(212,168,83,0.12)',
+  },
+  winsText: {
+    fontFamily: FONTS.bodyBold,
+    fontSize: SIZES.xs,
+    color: COLORS.gold,
   },
   shareBtnText: {
     fontFamily: FONTS.bodyBold,

@@ -44,7 +44,11 @@ export interface GameSettings {
   selectedCategories: CategoryId[];
   difficulty: Difficulty | 'all';
   skipPenalty: boolean;
+  // 'eight': each round deals cards of 8 words; the team taps every word guessed
+  arenaMode?: ArenaMode;
 }
+
+export type ArenaMode = 'classic' | 'eight';
 
 export interface RoundResult {
   teamId: number;

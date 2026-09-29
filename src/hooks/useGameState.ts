@@ -4,8 +4,15 @@ import { GameSettings, Team, RoundResult, CategoryId } from '../types';
 import { getShuffledWords, ALL_CATEGORIES } from '../data/words';
 import { Language } from '../i18n/strings';
 import { PackId } from '../store/packs';
+import {
+  getStartingTeamIndex,
+  getGameNumber,
+  parseSavedGame,
+  SavedArenaGame,
+} from './arenaSession';
 
 const SETTINGS_KEY = '@alias_game_settings';
+const SAVED_GAME_KEY = '@alias_saved_arena_game';
 
 const DEFAULT_SETTINGS: GameSettings = {
   roundDuration: 60,
@@ -14,6 +21,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   selectedCategories: [...ALL_CATEGORIES],
   difficulty: 'all',
   skipPenalty: true,
+  arenaMode: 'classic',
 };
 
 import { getStrings } from '../i18n/strings';
@@ -31,11 +39,14 @@ export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] 
   const wordIndexRef = useRef(0);
   const [roundResults, setRoundResults] = useState<RoundResult[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
+  // Games won per team id in this session of rematches
+  const [sessionWins, setSessionWins] = useState<Record<number, number>>({});
+  const [savedGame, setSavedGame] = useState<SavedArenaGame | null>(null);
 
   const guessedWordsRef = useRef<string[]>([]);
   const skippedWordsRef = useRef<string[]>([]);
 
-  // Load saved settings on mount
+  // Load saved settings and any unfinished game on mount
   useEffect(() => {
     AsyncStorage.getItem(SETTINGS_KEY).then((saved) => {
       if (saved) {
@@ -45,6 +56,37 @@ export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] 
         } catch {}
       }
     });
+    AsyncStorage.getItem(SAVED_GAME_KEY)
+      .then((raw) => setSavedGame(parseSavedGame(raw)))
+      .catch(() => {});
+  }, []);
+
+  // Save the game after every change between rounds; a finished game is removed.
+  // A round in progress is not saved, so after a restart that team replays its turn.
+  useEffect(() => {
+    if (!gameStarted || teams.length === 0) return;
+    const finished = teams.some((t) => t.score >= settings.winningScore);
+    if (finished) {
+      setSavedGame(null);
+      AsyncStorage.removeItem(SAVED_GAME_KEY).catch(() => {});
+      return;
+    }
+    const data: SavedArenaGame = {
+      version: 1,
+      teams,
+      currentTeamIndex,
+      roundResults,
+      sessionWins,
+      settings,
+      savedAt: Date.now(),
+    };
+    setSavedGame(data);
+    AsyncStorage.setItem(SAVED_GAME_KEY, JSON.stringify(data)).catch(() => {});
+  }, [gameStarted, teams, currentTeamIndex, roundResults, sessionWins, settings]);
+
+  const clearSavedGame = useCallback(() => {
+    setSavedGame(null);
+    AsyncStorage.removeItem(SAVED_GAME_KEY).catch(() => {});
   }, []);
 
   const initializeTeams = useCallback((teamNames?: string[]) => {
@@ -61,8 +103,35 @@ export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] 
     setCurrentTeamIndex(0);
     // Start each game with an empty history, even if the last one was abandoned
     setRoundResults([]);
+    setSessionWins({});
     setGameStarted(true);
   }, [settings.numberOfTeams]);
+
+  const resumeGame = useCallback((game: SavedArenaGame) => {
+    // Use the settings the game was started with, without changing the saved preferences
+    setSettings(game.settings);
+    setTeams(game.teams);
+    setCurrentTeamIndex(game.currentTeamIndex);
+    setRoundResults(game.roundResults);
+    setSessionWins(game.sessionWins);
+    wordsRef.current = [];
+    wordIndexRef.current = 0;
+    setGameStarted(true);
+  }, []);
+
+  const recordWin = useCallback((teamId: number) => {
+    setSessionWins((prev) => ({ ...prev, [teamId]: (prev[teamId] ?? 0) + 1 }));
+  }, []);
+
+  // Same teams and settings, scores back to zero; a different team starts each game
+  const rematch = useCallback(() => {
+    setTeams((prev) => prev.map((team) => ({ ...team, score: 0 })));
+    setCurrentTeamIndex(getStartingTeamIndex(getGameNumber(sessionWins) - 1, teams.length));
+    setRoundResults([]);
+    wordsRef.current = [];
+    wordIndexRef.current = 0;
+    setGameStarted(true);
+  }, [sessionWins, teams.length]);
 
   const reshuffleWords = useCallback(() => {
     wordsRef.current = getShuffledWords(settings.selectedCategories, settings.difficulty, language, unlockedPacks);
@@ -89,6 +158,24 @@ export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] 
       guessedWordsRef.current.push(word);
     }
     wordIndexRef.current += 1;
+  }, []);
+
+  // 8 words mode: take the next `count` words for a card
+  const dealWords = useCallback((count: number): string[] => {
+    const card: string[] = [];
+    while (card.length < count) {
+      card.push(getCurrentWord());
+      wordIndexRef.current += 1;
+    }
+    return card;
+  }, [getCurrentWord]);
+
+  // 8 words mode: a word can be tapped as guessed and tapped again to undo
+  const setWordGuessed = useCallback((word: string, guessed: boolean) => {
+    const list = guessedWordsRef.current;
+    const index = list.indexOf(word);
+    if (guessed && index === -1) list.push(word);
+    if (!guessed && index !== -1) list.splice(index, 1);
   }, []);
 
   const markSkipped = useCallback(() => {
@@ -136,10 +223,17 @@ export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] 
     wordsRef.current = [];
     wordIndexRef.current = 0;
     setRoundResults([]);
+    setSessionWins({});
     setGameStarted(false);
     guessedWordsRef.current = [];
     skippedWordsRef.current = [];
   }, []);
+
+  // Leaving a game on purpose: forget it, including the saved copy
+  const abandonGame = useCallback(() => {
+    resetGame();
+    clearSavedGame();
+  }, [resetGame, clearSavedGame]);
 
   const updateSettings = useCallback((newSettings: Partial<GameSettings>) => {
     setSettings((prev) => {
@@ -167,11 +261,20 @@ export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] 
     getCurrentWord,
     markCorrect,
     markSkipped,
+    dealWords,
+    setWordGuessed,
     endRound,
     checkWinner,
     resetGame,
+    abandonGame,
     gameStarted,
     roundResults,
+    sessionWins,
+    recordWin,
+    rematch,
+    savedGame,
+    resumeGame,
+    clearSavedGame,
     guessedWords: guessedWordsRef,
     skippedWords: skippedWordsRef,
   };

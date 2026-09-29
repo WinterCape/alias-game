@@ -19,6 +19,7 @@ import { useGame } from '../hooks/GameContext';
 import { useTimer } from '../hooks/useTimer';
 import { useSounds } from '../hooks/useSounds';
 import { useConfirmLeave } from '../hooks/useConfirmLeave';
+import { getGameNumber, getRoundNumber } from '../hooks/arenaSession';
 import { useI18n } from '../i18n/I18nContext';
 
 const { width } = Dimensions.get('window');
@@ -27,6 +28,7 @@ const SWIPE_THRESHOLD = 80;
 type GamePhase = 'ready' | 'playing' | 'finished';
 
 const CORNER_INSET = 8;
+const EIGHT_WORDS = 8;
 
 const CardCorner = ({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) => {
   const isTop = position === 'tl' || position === 'tr';
@@ -66,6 +68,12 @@ export const GameScreen = ({ navigation }: any) => {
     markSkipped,
     endRound,
     checkWinner,
+    abandonGame,
+    recordWin,
+    roundResults,
+    sessionWins,
+    dealWords,
+    setWordGuessed,
   } = useGame();
 
   const { t } = useI18n();
@@ -74,6 +82,7 @@ export const GameScreen = ({ navigation }: any) => {
     message: t.quitArenaMessage,
     confirm: t.quitQuestConfirm,
     cancel: t.cancel,
+    onConfirm: abandonGame,
   });
   const { playCorrect, playSkip, playTick, playTimeUp, playStart } = useSounds();
   const [phase, setPhase] = useState<GamePhase>('ready');
@@ -81,6 +90,14 @@ export const GameScreen = ({ navigation }: any) => {
   const [correctCount, setCorrectCount] = useState(0);
   const [skipCount, setSkipCount] = useState(0);
   const isAnimating = useRef(false);
+
+  // 8 words mode: the current card and which of its words have been tapped as guessed
+  const isEight = settings.arenaMode === 'eight';
+  const [card, setCard] = useState<string[]>([]);
+  const [cardGuessed, setCardGuessed] = useState<boolean[]>([]);
+  // Source of truth for taps: quick taps can arrive before the next render
+  const cardRef = useRef<string[]>([]);
+  const cardGuessedRef = useRef<boolean[]>([]);
 
   const pan = useRef(new Animated.Value(0)).current;
   const cardOpacity = useRef(new Animated.Value(1)).current;
@@ -93,6 +110,7 @@ export const GameScreen = ({ navigation }: any) => {
     Vibration.vibrate([0, 500, 200, 500]);
     const { result, updatedTeams } = endRound();
     const winner = checkWinner(updatedTeams);
+    if (winner) recordWin(winner.id);
 
     setTimeout(() => {
       if (winner) {
@@ -107,7 +125,7 @@ export const GameScreen = ({ navigation }: any) => {
         leave(StackActions.replace('RoundResult', { result }));
       }
     }, 800);
-  }, [endRound, checkWinner, leave]);
+  }, [endRound, checkWinner, recordWin, leave]);
 
   const { timeLeft, start: startTimer, progress } = useTimer(
     settings.roundDuration,
@@ -127,14 +145,51 @@ export const GameScreen = ({ navigation }: any) => {
     };
   }, []);
 
+  const dealCard = () => {
+    const next = dealWords(EIGHT_WORDS);
+    cardRef.current = next;
+    cardGuessedRef.current = next.map(() => false);
+    setCard(next);
+    setCardGuessed(cardGuessedRef.current);
+  };
+
   const handleStartRound = () => {
     startNewRound();
-    setCurrentWord(getCurrentWord());
+    if (isEight) {
+      dealCard();
+    } else {
+      setCurrentWord(getCurrentWord());
+    }
     setPhase('playing');
     startTimer();
     playStart();
     setCorrectCount(0);
     setSkipCount(0);
+  };
+
+  // 8 words mode: tap a word to mark it guessed, tap again to undo.
+  // When the whole card is guessed, a new card is dealt.
+  const phaseForCard = useRef(phase);
+  phaseForCard.current = phase;
+  const toggleCardWord = (index: number) => {
+    if (phaseForCard.current !== 'playing') return;
+    const current = cardGuessedRef.current;
+    if (index >= current.length || current.every(Boolean)) return;
+    const guessed = !current[index];
+    setWordGuessed(cardRef.current[index], guessed);
+    const nextGuessed = current.map((g, i) => (i === index ? guessed : g));
+    cardGuessedRef.current = nextGuessed;
+    setCardGuessed(nextGuessed);
+    setCorrectCount((p) => p + (guessed ? 1 : -1));
+    if (guessed) {
+      playCorrect();
+      flashScreen(COLORS.correctGlow);
+    }
+    if (nextGuessed.every(Boolean)) {
+      setTimeout(() => {
+        if (phaseForCard.current === 'playing') dealCard();
+      }, 400);
+    }
   };
 
   const flashScreen = (color: string) => {
@@ -230,6 +285,8 @@ export const GameScreen = ({ navigation }: any) => {
 
   const currentTeam = teams[currentTeamIndex];
   const isUrgent = timeLeft <= 10;
+  const roundNumber = getRoundNumber(roundResults.length, teams.length);
+  const gameNumber = getGameNumber(sessionWins);
 
   const cardRotation = pan.interpolate({
     inputRange: [-width, 0, width],
@@ -267,8 +324,19 @@ export const GameScreen = ({ navigation }: any) => {
           <Text style={styles.readySubtext}>{t.prepareHeroes}</Text>
           <Text style={styles.readyDesc}>
             {t.givePhone}{'\n\n'}
-            <Text style={{ color: COLORS.correctGlow, fontFamily: FONTS.bodyBold }}>{t.swipeRightCorrect}</Text>{'\n'}
-            <Text style={{ color: COLORS.skipGlow, fontFamily: FONTS.bodyBold }}>{t.swipeLeftSkip}</Text>
+            {isEight ? (
+              <Text style={{ color: COLORS.correctGlow, fontFamily: FONTS.bodyBold }}>{t.tapGuessedWords}</Text>
+            ) : (
+              <>
+                <Text style={{ color: COLORS.correctGlow, fontFamily: FONTS.bodyBold }}>{t.swipeRightCorrect}</Text>{'\n'}
+                <Text style={{ color: COLORS.skipGlow, fontFamily: FONTS.bodyBold }}>{t.swipeLeftSkip}</Text>
+              </>
+            )}
+          </Text>
+
+          <Text style={styles.readyMeta}>
+            {gameNumber > 1 ? `${t.gameLabel} ${gameNumber} · ` : ''}
+            {t.roundLabel} {roundNumber} · {t.targetLabel} {settings.winningScore}
           </Text>
 
           <View style={styles.scoreBoard}>
@@ -343,82 +411,123 @@ export const GameScreen = ({ navigation }: any) => {
         <View style={styles.headerRight}>
           <Text style={styles.scoreLabel}>
             <Text style={{ color: COLORS.correctGlow }}>+{correctCount}</Text>
-            {'  '}
-            <Text style={{ color: COLORS.skipGlow }}>-{skipCount}</Text>
+            {!isEight && (
+              <>
+                {'  '}
+                <Text style={{ color: COLORS.skipGlow }}>-{skipCount}</Text>
+              </>
+            )}
           </Text>
         </View>
       </View>
 
-      {/* Swipe Direction Indicators */}
-      <View style={styles.swipeHintRow}>
-        <Animated.View style={[styles.swipeHint, { opacity: leftIndicatorOpacity }]}>
-          <MaterialCommunityIcons name="shield-off" size={18} color={COLORS.skipGlow} />
-          <Text style={[styles.swipeHintText, { color: COLORS.skipGlow }]}>{t.retreat.toUpperCase()}</Text>
-        </Animated.View>
-        <Animated.View style={[styles.swipeHint, { opacity: rightIndicatorOpacity }]}>
-          <Text style={[styles.swipeHintText, { color: COLORS.correctGlow }]}>{t.victory.toUpperCase()}</Text>
-          <MaterialCommunityIcons name="sword" size={18} color={COLORS.correctGlow} />
-        </Animated.View>
-      </View>
+      {isEight ? (
+        <View style={styles.eightContainer}>
+          <Text style={styles.eightHint}>{t.tapGuessedWords}</Text>
+          <View style={styles.eightCard}>
+            <CardCorner position="tl" />
+            <CardCorner position="tr" />
+            <CardCorner position="bl" />
+            <CardCorner position="br" />
+            {card.map((word, index) => (
+              <TouchableOpacity
+                key={`${word}-${index}`}
+                style={[styles.eightRow, cardGuessed[index] && styles.eightRowGuessed]}
+                onPress={() => toggleCardWord(index)}
+                activeOpacity={0.7}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: cardGuessed[index] }}
+              >
+                <MaterialCommunityIcons
+                  name={cardGuessed[index] ? 'check-circle' : 'circle-outline'}
+                  size={22}
+                  color={cardGuessed[index] ? COLORS.correct : COLORS.parchmentEdge}
+                />
+                <Text
+                  style={[styles.eightWord, cardGuessed[index] && styles.eightWordGuessed]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                >
+                  {word}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      ) : (
+        <>
+        {/* Swipe Direction Indicators */}
+        <View style={styles.swipeHintRow}>
+          <Animated.View style={[styles.swipeHint, { opacity: leftIndicatorOpacity }]}>
+            <MaterialCommunityIcons name="shield-off" size={18} color={COLORS.skipGlow} />
+            <Text style={[styles.swipeHintText, { color: COLORS.skipGlow }]}>{t.retreat.toUpperCase()}</Text>
+          </Animated.View>
+          <Animated.View style={[styles.swipeHint, { opacity: rightIndicatorOpacity }]}>
+            <Text style={[styles.swipeHintText, { color: COLORS.correctGlow }]}>{t.victory.toUpperCase()}</Text>
+            <MaterialCommunityIcons name="sword" size={18} color={COLORS.correctGlow} />
+          </Animated.View>
+        </View>
 
-      {/* Word Card with PanResponder — Parchment Card */}
-      <View style={styles.wordContainer}>
-        <Animated.View
-          {...panResponder.panHandlers}
-          style={[
-            styles.wordCard,
-            {
-              transform: [
-                { translateX: pan },
-                { rotate: cardRotation },
-              ],
-              opacity: cardOpacity,
-              borderColor: cardBorderColor,
-            },
-          ]}
-        >
-          <CardCorner position="tl" />
-          <CardCorner position="tr" />
-          <CardCorner position="bl" />
-          <CardCorner position="br" />
-          <Text style={styles.wordText}>{currentWord}</Text>
-        </Animated.View>
-      </View>
-
-      {/* Action Buttons */}
-      <View style={styles.actionContainer}>
-        <TouchableOpacity
-          onPress={handleSkip}
-          activeOpacity={0.7}
-          style={styles.actionButtonWrap}
-        >
-          <LinearGradient
-            colors={['#5C1A24', COLORS.skip]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.actionButton}
+        {/* Word Card with PanResponder — Parchment Card */}
+        <View style={styles.wordContainer}>
+          <Animated.View
+            {...panResponder.panHandlers}
+            style={[
+              styles.wordCard,
+              {
+                transform: [
+                  { translateX: pan },
+                  { rotate: cardRotation },
+                ],
+                opacity: cardOpacity,
+                borderColor: cardBorderColor,
+              },
+            ]}
           >
-            <MaterialCommunityIcons name="shield-off" size={36} color="#FFF" />
-            <Text style={styles.actionLabel}>{t.retreat}</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+            <CardCorner position="tl" />
+            <CardCorner position="tr" />
+            <CardCorner position="bl" />
+            <CardCorner position="br" />
+            <Text style={styles.wordText}>{currentWord}</Text>
+          </Animated.View>
+        </View>
 
-        <TouchableOpacity
-          onPress={handleCorrect}
-          activeOpacity={0.7}
-          style={styles.actionButtonWrap}
-        >
-          <LinearGradient
-            colors={['#1B4332', COLORS.correct]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.actionButton}
+        {/* Action Buttons */}
+        <View style={styles.actionContainer}>
+          <TouchableOpacity
+            onPress={handleSkip}
+            activeOpacity={0.7}
+            style={styles.actionButtonWrap}
           >
-            <MaterialCommunityIcons name="sword" size={36} color="#FFF" />
-            <Text style={styles.actionLabel}>{t.victory}</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+            <LinearGradient
+              colors={['#5C1A24', COLORS.skip]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.actionButton}
+            >
+              <MaterialCommunityIcons name="shield-off" size={36} color="#FFF" />
+              <Text style={styles.actionLabel}>{t.retreat}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleCorrect}
+            activeOpacity={0.7}
+            style={styles.actionButtonWrap}
+          >
+            <LinearGradient
+              colors={['#1B4332', COLORS.correct]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.actionButton}
+            >
+              <MaterialCommunityIcons name="sword" size={36} color="#FFF" />
+              <Text style={styles.actionLabel}>{t.victory}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+        </>
+      )}
     </LinearGradient>
   );
 };
@@ -457,6 +566,13 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.display,
     color: COLORS.gold,
     marginBottom: 16,
+  },
+  readyMeta: {
+    fontSize: SIZES.sm,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.textSecondary,
+    letterSpacing: 1,
+    marginBottom: 12,
   },
   readyDesc: {
     fontSize: SIZES.md,
@@ -644,6 +760,51 @@ const styles = StyleSheet.create({
     color: COLORS.ink,
     textAlign: 'center',
     lineHeight: 52,
+  },
+
+  /* --- 8 Words Mode --- */
+  eightContainer: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingBottom: 32,
+    justifyContent: 'center',
+  },
+  eightHint: {
+    fontSize: SIZES.sm,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  eightCard: {
+    backgroundColor: COLORS.parchment,
+    borderRadius: SIZES.cardRadius,
+    borderWidth: 2,
+    borderColor: COLORS.parchmentEdge,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    gap: 6,
+  },
+  eightRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+  },
+  eightRowGuessed: {
+    backgroundColor: 'rgba(45,106,79,0.12)',
+  },
+  eightWord: {
+    flex: 1,
+    fontSize: SIZES.lg,
+    fontFamily: FONTS.displayBlack,
+    color: COLORS.ink,
+  },
+  eightWordGuessed: {
+    color: COLORS.correct,
+    textDecorationLine: 'line-through',
   },
 
   /* --- Action Buttons --- */

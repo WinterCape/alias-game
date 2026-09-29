@@ -17,13 +17,14 @@ import { useI18n } from '../i18n/I18nContext';
 
 export const RoundResultScreen = ({ route, navigation }: any) => {
   const { result } = route.params;
-  const { teams } = useGame();
+  const { teams, abandonGame } = useGame();
   const { t } = useI18n();
   const leave = useConfirmLeave(navigation, {
     title: t.quitArenaTitle,
     message: t.quitArenaMessage,
     confirm: t.quitQuestConfirm,
     cancel: t.cancel,
+    onConfirm: abandonGame,
   });
   const team = teams[result.teamId];
 
