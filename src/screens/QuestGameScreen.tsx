@@ -10,6 +10,12 @@ import {
   Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import {
+  CommonActions,
+  NavigationAction,
+  StackActions,
+  usePreventRemove,
+} from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useI18n } from '../i18n/I18nContext';
@@ -77,6 +83,13 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
   const [phase, setPhase] = useState<'storyteller' | 'playing' | 'revealed'>('storyteller');
   const [turnHistory, setTurnHistory] = useState<QuestTurn[]>([]);
   const [turnCount, setTurnCount] = useState(1);
+  // Set once leaving is allowed (quit confirmed or game won). Prevention turns
+  // off on the next render, then the effect below performs the navigation.
+  const [leaveAction, setLeaveAction] = useState<NavigationAction | null>(null);
+
+  useEffect(() => {
+    if (leaveAction) navigation.dispatch(leaveAction);
+  }, [leaveAction, navigation]);
 
   // Shuffle words on mount
   useEffect(() => {
@@ -116,10 +129,12 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
     // Check if anyone reached winning score
     const winner = updatedPlayers.find((p) => p.score >= settings.winningScore);
     if (winner) {
-      navigation.replace('QuestScores', {
-        players: updatedPlayers,
-        turnHistory,
-      });
+      setLeaveAction(
+        StackActions.replace('QuestScores', {
+          players: updatedPlayers,
+          turnHistory,
+        })
+      );
       return;
     }
 
@@ -182,16 +197,23 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
     advanceTurn(players);
   };
 
-  const handleQuit = () => {
+  const confirmQuit = (onConfirm: () => void) => {
     Alert.alert(t.quitQuestTitle, t.quitQuestMessage, [
       { text: t.cancel, style: 'cancel' },
-      {
-        text: t.quitQuestConfirm,
-        style: 'destructive',
-        onPress: () => navigation.reset({ index: 0, routes: [{ name: 'Home' }] }),
-      },
+      { text: t.quitQuestConfirm, style: 'destructive', onPress: onConfirm },
     ]);
   };
+
+  const handleQuit = () => {
+    confirmQuit(() =>
+      setLeaveAction(CommonActions.reset({ index: 0, routes: [{ name: 'Home' }] }))
+    );
+  };
+
+  // Ask before the iOS back swipe or Android back button leaves the game
+  usePreventRemove(leaveAction === null, ({ data }) => {
+    confirmQuit(() => setLeaveAction(data.action));
+  });
 
   const quitButton = (
     <TouchableOpacity
