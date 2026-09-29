@@ -13,7 +13,7 @@ import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { CATEGORIES } from '../data/categories';
 import { ALL_CATEGORIES } from '../data/words';
 import { useGame } from '../hooks/GameContext';
-import { CategoryId, Difficulty } from '../types';
+import { ArenaMode, CategoryId, Difficulty } from '../types';
 import { useI18n } from '../i18n/I18nContext';
 import { useProgression } from '../progression/ProgressionContext';
 import { getUnlockedTimerOptions, getUnlockedScoreOptions, getMaxTeams } from '../progression/rewards';
@@ -36,6 +36,12 @@ export const SettingsScreen = ({ navigation }: any) => {
   ];
 
   const allSelected = settings.selectedCategories.length === ALL_CATEGORIES.length;
+
+  const arenaMode: ArenaMode = settings.arenaMode ?? 'classic';
+  const MODES: { id: ArenaMode; label: string; desc: string; icon: string }[] = [
+    { id: 'classic', label: t.modeClassic, desc: t.modeClassicDesc, icon: 'cards-playing-outline' },
+    { id: 'eight', label: t.modeEightWords, desc: t.modeEightWordsDesc, icon: 'format-list-checks' },
+  ];
 
   const toggleAll = () => {
     if (allSelected) {
@@ -73,6 +79,36 @@ export const SettingsScreen = ({ navigation }: any) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {/* Game Mode */}
+        <View style={styles.sectionHeader}>
+          <MaterialCommunityIcons name="gamepad-variant" size={18} color={COLORS.gold} />
+          <Text style={styles.sectionTitle}>{t.gameMode}</Text>
+        </View>
+        <View style={styles.modeRow}>
+          {MODES.map((m) => {
+            const active = arenaMode === m.id;
+            return (
+              <TouchableOpacity
+                key={m.id}
+                style={[styles.modeCard, active && styles.optionChipActive]}
+                onPress={() => updateSettings({ arenaMode: m.id })}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: active }}
+              >
+                <View style={styles.modeCardHeader}>
+                  <MaterialCommunityIcons
+                    name={m.icon as any}
+                    size={18}
+                    color={active ? COLORS.gold : COLORS.textSecondary}
+                  />
+                  <Text style={[styles.optionText, active && styles.optionTextActive]}>{m.label}</Text>
+                </View>
+                <Text style={styles.modeDesc}>{m.desc}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
         {/* Round Duration */}
         <View style={styles.sectionHeader}>
           <MaterialCommunityIcons name="timer-sand" size={18} color={COLORS.gold} />
@@ -345,6 +381,29 @@ const styles = StyleSheet.create({
   optionChipActive: {
     backgroundColor: 'rgba(212,168,83,0.15)',
     borderColor: COLORS.gold,
+  },
+  modeRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  modeCard: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: 'rgba(212,168,83,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(212,168,83,0.1)',
+    gap: 6,
+  },
+  modeCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  modeDesc: {
+    fontSize: SIZES.xs,
+    fontFamily: FONTS.body,
+    color: COLORS.textSecondary,
   },
   optionText: {
     fontSize: SIZES.md,

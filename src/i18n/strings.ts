@@ -22,6 +22,20 @@ export interface Strings {
   purchaseFailedTitle: string;
   purchaseFailedMessage: string;
   purchasesRestored: string;
+  gameMode: string;
+  modeClassic: string;
+  modeEightWords: string;
+  modeClassicDesc: string;
+  modeEightWordsDesc: string;
+  tapGuessedWords: string;
+  roundLabel: string;
+  gameLabel: string;
+  targetLabel: string;
+  continueBattle: string;
+  newGameConfirmTitle: string;
+  newGameConfirmMessage: string;
+  newGameConfirm: string;
+  rematch: string;
   chronicles: string;
 
   // Settings
@@ -158,6 +172,20 @@ export const RO: Strings = {
   purchaseFailedTitle: 'Cumpărarea nu s-a finalizat',
   purchaseFailedMessage: 'Încearcă din nou sau restaurează cumpărăturile.',
   purchasesRestored: 'Cumpărături restaurate',
+  gameMode: 'Mod de joc',
+  modeClassic: 'Clasic',
+  modeEightWords: '8 cuvinte',
+  modeClassicDesc: 'Un cuvânt pe rând.',
+  modeEightWordsDesc: 'Un cartonaș cu 8 cuvinte. Atinge fiecare cuvânt ghicit, fără penalizări.',
+  tapGuessedWords: 'Atinge fiecare cuvânt ghicit',
+  roundLabel: 'Runda',
+  gameLabel: 'Jocul',
+  targetLabel: 'Țintă',
+  continueBattle: 'Continuă lupta',
+  newGameConfirmTitle: 'Începi un joc nou?',
+  newGameConfirmMessage: 'Jocul salvat se va pierde.',
+  newGameConfirm: 'Joc nou',
+  rematch: 'Revanșă',
   chronicles: 'Cronici',
   battlePrep: 'Pregătire de Luptă',
   missionDuration: 'Durata Misiunii (secunde)',
@@ -293,6 +321,20 @@ export const EN: Strings = {
   purchaseFailedTitle: 'Purchase didn\'t go through',
   purchaseFailedMessage: 'Please try again, or restore your purchases.',
   purchasesRestored: 'Purchases restored',
+  gameMode: 'Game mode',
+  modeClassic: 'Classic',
+  modeEightWords: '8 words',
+  modeClassicDesc: 'One word at a time.',
+  modeEightWordsDesc: 'A card of 8 words. Tap each word that gets guessed, no penalties.',
+  tapGuessedWords: 'Tap each word that gets guessed',
+  roundLabel: 'Round',
+  gameLabel: 'Game',
+  targetLabel: 'Target',
+  continueBattle: 'Continue the battle',
+  newGameConfirmTitle: 'Start a new game?',
+  newGameConfirmMessage: 'The saved game will be lost.',
+  newGameConfirm: 'New game',
+  rematch: 'Rematch',
   chronicles: 'Chronicles',
   battlePrep: 'Battle Preparation',
   missionDuration: 'Mission Duration (seconds)',
@@ -428,6 +470,20 @@ export const ES: Strings = {
   purchaseFailedTitle: 'La compra no se completó',
   purchaseFailedMessage: 'Inténtalo de nuevo o restaura tus compras.',
   purchasesRestored: 'Compras restauradas',
+  gameMode: 'Modo de juego',
+  modeClassic: 'Clásico',
+  modeEightWords: '8 palabras',
+  modeClassicDesc: 'Una palabra a la vez.',
+  modeEightWordsDesc: 'Una tarjeta con 8 palabras. Toca cada palabra adivinada, sin penalizaciones.',
+  tapGuessedWords: 'Toca cada palabra adivinada',
+  roundLabel: 'Ronda',
+  gameLabel: 'Partida',
+  targetLabel: 'Meta',
+  continueBattle: 'Continuar la batalla',
+  newGameConfirmTitle: '¿Empezar una partida nueva?',
+  newGameConfirmMessage: 'Se perderá la partida guardada.',
+  newGameConfirm: 'Partida nueva',
+  rematch: 'Revancha',
   chronicles: 'Crónicas',
   battlePrep: 'Preparación de Batalla',
   missionDuration: 'Duración de la Misión (segundos)',
@@ -563,6 +619,20 @@ export const FR: Strings = {
   purchaseFailedTitle: 'L\'achat n\'a pas abouti',
   purchaseFailedMessage: 'Réessaie ou restaure tes achats.',
   purchasesRestored: 'Achats restaurés',
+  gameMode: 'Mode de jeu',
+  modeClassic: 'Classique',
+  modeEightWords: '8 mots',
+  modeClassicDesc: 'Un mot à la fois.',
+  modeEightWordsDesc: 'Une carte de 8 mots. Touche chaque mot deviné, sans pénalité.',
+  tapGuessedWords: 'Touche chaque mot deviné',
+  roundLabel: 'Manche',
+  gameLabel: 'Partie',
+  targetLabel: 'Objectif',
+  continueBattle: 'Reprendre la bataille',
+  newGameConfirmTitle: 'Commencer une nouvelle partie ?',
+  newGameConfirmMessage: 'La partie sauvegardée sera perdue.',
+  newGameConfirm: 'Nouvelle partie',
+  rematch: 'Revanche',
   chronicles: 'Chroniques',
   battlePrep: 'Préparation au Combat',
   missionDuration: 'Durée de la Mission (secondes)',
@@ -698,6 +768,20 @@ export const RU: Strings = {
   purchaseFailedTitle: 'Покупка не завершена',
   purchaseFailedMessage: 'Попробуй ещё раз или восстанови покупки.',
   purchasesRestored: 'Покупки восстановлены',
+  gameMode: 'Режим игры',
+  modeClassic: 'Классика',
+  modeEightWords: '8 слов',
+  modeClassicDesc: 'По одному слову.',
+  modeEightWordsDesc: 'Карточка с 8 словами. Нажимай на каждое угаданное слово, без штрафов.',
+  tapGuessedWords: 'Нажимай на каждое угаданное слово',
+  roundLabel: 'Раунд',
+  gameLabel: 'Игра',
+  targetLabel: 'Цель',
+  continueBattle: 'Продолжить битву',
+  newGameConfirmTitle: 'Начать новую игру?',
+  newGameConfirmMessage: 'Сохранённая игра будет потеряна.',
+  newGameConfirm: 'Новая игра',
+  rematch: 'Реванш',
   chronicles: 'Хроники',
   battlePrep: 'Подготовка к Битве',
   missionDuration: 'Длительность Миссии (секунды)',

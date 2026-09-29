@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StatusBar,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -14,6 +15,8 @@ import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useI18n } from '../i18n/I18nContext';
 import { Language } from '../i18n/strings';
 import { ProfileCard } from '../components/ProfileCard';
+import { useGame } from '../hooks/GameContext';
+import { getRoundNumber } from '../hooks/arenaSession';
 
 const LANGUAGES: { id: Language; label: string; flag: string }[] = [
   { id: 'ro', label: 'RO', flag: '🇷🇴' },
@@ -26,6 +29,32 @@ const LANGUAGES: { id: Language; label: string; flag: string }[] = [
 export const HomeScreen = ({ navigation }: any) => {
   const { lang, t, setLanguage } = useI18n();
   const insets = useSafeAreaInsets();
+  const { savedGame, resumeGame, clearSavedGame } = useGame();
+
+  const handleContinue = () => {
+    if (!savedGame) return;
+    resumeGame(savedGame);
+    navigation.navigate('Game');
+  };
+
+  // Starting a new Arena game replaces the saved one, so ask first
+  const handleArena = () => {
+    if (!savedGame) {
+      navigation.navigate('Settings');
+      return;
+    }
+    Alert.alert(t.newGameConfirmTitle, t.newGameConfirmMessage, [
+      { text: t.cancel, style: 'cancel' },
+      {
+        text: t.newGameConfirm,
+        style: 'destructive',
+        onPress: () => {
+          clearSavedGame();
+          navigation.navigate('Settings');
+        },
+      },
+    ]);
+  };
 
   return (
     <LinearGradient colors={COLORS.gradientTable} style={styles.container}>
@@ -77,10 +106,30 @@ export const HomeScreen = ({ navigation }: any) => {
         </View>
 
         <View style={styles.buttonContainer}>
+          {/* Unfinished Arena game */}
+          {savedGame && (
+            <TouchableOpacity
+              style={styles.continueBtn}
+              onPress={handleContinue}
+              activeOpacity={0.8}
+            >
+              <MaterialCommunityIcons name="play-circle" size={28} color={COLORS.gold} />
+              <View style={styles.modeBtnContent}>
+                <Text style={styles.continueTitle}>{t.continueBattle}</Text>
+                <Text style={styles.continueDesc} numberOfLines={1}>
+                  {savedGame.teams.map((team) => `${team.name} ${team.score}`).join(' · ')}
+                </Text>
+              </View>
+              <Text style={styles.continueMeta}>
+                {t.roundLabel} {getRoundNumber(savedGame.roundResults.length, savedGame.teams.length)}
+              </Text>
+            </TouchableOpacity>
+          )}
+
           {/* Arena Mode */}
           <TouchableOpacity
             style={styles.primaryBtn}
-            onPress={() => navigation.navigate('Settings')}
+            onPress={handleArena}
             activeOpacity={0.8}
           >
             <LinearGradient
@@ -307,6 +356,34 @@ const styles = StyleSheet.create({
     color: COLORS.ink,
     letterSpacing: 2,
     textTransform: 'uppercase',
+  },
+  continueBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    borderRadius: SIZES.radius,
+    borderWidth: 1.5,
+    borderColor: COLORS.gold,
+    backgroundColor: 'rgba(212,168,83,0.1)',
+  },
+  continueTitle: {
+    fontFamily: FONTS.bodyBlack,
+    fontSize: 15,
+    color: COLORS.gold,
+    letterSpacing: 1,
+  },
+  continueDesc: {
+    fontFamily: FONTS.body,
+    fontSize: SIZES.xs,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  continueMeta: {
+    fontFamily: FONTS.bodyBold,
+    fontSize: SIZES.xs,
+    color: COLORS.textSecondary,
   },
   secondaryBtn: {
     flexDirection: 'row',

@@ -7,6 +7,8 @@ interface ConfirmTexts {
   message: string;
   confirm: string;
   cancel: string;
+  // Runs when the player confirms leaving (not for `leave`)
+  onConfirm?: () => void;
 }
 
 /**
@@ -29,7 +31,10 @@ export const useConfirmLeave = (navigation: any, texts: ConfirmTexts) => {
       {
         text: texts.confirm,
         style: 'destructive',
-        onPress: () => setLeaveAction(data.action),
+        onPress: () => {
+          texts.onConfirm?.();
+          setLeaveAction(data.action);
+        },
       },
     ]);
   });
