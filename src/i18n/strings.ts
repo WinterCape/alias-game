@@ -6,6 +6,7 @@ export interface Strings {
   // Home
   newAdventure: string;
   heroCode: string;
+  heroShop: string;
   chronicles: string;
 
   // Settings
@@ -123,6 +124,7 @@ export interface Strings {
 export const RO: Strings = {
   newAdventure: 'Aventură Nouă',
   heroCode: 'Codul Eroilor',
+  heroShop: 'Magazinul Eroilor',
   chronicles: 'Cronici',
   battlePrep: 'Pregătire de Luptă',
   missionDuration: 'Durata Misiunii (secunde)',
@@ -239,6 +241,7 @@ export const RO: Strings = {
 export const EN: Strings = {
   newAdventure: 'New Adventure',
   heroCode: 'Hero\'s Code',
+  heroShop: 'Hero\'s Shop',
   chronicles: 'Chronicles',
   battlePrep: 'Battle Preparation',
   missionDuration: 'Mission Duration (seconds)',
@@ -355,6 +358,7 @@ export const EN: Strings = {
 export const ES: Strings = {
   newAdventure: 'Nueva Aventura',
   heroCode: 'Código del Héroe',
+  heroShop: 'Tienda del Héroe',
   chronicles: 'Crónicas',
   battlePrep: 'Preparación de Batalla',
   missionDuration: 'Duración de la Misión (segundos)',
@@ -471,6 +475,7 @@ export const ES: Strings = {
 export const FR: Strings = {
   newAdventure: 'Nouvelle Aventure',
   heroCode: 'Code des Héros',
+  heroShop: 'Boutique des Héros',
   chronicles: 'Chroniques',
   battlePrep: 'Préparation au Combat',
   missionDuration: 'Durée de la Mission (secondes)',
@@ -587,6 +592,7 @@ export const FR: Strings = {
 export const RU: Strings = {
   newAdventure: 'Новое Приключение',
   heroCode: 'Кодекс Героев',
+  heroShop: 'Лавка Героев',
   chronicles: 'Хроники',
   battlePrep: 'Подготовка к Битве',
   missionDuration: 'Длительность Миссии (секунды)',
