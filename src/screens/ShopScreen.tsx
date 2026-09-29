@@ -17,7 +17,7 @@ import { useProgression } from '../progression/ProgressionContext';
 import { isPackUnlockedByLevel, getPackUnlockLevel } from '../progression/rewards';
 
 export const ShopScreen = ({ navigation }: any) => {
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const {
     isPurchased,
     purchasePack,
@@ -49,7 +49,7 @@ export const ShopScreen = ({ navigation }: any) => {
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>
-          {lang === 'ro' ? 'Magazinul Eroilor' : "Hero's Shop"}
+          {t.heroShop}
         </Text>
 
         <TouchableOpacity
