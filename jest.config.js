@@ -7,6 +7,7 @@ module.exports = {
       tsconfig: {
         jsx: 'react-jsx',
         esModuleInterop: true,
+        resolveJsonModule: true,
         strict: true,
         moduleResolution: 'node',
         target: 'ES2020',

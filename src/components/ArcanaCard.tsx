@@ -36,6 +36,8 @@ interface ArcanaCardProps {
   accent?: string;
   // Shown as a Roman numeral next to the realm name
   number?: number;
+  // Optional clue printed under the word, in italics
+  description?: string | null;
   // Outer style, may be animated (swipe transform, border colour)
   style?: StyleProp<any>;
   minHeight?: number;
@@ -51,6 +53,7 @@ export const ArcanaCard = ({
   realm,
   accent = COLORS.gold,
   number,
+  description,
   style,
   minHeight = 260,
   children,
@@ -109,6 +112,9 @@ export const ArcanaCard = ({
             <Text style={[styles.diamond, { color: accent }]}>◆</Text>
             <View style={[styles.ruleLine, { backgroundColor: accent + '66' }]} />
           </View>
+          {!!description && (
+            <Text style={styles.description}>{description}</Text>
+          )}
           {children}
         </View>
 
@@ -181,6 +187,16 @@ const styles = StyleSheet.create({
     color: COLORS.parchment,
     textAlign: 'center',
     letterSpacing: 0.5,
+  },
+  description: {
+    fontFamily: FONTS.body,
+    fontStyle: 'italic',
+    fontSize: 16,
+    lineHeight: 22,
+    color: COLORS.parchment,
+    opacity: 0.9,
+    textAlign: 'center',
+    paddingHorizontal: 6,
   },
   wordTall: {
     fontSize: 50,

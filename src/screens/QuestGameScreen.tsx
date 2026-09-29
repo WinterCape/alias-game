@@ -20,6 +20,7 @@ import { getShuffledWords, getWordCategory, getWordPack } from '../data/words';
 import { PREMIUM_PACKS } from '../store/packs';
 import { ArcanaCard } from '../components/ArcanaCard';
 import { getWordRealm } from '../utils/realm';
+import { getWordDescription } from '../data/descriptions';
 import { useStore } from '../store/StoreContext';
 import { formatHintsLeft, generateHints } from '../utils/hints';
 
@@ -79,6 +80,8 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
       t.categoryNames.general;
 
   const realm = useMemo(() => getWordRealm(currentWord, lang, t), [currentWord, lang, t]);
+  // Ready-made first clue, so the storyteller doesn't have to invent one
+  const description = useMemo(() => getWordDescription(currentWord, lang), [currentWord, lang]);
 
   const hints = useMemo(() => {
     if (!currentWord) return [];
@@ -292,13 +295,16 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
             realm={realm}
             accent={COLORS.quest}
             number={turnCount}
+            description={description}
             minHeight={280}
             style={styles.arcana}
           />
         </View>
 
         {/* Describe instruction */}
-        <Text style={styles.instructionText}>{t.describeWord}</Text>
+        <Text style={styles.instructionText}>
+          {description ? t.readDescriptionAloud : t.describeWord}
+        </Text>
 
         {/* Hints section */}
         <View style={styles.hintsSection}>
