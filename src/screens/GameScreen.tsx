@@ -180,20 +180,29 @@ export const GameScreen = ({ navigation }: any) => {
     });
   }, [phase, markSkipped, getCurrentWord, playSkip]);
 
+  // The pan responder is created once, so it reads the latest phase and
+  // handlers through refs instead of the values from the first render.
+  const phaseRef = useRef(phase);
+  const handleCorrectRef = useRef(handleCorrect);
+  const handleSkipRef = useRef(handleSkip);
+  phaseRef.current = phase;
+  handleCorrectRef.current = handleCorrect;
+  handleSkipRef.current = handleSkip;
+
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 10,
       onPanResponderMove: (_, gestureState) => {
-        if (phase !== 'playing' || isAnimating.current) return;
+        if (phaseRef.current !== 'playing' || isAnimating.current) return;
         pan.setValue(gestureState.dx);
       },
       onPanResponderRelease: (_, gestureState) => {
-        if (phase !== 'playing' || isAnimating.current) return;
+        if (phaseRef.current !== 'playing' || isAnimating.current) return;
         if (gestureState.dx > SWIPE_THRESHOLD || gestureState.vx > 0.5) {
-          handleCorrect();
+          handleCorrectRef.current();
         } else if (gestureState.dx < -SWIPE_THRESHOLD || gestureState.vx < -0.5) {
-          handleSkip();
+          handleSkipRef.current();
         } else {
           Animated.spring(pan, {
             toValue: 0,
