@@ -11,12 +11,14 @@ import {
   Vibration,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { CommonActions, StackActions } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useGame } from '../hooks/GameContext';
 import { useTimer } from '../hooks/useTimer';
 import { useSounds } from '../hooks/useSounds';
+import { useConfirmLeave } from '../hooks/useConfirmLeave';
 import { useI18n } from '../i18n/I18nContext';
 
 const { width } = Dimensions.get('window');
@@ -67,6 +69,12 @@ export const GameScreen = ({ navigation }: any) => {
   } = useGame();
 
   const { t } = useI18n();
+  const leave = useConfirmLeave(navigation, {
+    title: t.quitArenaTitle,
+    message: t.quitArenaMessage,
+    confirm: t.quitQuestConfirm,
+    cancel: t.cancel,
+  });
   const { playCorrect, playSkip, playTick, playTimeUp, playStart } = useSounds();
   const [phase, setPhase] = useState<GamePhase>('ready');
   const [currentWord, setCurrentWord] = useState('');
@@ -83,17 +91,23 @@ export const GameScreen = ({ navigation }: any) => {
     setPhase('finished');
     playTimeUp();
     Vibration.vibrate([0, 500, 200, 500]);
-    const result = endRound();
-    const winner = checkWinner();
+    const { result, updatedTeams } = endRound();
+    const winner = checkWinner(updatedTeams);
 
     setTimeout(() => {
       if (winner) {
-        navigation.replace('GameOver', { teams });
+        // Only Home stays underneath, so back from the winner screen goes Home
+        leave(
+          CommonActions.reset({
+            index: 1,
+            routes: [{ name: 'Home' }, { name: 'GameOver', params: { teams: updatedTeams } }],
+          })
+        );
       } else {
-        navigation.replace('RoundResult', { result });
+        leave(StackActions.replace('RoundResult', { result }));
       }
     }, 800);
-  }, [endRound, checkWinner, navigation, teams]);
+  }, [endRound, checkWinner, leave]);
 
   const { timeLeft, start: startTimer, progress } = useTimer(
     settings.roundDuration,

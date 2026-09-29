@@ -8,15 +8,23 @@ import {
   StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { StackActions } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { useGame } from '../hooks/GameContext';
+import { useConfirmLeave } from '../hooks/useConfirmLeave';
 import { useI18n } from '../i18n/I18nContext';
 
 export const RoundResultScreen = ({ route, navigation }: any) => {
   const { result } = route.params;
   const { teams } = useGame();
   const { t } = useI18n();
+  const leave = useConfirmLeave(navigation, {
+    title: t.quitArenaTitle,
+    message: t.quitArenaMessage,
+    confirm: t.quitQuestConfirm,
+    cancel: t.cancel,
+  });
   const team = teams[result.teamId];
 
   return (
@@ -95,7 +103,7 @@ export const RoundResultScreen = ({ route, navigation }: any) => {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.nextButtonWrap}
-          onPress={() => navigation.replace('Game')}
+          onPress={() => leave(StackActions.replace('Game'))}
           activeOpacity={0.8}
         >
           <LinearGradient
