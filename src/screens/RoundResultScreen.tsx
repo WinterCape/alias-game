@@ -110,9 +110,11 @@ export const RoundResultScreen = ({ navigation }: any) => {
                 onPress={() => toggleWord(word)}
                 activeOpacity={0.6}
               >
-                <MaterialCommunityIcons name="sword" size={16} color={COLORS.correctGlow} />
+                <MaterialCommunityIcons name="check-circle" size={20} color={COLORS.correctGlow} />
                 <Text style={styles.wordText}>{word}</Text>
-                <MaterialCommunityIcons name="swap-horizontal" size={16} color={COLORS.textSecondary} />
+                <View style={styles.toggleBtn}>
+                  <MaterialCommunityIcons name="close-circle" size={22} color={COLORS.skipGlow} />
+                </View>
               </TouchableOpacity>
             ))}
           </View>
@@ -128,9 +130,11 @@ export const RoundResultScreen = ({ navigation }: any) => {
                 onPress={() => toggleWord(word)}
                 activeOpacity={0.6}
               >
-                <MaterialCommunityIcons name="shield-off" size={16} color={COLORS.skipGlow} />
+                <MaterialCommunityIcons name="close-circle" size={20} color={COLORS.skipGlow} />
                 <Text style={[styles.wordText, { color: COLORS.textSecondary }]}>{word}</Text>
-                <MaterialCommunityIcons name="swap-horizontal" size={16} color={COLORS.textSecondary} />
+                <View style={styles.toggleBtn}>
+                  <MaterialCommunityIcons name="check-circle" size={22} color={COLORS.correctGlow} />
+                </View>
               </TouchableOpacity>
             ))}
           </View>
@@ -277,6 +281,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     paddingVertical: 8,
+  },
+  toggleBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   wordText: {
     flex: 1,
