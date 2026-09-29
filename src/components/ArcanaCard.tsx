@@ -55,6 +55,10 @@ export const ArcanaCard = ({
   minHeight = 260,
   children,
 }: ArcanaCardProps) => {
+  // Tall cards get a bigger emblem and word so the face doesn't look empty
+  const tall = minHeight >= 380;
+  const emblemSize = tall ? 76 : 48;
+
   const footer = [realm?.name?.toUpperCase(), number ? toRoman(number) : null]
     .filter(Boolean)
     .join(' · ');
@@ -68,8 +72,20 @@ export const ArcanaCard = ({
         <Star color={accent} style={styles.starBR} />
 
         {realm && (
-          <View style={[styles.emblem, { borderColor: accent, backgroundColor: realm.color + '22' }]}>
-            <MaterialCommunityIcons name={realm.icon as any} size={24} color={realm.color} />
+          <View
+            style={[
+              styles.emblem,
+              {
+                width: emblemSize,
+                height: emblemSize,
+                borderRadius: emblemSize / 2,
+                borderColor: accent,
+                backgroundColor: realm.color + '22',
+                marginTop: tall ? 12 : 0,
+              },
+            ]}
+          >
+            <MaterialCommunityIcons name={realm.icon as any} size={emblemSize / 2} color={realm.color} />
           </View>
         )}
 
@@ -80,7 +96,7 @@ export const ArcanaCard = ({
             <View style={[styles.ruleLine, { backgroundColor: accent + '66' }]} />
           </View>
           <Text
-            style={styles.word}
+            style={[styles.word, tall && styles.wordTall]}
             numberOfLines={2}
             adjustsFontSizeToFit
             minimumFontScale={0.55}
@@ -165,6 +181,9 @@ const styles = StyleSheet.create({
     color: COLORS.parchment,
     textAlign: 'center',
     letterSpacing: 0.5,
+  },
+  wordTall: {
+    fontSize: 50,
   },
   footer: {
     fontSize: 11,

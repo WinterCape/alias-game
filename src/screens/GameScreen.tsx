@@ -33,6 +33,7 @@ type GamePhase = 'ready' | 'playing' | 'lastWord' | 'finished';
 
 const CORNER_INSET = 8;
 const EIGHT_WORDS = 8;
+const CARD_RATIO = 1.55;
 
 const CardCorner = ({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) => {
   const isTop = position === 'tl' || position === 'tr';
@@ -348,6 +349,13 @@ export const GameScreen = ({ navigation }: any) => {
   const realm = useMemo(() => getWordRealm(currentWord, lang, t), [currentWord, lang, t]);
   // Card number for this turn: the how-many-th word it is
   const wordNumber = correctCount + skipCount + 1;
+
+  // The card fills the free space up to tarot proportions (about 1 : 1.55)
+  const [cardSpace, setCardSpace] = useState(0);
+  const cardHeight = Math.max(
+    300,
+    Math.min(cardSpace - 48, Math.round((width - 48) * CARD_RATIO))
+  );
   const roundNumber = getRoundNumber(roundResults.length, teams.length);
   const gameNumber = getGameNumber(sessionWins);
 
@@ -657,7 +665,10 @@ export const GameScreen = ({ navigation }: any) => {
         </View>
 
         {/* Word Card with PanResponder — Parchment Card */}
-        <View style={styles.wordContainer}>
+        <View
+          style={styles.wordContainer}
+          onLayout={(e) => setCardSpace(e.nativeEvent.layout.height)}
+        >
           <Animated.View
             {...panResponder.panHandlers}
             style={[
@@ -675,7 +686,7 @@ export const GameScreen = ({ navigation }: any) => {
               word={currentWord}
               realm={realm}
               number={wordNumber}
-              minHeight={340}
+              minHeight={cardHeight}
               style={{ borderColor: cardBorderColor }}
             />
           </Animated.View>

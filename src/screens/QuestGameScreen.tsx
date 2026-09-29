@@ -292,7 +292,7 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
             realm={realm}
             accent={COLORS.quest}
             number={turnCount}
-            minHeight={220}
+            minHeight={280}
             style={styles.arcana}
           />
         </View>
