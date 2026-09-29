@@ -123,6 +123,9 @@ export interface Strings {
   hintsLeft: string;
   nextTurn: string;
   wordRevealed: string;
+  quitQuestTitle: string;
+  quitQuestMessage: string;
+  quitQuestConfirm: string;
   pointsToWin: string;
   players: string;
   questScores: string;
@@ -250,6 +253,9 @@ export const RO: Strings = {
   hintsLeft: 'indicii rămase',
   nextTurn: 'Runda următoare',
   wordRevealed: 'Cuvântul era:',
+  quitQuestTitle: 'Părăsești aventura?',
+  quitQuestMessage: 'Progresul acestui joc se va pierde.',
+  quitQuestConfirm: 'Părăsește',
   pointsToWin: 'Puncte pentru victorie',
   players: 'Jucători',
   questScores: 'Clasament',
@@ -375,6 +381,9 @@ export const EN: Strings = {
   hintsLeft: 'hints left',
   nextTurn: 'Next turn',
   wordRevealed: 'The word was:',
+  quitQuestTitle: 'Leave the adventure?',
+  quitQuestMessage: 'This game\'s progress will be lost.',
+  quitQuestConfirm: 'Leave',
   pointsToWin: 'Points to win',
   players: 'Players',
   questScores: 'Scoreboard',
@@ -500,6 +509,9 @@ export const ES: Strings = {
   hintsLeft: 'pistas restantes',
   nextTurn: 'Siguiente turno',
   wordRevealed: 'La palabra era:',
+  quitQuestTitle: '¿Abandonar la aventura?',
+  quitQuestMessage: 'Se perderá el progreso de esta partida.',
+  quitQuestConfirm: 'Abandonar',
   pointsToWin: 'Puntos para ganar',
   players: 'Jugadores',
   questScores: 'Marcador',
@@ -625,6 +637,9 @@ export const FR: Strings = {
   hintsLeft: 'indices restants',
   nextTurn: 'Tour suivant',
   wordRevealed: 'Le mot était :',
+  quitQuestTitle: 'Quitter l\'aventure ?',
+  quitQuestMessage: 'La progression de cette partie sera perdue.',
+  quitQuestConfirm: 'Quitter',
   pointsToWin: 'Points pour gagner',
   players: 'Joueurs',
   questScores: 'Tableau des scores',
@@ -750,6 +765,9 @@ export const RU: Strings = {
   hintsLeft: 'подсказок осталось',
   nextTurn: 'Следующий ход',
   wordRevealed: 'Слово было:',
+  quitQuestTitle: 'Покинуть приключение?',
+  quitQuestMessage: 'Прогресс этой игры будет потерян.',
+  quitQuestConfirm: 'Покинуть',
   pointsToWin: 'Очки для победы',
   players: 'Игроки',
   questScores: 'Таблица',

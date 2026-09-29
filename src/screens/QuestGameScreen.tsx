@@ -7,6 +7,7 @@ import {
   StatusBar,
   ScrollView,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -181,11 +182,39 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
     advanceTurn(players);
   };
 
+  const handleQuit = () => {
+    Alert.alert(t.quitQuestTitle, t.quitQuestMessage, [
+      { text: t.cancel, style: 'cancel' },
+      {
+        text: t.quitQuestConfirm,
+        style: 'destructive',
+        onPress: () => navigation.reset({ index: 0, routes: [{ name: 'Home' }] }),
+      },
+    ]);
+  };
+
+  const quitButton = (
+    <TouchableOpacity
+      style={styles.quitBtn}
+      onPress={handleQuit}
+      activeOpacity={0.7}
+      hitSlop={8}
+      accessibilityRole="button"
+      accessibilityLabel={t.quitQuestTitle}
+    >
+      <MaterialCommunityIcons name="close" size={22} color={COLORS.quest} />
+    </TouchableOpacity>
+  );
+
+  // Floating quit button for the full-screen phases, level with the playing top bar
+  const floatingQuit = <View style={styles.quitFloating}>{quitButton}</View>;
+
   // Phase: Storyteller handoff
   if (phase === 'storyteller') {
     return (
       <LinearGradient colors={['#0D0A1A', '#161230', '#0D0A1A']} style={styles.container}>
         <StatusBar barStyle="light-content" />
+        {floatingQuit}
         <View style={styles.storytellerContainer}>
           <View style={[styles.storytellerBadge, { backgroundColor: storyteller?.color + '25', borderColor: storyteller?.color + '60' }]}>
             <MaterialCommunityIcons name="book-open-page-variant" size={48} color={storyteller?.color} />
@@ -234,6 +263,7 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
     return (
       <LinearGradient colors={['#0D0A1A', '#161230', '#0D0A1A']} style={styles.container}>
         <StatusBar barStyle="light-content" />
+        {floatingQuit}
         <View style={styles.revealedContainer}>
           <MaterialCommunityIcons name="eye" size={48} color={COLORS.skipGlow} />
           <Text style={styles.revealedLabel}>{t.wordRevealed}</Text>
@@ -266,6 +296,7 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
       {/* Top bar */}
       <View style={styles.topBar}>
         <View style={styles.topBarLeft}>
+          {quitButton}
           <View style={[styles.topDot, { backgroundColor: storyteller?.color }]} />
           <Text style={styles.topBarName} numberOfLines={1}>{storyteller?.name}</Text>
         </View>
@@ -562,6 +593,25 @@ const styles = StyleSheet.create({
     fontSize: SIZES.lg,
     fontFamily: FONTS.displayBlack,
     color: '#FFF',
+  },
+
+  /* --- Quit --- */
+  quitBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(78,168,222,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(78,168,222,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  quitFloating: {
+    position: 'absolute',
+    top: 60,
+    left: SIZES.padding,
+    zIndex: 10,
   },
 
   /* --- Playing Phase --- */
