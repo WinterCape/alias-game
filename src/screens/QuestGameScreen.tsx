@@ -19,7 +19,7 @@ import { useConfirmLeave } from '../hooks/useConfirmLeave';
 import { getShuffledWords, getWordCategory, getWordPack } from '../data/words';
 import { PREMIUM_PACKS } from '../store/packs';
 import { useStore } from '../store/StoreContext';
-import { generateHints } from '../utils/hints';
+import { formatHintsLeft, generateHints } from '../utils/hints';
 
 const { width } = Dimensions.get('window');
 
@@ -340,7 +340,7 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
           <View style={styles.hintsHeader}>
             <Text style={styles.hintsTitle}>{t.revealHint}</Text>
             <Text style={styles.hintsRemaining}>
-              {5 - hintsRevealed} {t.hintsLeft}
+              {formatHintsLeft(5 - hintsRevealed, lang)}
             </Text>
           </View>
 

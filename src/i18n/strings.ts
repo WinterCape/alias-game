@@ -170,7 +170,6 @@ export interface Strings {
   whoGuessed: string;
   nobodyGuessed: string;
   revealHint: string;
-  hintsLeft: string;
   nextTurn: string;
   wordRevealed: string;
   quitQuestTitle: string;
@@ -352,7 +351,6 @@ export const RO: Strings = {
   whoGuessed: 'Cine a ghicit?',
   nobodyGuessed: 'Nimeni nu a ghicit',
   revealHint: 'Indiciu',
-  hintsLeft: 'indicii rămase',
   nextTurn: 'Runda următoare',
   wordRevealed: 'Cuvântul era:',
   quitQuestTitle: 'Părăsești aventura?',
@@ -532,7 +530,6 @@ export const EN: Strings = {
   whoGuessed: 'Who guessed it?',
   nobodyGuessed: 'Nobody guessed',
   revealHint: 'Hint',
-  hintsLeft: 'hints left',
   nextTurn: 'Next turn',
   wordRevealed: 'The word was:',
   quitQuestTitle: 'Leave the adventure?',
@@ -712,7 +709,6 @@ export const ES: Strings = {
   whoGuessed: '¿Quién adivinó?',
   nobodyGuessed: 'Nadie adivinó',
   revealHint: 'Pista',
-  hintsLeft: 'pistas restantes',
   nextTurn: 'Siguiente turno',
   wordRevealed: 'La palabra era:',
   quitQuestTitle: '¿Abandonar la aventura?',
@@ -892,7 +888,6 @@ export const FR: Strings = {
   whoGuessed: 'Qui a deviné ?',
   nobodyGuessed: 'Personne n\'a deviné',
   revealHint: 'Indice',
-  hintsLeft: 'indices restants',
   nextTurn: 'Tour suivant',
   wordRevealed: 'Le mot était :',
   quitQuestTitle: 'Quitter l\'aventure ?',
@@ -1072,7 +1067,6 @@ export const RU: Strings = {
   whoGuessed: 'Кто угадал?',
   nobodyGuessed: 'Никто не угадал',
   revealHint: 'Подсказка',
-  hintsLeft: 'подсказок осталось',
   nextTurn: 'Следующий ход',
   wordRevealed: 'Слово было:',
   quitQuestTitle: 'Покинуть приключение?',
