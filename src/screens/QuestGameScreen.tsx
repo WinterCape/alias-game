@@ -119,10 +119,11 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
     const guesser = players.find((p) => p.id === guesserId);
     if (!guesser) return;
 
-    // Guesser gets +1, storyteller gets +1
+    // Fewer hints = more points: 0 hints → 5 pts, 1 → 4, 2 → 3, 3 → 2, 4+ → 1
+    const guessPoints = Math.max(1, 5 - hintsRevealed);
+    // Storyteller gets nothing — they're reading, not guessing
     const updatedPlayers = players.map((p) => {
-      if (p.id === guesserId) return { ...p, score: p.score + 1 };
-      if (p.id === storyteller.id) return { ...p, score: p.score + 1 };
+      if (p.id === guesserId) return { ...p, score: p.score + guessPoints };
       return p;
     });
     setPlayers(updatedPlayers);
@@ -363,7 +364,12 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
 
         {/* Who guessed? */}
         <View style={styles.guessSection}>
-          <Text style={styles.guessSectionTitle}>{t.whoGuessed}</Text>
+          <View style={styles.guessTitleRow}>
+            <Text style={styles.guessSectionTitle}>{t.whoGuessed}</Text>
+            <View style={styles.pointsBadge}>
+              <Text style={styles.pointsBadgeText}>+{Math.max(1, 5 - hintsRevealed)}</Text>
+            </View>
+          </View>
 
           <View style={styles.playerGrid}>
             {otherPlayers.map((player) => (
@@ -740,13 +746,29 @@ const styles = StyleSheet.create({
   guessSection: {
     marginBottom: 20,
   },
+  guessTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
   guessSectionTitle: {
     fontSize: SIZES.sm,
     fontFamily: FONTS.bodyBold,
     color: COLORS.quest,
     textTransform: 'uppercase',
     letterSpacing: 2,
-    marginBottom: 12,
+  },
+  pointsBadge: {
+    backgroundColor: COLORS.correctGlow,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  pointsBadgeText: {
+    fontFamily: FONTS.bodyBlack,
+    fontSize: SIZES.sm,
+    color: '#FFF',
   },
   playerGrid: {
     flexDirection: 'row',
