@@ -13,10 +13,42 @@ import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { CATEGORIES } from '../data/categories';
 import { ALL_CATEGORIES } from '../data/words';
 import { useGame } from '../hooks/GameContext';
-import { ArenaMode, CategoryId, Difficulty } from '../types';
+import { ArenaMode, CategoryId, Difficulty, LastWordTime } from '../types';
 import { useI18n } from '../i18n/I18nContext';
 import { useProgression } from '../progression/ProgressionContext';
 import { getUnlockedTimerOptions, getUnlockedScoreOptions, getMaxTeams } from '../progression/rewards';
+
+const ToggleRow = ({
+  icon,
+  title,
+  description,
+  value,
+  onToggle,
+}: {
+  icon: string;
+  title: string;
+  description: string;
+  value: boolean;
+  onToggle: () => void;
+}) => (
+  <TouchableOpacity
+    style={styles.toggleRow}
+    onPress={onToggle}
+    accessibilityRole="switch"
+    accessibilityState={{ checked: value }}
+  >
+    <View style={styles.toggleInfo}>
+      <View style={styles.sectionHeader}>
+        <MaterialCommunityIcons name={icon as any} size={18} color={COLORS.gold} />
+        <Text style={styles.sectionTitle}>{title}</Text>
+      </View>
+      <Text style={styles.toggleDesc}>{description}</Text>
+    </View>
+    <View style={[styles.toggle, value && styles.toggleActive]}>
+      <View style={[styles.toggleDot, value && styles.toggleDotActive]} />
+    </View>
+  </TouchableOpacity>
+);
 
 export const SettingsScreen = ({ navigation }: any) => {
   const { settings, updateSettings } = useGame();
@@ -38,6 +70,13 @@ export const SettingsScreen = ({ navigation }: any) => {
   const allSelected = settings.selectedCategories.length === ALL_CATEGORIES.length;
 
   const arenaMode: ArenaMode = settings.arenaMode ?? 'classic';
+  const lastWordTime: LastWordTime = settings.lastWordTime ?? 'off';
+  const LAST_WORD_OPTIONS: { id: LastWordTime; label: string }[] = [
+    { id: 'off', label: t.lastWordOff },
+    { id: 10, label: '10s' },
+    { id: 20, label: '20s' },
+    { id: 'unlimited', label: '∞' },
+  ];
   const MODES: { id: ArenaMode; label: string; desc: string; icon: string }[] = [
     { id: 'classic', label: t.modeClassic, desc: t.modeClassicDesc, icon: 'cards-playing-outline' },
     { id: 'eight', label: t.modeEightWords, desc: t.modeEightWordsDesc, icon: 'format-list-checks' },
@@ -224,31 +263,55 @@ export const SettingsScreen = ({ navigation }: any) => {
         </View>
 
         {/* Skip Penalty */}
-        <TouchableOpacity
-          style={styles.toggleRow}
-          onPress={() => updateSettings({ skipPenalty: !settings.skipPenalty })}
-        >
-          <View style={styles.toggleInfo}>
+        <ToggleRow
+          icon="run-fast"
+          title={t.retreatPenalty}
+          description={t.retreatPenaltyDesc}
+          value={settings.skipPenalty}
+          onToggle={() => updateSettings({ skipPenalty: !settings.skipPenalty })}
+        />
+
+        {/* Last Word (classic mode only) */}
+        {arenaMode === 'classic' && (
+          <>
             <View style={styles.sectionHeader}>
-              <MaterialCommunityIcons name="run-fast" size={18} color={COLORS.gold} />
-              <Text style={styles.sectionTitle}>{t.retreatPenalty}</Text>
+              <MaterialCommunityIcons name="timer-sand-complete" size={18} color={COLORS.gold} />
+              <Text style={styles.sectionTitle}>{t.lastWordSetting}</Text>
             </View>
-            <Text style={styles.toggleDesc}>{t.retreatPenaltyDesc}</Text>
-          </View>
-          <View
-            style={[
-              styles.toggle,
-              settings.skipPenalty && styles.toggleActive,
-            ]}
-          >
-            <View
-              style={[
-                styles.toggleDot,
-                settings.skipPenalty && styles.toggleDotActive,
-              ]}
-            />
-          </View>
-        </TouchableOpacity>
+            <Text style={[styles.toggleDesc, styles.sectionDesc]}>{t.lastWordSettingDesc}</Text>
+            <View style={styles.optionRow}>
+              {LAST_WORD_OPTIONS.map((o) => (
+                <TouchableOpacity
+                  key={String(o.id)}
+                  style={[styles.optionChip, lastWordTime === o.id && styles.optionChipActive]}
+                  onPress={() => updateSettings({ lastWordTime: o.id })}
+                >
+                  <Text style={[styles.optionText, lastWordTime === o.id && styles.optionTextActive]}>
+                    {o.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            {lastWordTime !== 'off' && (
+              <ToggleRow
+                icon="account-group"
+                title={t.sharedLastWord}
+                description={t.sharedLastWordDesc}
+                value={settings.sharedLastWord === true}
+                onToggle={() => updateSettings({ sharedLastWord: !settings.sharedLastWord })}
+              />
+            )}
+          </>
+        )}
+
+        {/* Sounds */}
+        <ToggleRow
+          icon="volume-high"
+          title={t.soundSetting}
+          description={t.soundSettingDesc}
+          value={settings.soundEnabled !== false}
+          onToggle={() => updateSettings({ soundEnabled: settings.soundEnabled === false })}
+        />
 
         {/* Categories */}
         <View style={styles.sectionHeader}>
@@ -381,6 +444,10 @@ const styles = StyleSheet.create({
   optionChipActive: {
     backgroundColor: 'rgba(212,168,83,0.15)',
     borderColor: COLORS.gold,
+  },
+  sectionDesc: {
+    marginTop: -6,
+    marginBottom: 10,
   },
   modeRow: {
     flexDirection: 'row',

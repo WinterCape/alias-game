@@ -5,6 +5,8 @@ import { getShuffledWords, ALL_CATEGORIES } from '../data/words';
 import { Language } from '../i18n/strings';
 import { PackId } from '../store/packs';
 import {
+  applyRoundScores,
+  scoreRound,
   getStartingTeamIndex,
   getGameNumber,
   parseSavedGame,
@@ -22,6 +24,9 @@ const DEFAULT_SETTINGS: GameSettings = {
   difficulty: 'all',
   skipPenalty: true,
   arenaMode: 'classic',
+  lastWordTime: 'off',
+  sharedLastWord: false,
+  soundEnabled: true,
 };
 
 import { getStrings } from '../i18n/strings';
@@ -188,22 +193,19 @@ export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] 
 
   // Returns the teams with this round's score applied, since the state
   // update is not visible to the caller until the next render
-  const endRound = useCallback((): { result: RoundResult; updatedTeams: Team[] } => {
-    const correctCount = guessedWordsRef.current.length;
-    const skippedCount = skippedWordsRef.current.length;
-    const penalty = settings.skipPenalty ? skippedCount : 0;
-    const score = correctCount - penalty;
-
-    const result: RoundResult = {
+  const endRound = useCallback((
+    lastWord?: RoundResult['lastWord']
+  ): { result: RoundResult; updatedTeams: Team[] } => {
+    const round = {
       teamId: currentTeamIndex,
       guessedWords: [...guessedWordsRef.current],
       skippedWords: [...skippedWordsRef.current],
-      score,
+      ...(lastWord ? { lastWord } : {}),
     };
+    const points = scoreRound(round, settings.skipPenalty);
+    const result: RoundResult = { ...round, score: points[currentTeamIndex] ?? 0 };
 
-    const updatedTeams = teams.map((team) =>
-      team.id === currentTeamIndex ? { ...team, score: team.score + score } : team
-    );
+    const updatedTeams = applyRoundScores(teams, points);
     setTeams(updatedTeams);
 
     setRoundResults((prev) => [...prev, result]);
@@ -211,6 +213,25 @@ export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] 
 
     return { result, updatedTeams };
   }, [currentTeamIndex, settings.skipPenalty, teams]);
+
+  // Round review: replace the last round (e.g. a word marked by mistake) and
+  // move the teams' scores from the old version to the corrected one
+  const reviseLastRound = useCallback((
+    revised: Pick<RoundResult, 'guessedWords' | 'skippedWords' | 'lastWord'>
+  ): Team[] => {
+    const previous = roundResults[roundResults.length - 1];
+    if (!previous) return teams;
+    const next = { ...previous, ...revised };
+    const newPoints = scoreRound(next, settings.skipPenalty);
+    const result: RoundResult = { ...next, score: newPoints[next.teamId] ?? 0 };
+    const updatedTeams = applyRoundScores(
+      applyRoundScores(teams, scoreRound(previous, settings.skipPenalty), -1),
+      newPoints
+    );
+    setTeams(updatedTeams);
+    setRoundResults((prev) => [...prev.slice(0, -1), result]);
+    return updatedTeams;
+  }, [roundResults, teams, settings.skipPenalty]);
 
   const checkWinner = useCallback((teamsToCheck: Team[] = teams): Team | null => {
     const winner = teamsToCheck.find((t) => t.score >= settings.winningScore);
@@ -264,6 +285,7 @@ export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] 
     dealWords,
     setWordGuessed,
     endRound,
+    reviseLastRound,
     checkWinner,
     resetGame,
     abandonGame,

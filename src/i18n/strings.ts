@@ -36,6 +36,21 @@ export interface Strings {
   newGameConfirmMessage: string;
   newGameConfirm: string;
   rematch: string;
+  lastWordSetting: string;
+  lastWordSettingDesc: string;
+  lastWordOff: string;
+  sharedLastWord: string;
+  sharedLastWordDesc: string;
+  soundSetting: string;
+  soundSettingDesc: string;
+  lastWordTag: string;
+  whoGuessedLastWord: string;
+  nobody: string;
+  pause: string;
+  paused: string;
+  resume: string;
+  tapToFixWords: string;
+  seeWinner: string;
   chronicles: string;
 
   // Settings
@@ -186,6 +201,21 @@ export const RO: Strings = {
   newGameConfirmMessage: 'Jocul salvat se va pierde.',
   newGameConfirm: 'Joc nou',
   rematch: 'Revanșă',
+  lastWordSetting: 'Ultimul cuvânt',
+  lastWordSettingDesc: 'Când timpul expiră, cuvântul de pe ecran mai poate fi ghicit',
+  lastWordOff: 'Oprit',
+  sharedLastWord: 'Ultimul cuvânt comun',
+  sharedLastWordDesc: 'Orice echipă poate ghici ultimul cuvânt',
+  soundSetting: 'Sunete',
+  soundSettingDesc: 'Efecte sonore în timpul jocului',
+  lastWordTag: 'Ultimul cuvânt',
+  whoGuessedLastWord: 'Cine l-a ghicit?',
+  nobody: 'Nimeni',
+  pause: 'Pauză',
+  paused: 'Joc pus pe pauză',
+  resume: 'Continuă',
+  tapToFixWords: 'Atinge un cuvânt pentru a-l corecta',
+  seeWinner: 'Vezi câștigătorul',
   chronicles: 'Cronici',
   battlePrep: 'Pregătire de Luptă',
   missionDuration: 'Durata Misiunii (secunde)',
@@ -335,6 +365,21 @@ export const EN: Strings = {
   newGameConfirmMessage: 'The saved game will be lost.',
   newGameConfirm: 'New game',
   rematch: 'Rematch',
+  lastWordSetting: 'Last word',
+  lastWordSettingDesc: 'When time runs out, the word on screen can still be guessed',
+  lastWordOff: 'Off',
+  sharedLastWord: 'Shared last word',
+  sharedLastWordDesc: 'Any team can guess the last word',
+  soundSetting: 'Sounds',
+  soundSettingDesc: 'Sound effects during the game',
+  lastWordTag: 'Last word',
+  whoGuessedLastWord: 'Who guessed it?',
+  nobody: 'Nobody',
+  pause: 'Pause',
+  paused: 'Game paused',
+  resume: 'Resume',
+  tapToFixWords: 'Tap a word to correct it',
+  seeWinner: 'See the winner',
   chronicles: 'Chronicles',
   battlePrep: 'Battle Preparation',
   missionDuration: 'Mission Duration (seconds)',
@@ -484,6 +529,21 @@ export const ES: Strings = {
   newGameConfirmMessage: 'Se perderá la partida guardada.',
   newGameConfirm: 'Partida nueva',
   rematch: 'Revancha',
+  lastWordSetting: 'Última palabra',
+  lastWordSettingDesc: 'Cuando se acaba el tiempo, aún se puede adivinar la palabra en pantalla',
+  lastWordOff: 'No',
+  sharedLastWord: 'Última palabra compartida',
+  sharedLastWordDesc: 'Cualquier equipo puede adivinar la última palabra',
+  soundSetting: 'Sonidos',
+  soundSettingDesc: 'Efectos de sonido durante el juego',
+  lastWordTag: 'Última palabra',
+  whoGuessedLastWord: '¿Quién la adivinó?',
+  nobody: 'Nadie',
+  pause: 'Pausa',
+  paused: 'Juego en pausa',
+  resume: 'Continuar',
+  tapToFixWords: 'Toca una palabra para corregirla',
+  seeWinner: 'Ver al ganador',
   chronicles: 'Crónicas',
   battlePrep: 'Preparación de Batalla',
   missionDuration: 'Duración de la Misión (segundos)',
@@ -633,6 +693,21 @@ export const FR: Strings = {
   newGameConfirmMessage: 'La partie sauvegardée sera perdue.',
   newGameConfirm: 'Nouvelle partie',
   rematch: 'Revanche',
+  lastWordSetting: 'Dernier mot',
+  lastWordSettingDesc: 'Quand le temps est écoulé, le mot à l\'écran peut encore être deviné',
+  lastWordOff: 'Non',
+  sharedLastWord: 'Dernier mot partagé',
+  sharedLastWordDesc: 'Toutes les équipes peuvent deviner le dernier mot',
+  soundSetting: 'Sons',
+  soundSettingDesc: 'Effets sonores pendant le jeu',
+  lastWordTag: 'Dernier mot',
+  whoGuessedLastWord: 'Qui l\'a deviné ?',
+  nobody: 'Personne',
+  pause: 'Pause',
+  paused: 'Jeu en pause',
+  resume: 'Reprendre',
+  tapToFixWords: 'Touche un mot pour le corriger',
+  seeWinner: 'Voir le gagnant',
   chronicles: 'Chroniques',
   battlePrep: 'Préparation au Combat',
   missionDuration: 'Durée de la Mission (secondes)',
@@ -782,6 +857,21 @@ export const RU: Strings = {
   newGameConfirmMessage: 'Сохранённая игра будет потеряна.',
   newGameConfirm: 'Новая игра',
   rematch: 'Реванш',
+  lastWordSetting: 'Последнее слово',
+  lastWordSettingDesc: 'Когда время вышло, слово на экране ещё можно угадать',
+  lastWordOff: 'Выкл.',
+  sharedLastWord: 'Общее последнее слово',
+  sharedLastWordDesc: 'Последнее слово может угадать любая команда',
+  soundSetting: 'Звуки',
+  soundSettingDesc: 'Звуковые эффекты в игре',
+  lastWordTag: 'Последнее слово',
+  whoGuessedLastWord: 'Кто угадал?',
+  nobody: 'Никто',
+  pause: 'Пауза',
+  paused: 'Игра на паузе',
+  resume: 'Продолжить',
+  tapToFixWords: 'Нажми на слово, чтобы исправить',
+  seeWinner: 'Узнать победителя',
   chronicles: 'Хроники',
   battlePrep: 'Подготовка к Битве',
   missionDuration: 'Длительность Миссии (секунды)',
