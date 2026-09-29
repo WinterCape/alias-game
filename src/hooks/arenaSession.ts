@@ -47,3 +47,50 @@ export const parseSavedGame = (raw: string | null): SavedArenaGame | null => {
     return null;
   }
 };
+
+/** Points each team gets from one round. The last word is never penalised. */
+export const scoreRound = (
+  round: Pick<RoundResult, 'teamId' | 'guessedWords' | 'skippedWords' | 'lastWord'>,
+  skipPenalty: boolean
+): Record<number, number> => {
+  const points: Record<number, number> = {
+    [round.teamId]: round.guessedWords.length - (skipPenalty ? round.skippedWords.length : 0),
+  };
+  const lastTeam = round.lastWord?.teamId;
+  if (lastTeam !== null && lastTeam !== undefined) {
+    points[lastTeam] = (points[lastTeam] ?? 0) + 1;
+  }
+  return points;
+};
+
+/** Adds (sign 1) or removes (sign -1) a round's points from the teams. */
+export const applyRoundScores = (
+  teams: Team[],
+  points: Record<number, number>,
+  sign: 1 | -1 = 1
+): Team[] =>
+  teams.map((team) =>
+    points[team.id] ? { ...team, score: team.score + sign * points[team.id] } : team
+  );
+
+/** Moves a word between the guessed and skipped lists of a round. */
+export const toggleRoundWord = <T extends Pick<RoundResult, 'guessedWords' | 'skippedWords'>>(
+  round: T,
+  word: string
+): T => {
+  if (round.guessedWords.includes(word)) {
+    return {
+      ...round,
+      guessedWords: round.guessedWords.filter((w) => w !== word),
+      skippedWords: [...round.skippedWords, word],
+    };
+  }
+  if (round.skippedWords.includes(word)) {
+    return {
+      ...round,
+      skippedWords: round.skippedWords.filter((w) => w !== word),
+      guessedWords: [...round.guessedWords, word],
+    };
+  }
+  return round;
+};

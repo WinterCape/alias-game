@@ -46,7 +46,15 @@ export interface GameSettings {
   skipPenalty: boolean;
   // 'eight': each round deals cards of 8 words; the team taps every word guessed
   arenaMode?: ArenaMode;
+  // Classic mode: when time runs out, the word on screen can still be guessed
+  lastWordTime?: LastWordTime;
+  // Any team may guess the last word; players pick which one did
+  sharedLastWord?: boolean;
+  soundEnabled?: boolean;
 }
+
+// 'off', a number of extra seconds, or 'unlimited'
+export type LastWordTime = 'off' | 'unlimited' | number;
 
 export type ArenaMode = 'classic' | 'eight';
 
@@ -54,7 +62,10 @@ export interface RoundResult {
   teamId: number;
   guessedWords: string[];
   skippedWords: string[];
+  // Points for the team that played the round
   score: number;
+  // The word on screen when time ran out; teamId is who guessed it, null if nobody
+  lastWord?: { word: string; teamId: number | null };
 }
 
 // Quest Mode (Storyteller)
@@ -81,6 +92,6 @@ export type RootStackParamList = {
   Settings: undefined;
   TeamSetup: undefined;
   Game: undefined;
-  RoundResult: { result: RoundResult };
+  RoundResult: undefined;
   GameOver: { teams: Team[] };
 };

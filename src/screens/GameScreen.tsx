@@ -9,9 +9,10 @@ import {
   Dimensions,
   StatusBar,
   Vibration,
+  AppState,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { CommonActions, StackActions } from '@react-navigation/native';
+import { StackActions } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
@@ -25,7 +26,7 @@ import { useI18n } from '../i18n/I18nContext';
 const { width } = Dimensions.get('window');
 const SWIPE_THRESHOLD = 80;
 
-type GamePhase = 'ready' | 'playing' | 'finished';
+type GamePhase = 'ready' | 'playing' | 'lastWord' | 'finished';
 
 const CORNER_INSET = 8;
 const EIGHT_WORDS = 8;
@@ -67,9 +68,7 @@ export const GameScreen = ({ navigation }: any) => {
     markCorrect,
     markSkipped,
     endRound,
-    checkWinner,
     abandonGame,
-    recordWin,
     roundResults,
     sessionWins,
     dealWords,
@@ -84,12 +83,22 @@ export const GameScreen = ({ navigation }: any) => {
     cancel: t.cancel,
     onConfirm: abandonGame,
   });
-  const { playCorrect, playSkip, playTick, playTimeUp, playStart } = useSounds();
+  const { playCorrect, playSkip, playTick, playTimeUp, playStart } = useSounds(
+    settings.soundEnabled !== false
+  );
   const [phase, setPhase] = useState<GamePhase>('ready');
   const [currentWord, setCurrentWord] = useState('');
   const [correctCount, setCorrectCount] = useState(0);
   const [skipCount, setSkipCount] = useState(0);
   const isAnimating = useRef(false);
+  const [paused, setPaused] = useState(false);
+  const pausedRef = useRef(false);
+  pausedRef.current = paused;
+  // The word on screen, read when the timer ends (the callback outlives renders)
+  const currentWordRef = useRef('');
+  currentWordRef.current = currentWord;
+
+  const lastWordTime = settings.lastWordTime ?? 'off';
 
   // 8 words mode: the current card and which of its words have been tapped as guessed
   const isEight = settings.arenaMode === 'eight';
@@ -104,33 +113,67 @@ export const GameScreen = ({ navigation }: any) => {
   const flashAnim = useRef(new Animated.Value(0)).current;
   const flashColorRef = useRef(COLORS.correct);
 
-  const onTimerComplete = useCallback(() => {
+  // Every round ends on the round review, which also decides if someone has won
+  const finishRound = useCallback((lastWord?: { word: string; teamId: number | null }) => {
     setPhase('finished');
+    endRound(lastWord);
+    setTimeout(() => leave(StackActions.replace('RoundResult')), lastWord ? 300 : 800);
+  }, [endRound, leave]);
+
+  const onLastWordTimeout = useCallback(() => {
+    finishRound({ word: currentWordRef.current, teamId: null });
+  }, [finishRound]);
+
+  const lastWordTimer = useTimer(
+    typeof lastWordTime === 'number' ? lastWordTime : 1,
+    onLastWordTimeout
+  );
+
+  const onTimerComplete = useCallback(() => {
     playTimeUp();
     Vibration.vibrate([0, 500, 200, 500]);
-    const { result, updatedTeams } = endRound();
-    const winner = checkWinner(updatedTeams);
-    if (winner) recordWin(winner.id);
+    // Classic mode can give the word on screen a last chance
+    if (!isEight && lastWordTime !== 'off' && currentWordRef.current) {
+      setPhase('lastWord');
+      if (typeof lastWordTime === 'number') lastWordTimer.start();
+      return;
+    }
+    finishRound();
+  }, [finishRound, playTimeUp, isEight, lastWordTime, lastWordTimer.start]);
 
-    setTimeout(() => {
-      if (winner) {
-        // Only Home stays underneath, so back from the winner screen goes Home
-        leave(
-          CommonActions.reset({
-            index: 1,
-            routes: [{ name: 'Home' }, { name: 'GameOver', params: { teams: updatedTeams } }],
-          })
-        );
-      } else {
-        leave(StackActions.replace('RoundResult', { result }));
-      }
-    }, 800);
-  }, [endRound, checkWinner, recordWin, leave]);
+  const {
+    timeLeft,
+    start: startTimer,
+    pause: pauseTimer,
+    resume: resumeTimer,
+    progress,
+  } = useTimer(settings.roundDuration, onTimerComplete);
 
-  const { timeLeft, start: startTimer, progress } = useTimer(
-    settings.roundDuration,
-    onTimerComplete
-  );
+  const resolveLastWord = (teamId: number | null) => {
+    if (phase !== 'lastWord') return;
+    lastWordTimer.pause();
+    if (teamId !== null) playCorrect();
+    finishRound({ word: currentWord, teamId });
+  };
+
+  const pauseGame = useCallback(() => {
+    if (phaseRef.current !== 'playing' || pausedRef.current) return;
+    pauseTimer();
+    setPaused(true);
+  }, [pauseTimer]);
+
+  const resumeGame = () => {
+    setPaused(false);
+    resumeTimer();
+  };
+
+  // Pause automatically when the app goes to the background (a call, a lock)
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state !== 'active') pauseGame();
+    });
+    return () => sub.remove();
+  }, [pauseGame]);
 
   useEffect(() => {
     if (phase === 'playing' && timeLeft <= 10 && timeLeft > 0) {
@@ -172,7 +215,7 @@ export const GameScreen = ({ navigation }: any) => {
   const phaseForCard = useRef(phase);
   phaseForCard.current = phase;
   const toggleCardWord = (index: number) => {
-    if (phaseForCard.current !== 'playing') return;
+    if (phaseForCard.current !== 'playing' || pausedRef.current) return;
     const current = cardGuessedRef.current;
     if (index >= current.length || current.every(Boolean)) return;
     const guessed = !current[index];
@@ -227,7 +270,7 @@ export const GameScreen = ({ navigation }: any) => {
   };
 
   const handleCorrect = useCallback(() => {
-    if (phase !== 'playing' || isAnimating.current) return;
+    if (phase !== 'playing' || pausedRef.current || isAnimating.current) return;
     playCorrect();
     flashScreen(COLORS.correctGlow);
     animateOut('right', () => {
@@ -238,7 +281,7 @@ export const GameScreen = ({ navigation }: any) => {
   }, [phase, markCorrect, getCurrentWord, playCorrect]);
 
   const handleSkip = useCallback(() => {
-    if (phase !== 'playing' || isAnimating.current) return;
+    if (phase !== 'playing' || pausedRef.current || isAnimating.current) return;
     playSkip();
     flashScreen(COLORS.skipGlow);
     Vibration.vibrate(100);
@@ -263,11 +306,11 @@ export const GameScreen = ({ navigation }: any) => {
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 10,
       onPanResponderMove: (_, gestureState) => {
-        if (phaseRef.current !== 'playing' || isAnimating.current) return;
+        if (phaseRef.current !== 'playing' || pausedRef.current || isAnimating.current) return;
         pan.setValue(gestureState.dx);
       },
       onPanResponderRelease: (_, gestureState) => {
-        if (phaseRef.current !== 'playing' || isAnimating.current) return;
+        if (phaseRef.current !== 'playing' || pausedRef.current || isAnimating.current) return;
         if (gestureState.dx > SWIPE_THRESHOLD || gestureState.vx > 0.5) {
           handleCorrectRef.current();
         } else if (gestureState.dx < -SWIPE_THRESHOLD || gestureState.vx < -0.5) {
@@ -365,6 +408,107 @@ export const GameScreen = ({ navigation }: any) => {
     );
   }
 
+  // Time is up: the word on screen gets a last chance
+  if (phase === 'lastWord') {
+    const shared = settings.sharedLastWord === true;
+    return (
+      <LinearGradient colors={[...COLORS.gradientTable]} style={styles.container}>
+        <StatusBar barStyle="light-content" />
+        {/* Empty timer bar: the round time is up; keeps the header in the same place */}
+        <View style={styles.timerBarContainer} />
+        <View style={styles.gameHeader}>
+          <View style={styles.headerLeft}>
+            <View style={[styles.miniTeamDot, { backgroundColor: currentTeam?.color }]} />
+            <Text style={styles.headerTeam}>{currentTeam?.name}</Text>
+          </View>
+          <View style={[styles.timerCircle, styles.timerCircleUrgent]}>
+            <Text style={[styles.timerText, styles.timerTextUrgent]}>
+              {typeof lastWordTime === 'number' ? lastWordTimer.timeLeft : '∞'}
+            </Text>
+          </View>
+          <View style={styles.headerRight}>
+            <Text style={styles.scoreLabel}>
+              <Text style={{ color: COLORS.correctGlow }}>+{correctCount}</Text>
+              {'  '}
+              <Text style={{ color: COLORS.skipGlow }}>-{skipCount}</Text>
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.lastWordContainer}>
+          <View style={styles.lastWordTag}>
+            <MaterialCommunityIcons name="timer-sand-complete" size={16} color={COLORS.ink} />
+            <Text style={styles.lastWordTagText}>{t.lastWordTag.toUpperCase()}</Text>
+          </View>
+          <View style={styles.wordCard}>
+            <CardCorner position="tl" />
+            <CardCorner position="tr" />
+            <CardCorner position="bl" />
+            <CardCorner position="br" />
+            <Text style={styles.wordText}>{currentWord}</Text>
+          </View>
+        </View>
+
+        {shared ? (
+          <View style={styles.lastWordTeams}>
+            <Text style={styles.lastWordQuestion}>{t.whoGuessedLastWord}</Text>
+            {teams.map((team) => (
+              <TouchableOpacity
+                key={team.id}
+                style={[styles.lastWordTeamBtn, { borderColor: team.color, backgroundColor: team.color + '22' }]}
+                onPress={() => resolveLastWord(team.id)}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.miniTeamDot, { backgroundColor: team.color }]} />
+                <Text style={styles.lastWordTeamText}>{team.name}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity
+              style={styles.lastWordNobodyBtn}
+              onPress={() => resolveLastWord(null)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.lastWordNobodyText}>{t.nobody}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.actionContainer}>
+            <TouchableOpacity
+              onPress={() => resolveLastWord(null)}
+              activeOpacity={0.7}
+              style={styles.actionButtonWrap}
+            >
+              <LinearGradient
+                colors={['#5C1A24', COLORS.skip]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.actionButton}
+              >
+                <MaterialCommunityIcons name="close-circle-outline" size={36} color="#FFF" />
+                <Text style={styles.actionLabel}>{t.nobody}</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => resolveLastWord(currentTeam?.id ?? currentTeamIndex)}
+              activeOpacity={0.7}
+              style={styles.actionButtonWrap}
+            >
+              <LinearGradient
+                colors={['#1B4332', COLORS.correct]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.actionButton}
+              >
+                <MaterialCommunityIcons name="sword" size={36} color="#FFF" />
+                <Text style={styles.actionLabel}>{t.victory}</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        )}
+      </LinearGradient>
+    );
+  }
+
   return (
     <LinearGradient colors={[...COLORS.gradientTable]} style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -419,6 +563,19 @@ export const GameScreen = ({ navigation }: any) => {
             )}
           </Text>
         </View>
+      </View>
+
+      <View style={styles.pauseRow}>
+        <TouchableOpacity
+          style={styles.pauseBtn}
+          onPress={pauseGame}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel={t.pause}
+        >
+          <MaterialCommunityIcons name="pause" size={18} color={COLORS.textSecondary} />
+          <Text style={styles.pauseBtnText}>{t.pause}</Text>
+        </TouchableOpacity>
       </View>
 
       {isEight ? (
@@ -527,6 +684,23 @@ export const GameScreen = ({ navigation }: any) => {
           </TouchableOpacity>
         </View>
         </>
+      )}
+
+      {/* Paused: the word is hidden so nobody can peek */}
+      {paused && (
+        <View style={styles.pausedOverlay}>
+          <MaterialCommunityIcons name="pause-circle" size={64} color={COLORS.gold} />
+          <Text style={styles.pausedTitle}>{t.paused}</Text>
+          <Text style={styles.pausedTime}>{timeLeft}s</Text>
+          <TouchableOpacity
+            style={[styles.startRoundBtn, { backgroundColor: currentTeam?.color ?? COLORS.gold }]}
+            onPress={resumeGame}
+            activeOpacity={0.8}
+          >
+            <MaterialCommunityIcons name="play" size={28} color="#FFF" />
+            <Text style={styles.startRoundText}>{t.resume}</Text>
+          </TouchableOpacity>
+        </View>
       )}
     </LinearGradient>
   );
@@ -760,6 +934,105 @@ const styles = StyleSheet.create({
     color: COLORS.ink,
     textAlign: 'center',
     lineHeight: 52,
+  },
+
+  /* --- Pause --- */
+  pauseRow: {
+    alignItems: 'center',
+    marginTop: -4,
+  },
+  pauseBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(212,168,83,0.2)',
+    backgroundColor: 'rgba(212,168,83,0.06)',
+  },
+  pauseBtnText: {
+    fontSize: SIZES.sm,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.textSecondary,
+  },
+  pausedOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 20,
+    backgroundColor: COLORS.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  pausedTitle: {
+    fontSize: SIZES.xl,
+    fontFamily: FONTS.display,
+    color: COLORS.gold,
+  },
+  pausedTime: {
+    fontSize: SIZES.md,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.textSecondary,
+    marginBottom: 12,
+  },
+
+  /* --- Last Word --- */
+  lastWordContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 16,
+  },
+  lastWordTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 14,
+    backgroundColor: COLORS.gold,
+  },
+  lastWordTagText: {
+    fontSize: SIZES.sm,
+    fontFamily: FONTS.bodyBlack,
+    color: COLORS.ink,
+    letterSpacing: 2,
+  },
+  lastWordTeams: {
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+    gap: 10,
+  },
+  lastWordQuestion: {
+    fontSize: SIZES.md,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  lastWordTeamBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    borderRadius: SIZES.radius,
+    borderWidth: 1.5,
+  },
+  lastWordTeamText: {
+    fontSize: SIZES.md,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.text,
+  },
+  lastWordNobodyBtn: {
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  lastWordNobodyText: {
+    fontSize: SIZES.md,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.textSecondary,
   },
 
   /* --- 8 Words Mode --- */

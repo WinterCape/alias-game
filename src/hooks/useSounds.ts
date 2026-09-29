@@ -78,7 +78,7 @@ const SOUND_CONFIGS: Record<SoundType, { freq: number; duration: number; volume:
   start: { freq: 520, duration: 200, volume: 0.35, type: 'sine' },
 };
 
-export const useSounds = () => {
+export const useSounds = (enabled: boolean = true) => {
   const playersRef = useRef<Partial<Record<SoundType, AudioPlayer>>>({});
   const audioReady = useRef(false);
 
@@ -107,8 +107,11 @@ export const useSounds = () => {
     };
   }, []);
 
+  const enabledRef = useRef(enabled);
+  enabledRef.current = enabled;
+
   const playSound = useCallback(async (type: SoundType) => {
-    if (!audioReady.current) return;
+    if (!audioReady.current || !enabledRef.current) return;
 
     try {
       let player = playersRef.current[type];
