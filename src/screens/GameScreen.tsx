@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -22,6 +22,8 @@ import { useSounds } from '../hooks/useSounds';
 import { useConfirmLeave } from '../hooks/useConfirmLeave';
 import { getGameNumber, getRoundNumber } from '../hooks/arenaSession';
 import { getTaskPool, pickTask, TASK_GROUP_ICONS } from '../data/tasks';
+import { ArcanaCard } from '../components/ArcanaCard';
+import { getWordRealm } from '../utils/realm';
 import { useI18n } from '../i18n/I18nContext';
 
 const { width } = Dimensions.get('window');
@@ -31,6 +33,7 @@ type GamePhase = 'ready' | 'playing' | 'lastWord' | 'finished';
 
 const CORNER_INSET = 8;
 const EIGHT_WORDS = 8;
+const CARD_RATIO = 1.55;
 
 const CardCorner = ({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) => {
   const isTop = position === 'tl' || position === 'tr';
@@ -343,6 +346,16 @@ export const GameScreen = ({ navigation }: any) => {
 
   const currentTeam = teams[currentTeamIndex];
   const isUrgent = timeLeft <= 10;
+  const realm = useMemo(() => getWordRealm(currentWord, lang, t), [currentWord, lang, t]);
+  // Card number for this turn: the how-many-th word it is
+  const wordNumber = correctCount + skipCount + 1;
+
+  // The card fills the free space up to tarot proportions (about 1 : 1.55)
+  const [cardSpace, setCardSpace] = useState(0);
+  const cardHeight = Math.max(
+    300,
+    Math.min(cardSpace - 48, Math.round((width - 48) * CARD_RATIO))
+  );
   const roundNumber = getRoundNumber(roundResults.length, teams.length);
   const gameNumber = getGameNumber(sessionWins);
 
@@ -366,7 +379,7 @@ export const GameScreen = ({ navigation }: any) => {
 
   const cardBorderColor = pan.interpolate({
     inputRange: [-SWIPE_THRESHOLD, 0, SWIPE_THRESHOLD],
-    outputRange: [COLORS.skipGlow, COLORS.parchmentEdge, COLORS.correctGlow],
+    outputRange: [COLORS.skipGlow, COLORS.gold, COLORS.correctGlow],
     extrapolate: 'clamp',
   });
 
@@ -465,13 +478,7 @@ export const GameScreen = ({ navigation }: any) => {
             <MaterialCommunityIcons name="timer-sand-complete" size={16} color={COLORS.ink} />
             <Text style={styles.lastWordTagText}>{t.lastWordTag.toUpperCase()}</Text>
           </View>
-          <View style={styles.wordCard}>
-            <CardCorner position="tl" />
-            <CardCorner position="tr" />
-            <CardCorner position="bl" />
-            <CardCorner position="br" />
-            <Text style={styles.wordText}>{currentWord}</Text>
-          </View>
+          <ArcanaCard word={currentWord} realm={realm} number={wordNumber} style={styles.arcana} />
         </View>
 
         {shared ? (
@@ -630,7 +637,7 @@ export const GameScreen = ({ navigation }: any) => {
                 <MaterialCommunityIcons
                   name={cardGuessed[index] ? 'check-circle' : 'circle-outline'}
                   size={22}
-                  color={cardGuessed[index] ? COLORS.correct : COLORS.parchmentEdge}
+                  color={cardGuessed[index] ? COLORS.correctGlow : COLORS.goldDim}
                 />
                 <Text
                   style={[styles.eightWord, cardGuessed[index] && styles.eightWordGuessed]}
@@ -658,26 +665,30 @@ export const GameScreen = ({ navigation }: any) => {
         </View>
 
         {/* Word Card with PanResponder — Parchment Card */}
-        <View style={styles.wordContainer}>
+        <View
+          style={styles.wordContainer}
+          onLayout={(e) => setCardSpace(e.nativeEvent.layout.height)}
+        >
           <Animated.View
             {...panResponder.panHandlers}
             style={[
-              styles.wordCard,
+              styles.arcana,
               {
                 transform: [
                   { translateX: pan },
                   { rotate: cardRotation },
                 ],
                 opacity: cardOpacity,
-                borderColor: cardBorderColor,
               },
             ]}
           >
-            <CardCorner position="tl" />
-            <CardCorner position="tr" />
-            <CardCorner position="bl" />
-            <CardCorner position="br" />
-            <Text style={styles.wordText}>{currentWord}</Text>
+            <ArcanaCard
+              word={currentWord}
+              realm={realm}
+              number={wordNumber}
+              minHeight={cardHeight}
+              style={{ borderColor: cardBorderColor }}
+            />
           </Animated.View>
         </View>
 
@@ -938,34 +949,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: SIZES.padding,
   },
-  wordCard: {
+  arcana: {
     width: width - 48,
-    backgroundColor: COLORS.parchment,
-    borderRadius: SIZES.cardRadius,
-    padding: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: COLORS.parchmentEdge,
-    minHeight: 200,
-    elevation: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
   },
   cardCorner: {
     position: 'absolute',
     width: 20,
     height: 20,
     borderColor: COLORS.gold,
-  },
-  wordText: {
-    fontSize: 42,
-    fontFamily: FONTS.displayBlack,
-    color: COLORS.ink,
-    textAlign: 'center',
-    lineHeight: 52,
   },
 
   /* --- Task Rounds --- */
@@ -1128,10 +1119,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   eightCard: {
-    backgroundColor: COLORS.parchment,
-    borderRadius: SIZES.cardRadius,
-    borderWidth: 2,
-    borderColor: COLORS.parchmentEdge,
+    backgroundColor: '#1A1530',
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: COLORS.gold,
     paddingVertical: 20,
     paddingHorizontal: 20,
     gap: 6,
@@ -1145,16 +1136,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   eightRowGuessed: {
-    backgroundColor: 'rgba(45,106,79,0.12)',
+    backgroundColor: 'rgba(45,106,79,0.25)',
   },
   eightWord: {
     flex: 1,
     fontSize: SIZES.lg,
     fontFamily: FONTS.displayBlack,
-    color: COLORS.ink,
+    color: COLORS.parchment,
   },
   eightWordGuessed: {
-    color: COLORS.correct,
+    color: COLORS.correctGlow,
     textDecorationLine: 'line-through',
   },
 

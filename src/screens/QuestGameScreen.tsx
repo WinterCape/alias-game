@@ -18,39 +18,12 @@ import { QuestSettings } from '../hooks/useQuestGame';
 import { useConfirmLeave } from '../hooks/useConfirmLeave';
 import { getShuffledWords, getWordCategory, getWordPack } from '../data/words';
 import { PREMIUM_PACKS } from '../store/packs';
+import { ArcanaCard } from '../components/ArcanaCard';
+import { getWordRealm } from '../utils/realm';
 import { useStore } from '../store/StoreContext';
 import { formatHintsLeft, generateHints } from '../utils/hints';
 
 const { width } = Dimensions.get('window');
-
-const CORNER_INSET = 8;
-
-const CardCorner = ({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) => {
-  const isTop = position === 'tl' || position === 'tr';
-  const isLeft = position === 'tl' || position === 'bl';
-  return (
-    <View
-      style={[
-        styles.cardCorner,
-        {
-          // Inset from the edge so the bracket sits inside the card's rounded corner
-          top: isTop ? CORNER_INSET : undefined,
-          bottom: !isTop ? CORNER_INSET : undefined,
-          left: isLeft ? CORNER_INSET : undefined,
-          right: !isLeft ? CORNER_INSET : undefined,
-          borderTopWidth: isTop ? 2 : 0,
-          borderBottomWidth: !isTop ? 2 : 0,
-          borderLeftWidth: isLeft ? 2 : 0,
-          borderRightWidth: !isLeft ? 2 : 0,
-          borderTopLeftRadius: position === 'tl' ? 4 : 0,
-          borderTopRightRadius: position === 'tr' ? 4 : 0,
-          borderBottomLeftRadius: position === 'bl' ? 4 : 0,
-          borderBottomRightRadius: position === 'br' ? 4 : 0,
-        },
-      ]}
-    />
-  );
-};
 
 export const QuestGameScreen = ({ navigation, route }: any) => {
   const { lang, t } = useI18n();
@@ -104,6 +77,8 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
     ? t.categoryNames[wordCategory]
     : (wordPack && PREMIUM_PACKS.find((p) => p.id === wordPack)?.name[lang]) ||
       t.categoryNames.general;
+
+  const realm = useMemo(() => getWordRealm(currentWord, lang, t), [currentWord, lang, t]);
 
   const hints = useMemo(() => {
     if (!currentWord) return [];
@@ -310,26 +285,16 @@ export const QuestGameScreen = ({ navigation, route }: any) => {
         contentContainerStyle={styles.playingContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Parchment Word Card */}
+        {/* Word card: realm emblem and name are on the card */}
         <View style={styles.wordCardContainer}>
-          <View style={styles.wordCard}>
-            <CardCorner position="tl" />
-            <CardCorner position="tr" />
-            <CardCorner position="bl" />
-            <CardCorner position="br" />
-
-            {/* Decorative top line */}
-            <View style={styles.decorLine} />
-            <Text style={styles.wordText}>{currentWord}</Text>
-            {/* Decorative bottom line */}
-            <View style={styles.decorLine} />
-          </View>
-        </View>
-
-        {/* Category badge */}
-        <View style={styles.categoryBadge}>
-          <MaterialCommunityIcons name="tag" size={14} color={COLORS.quest} />
-          <Text style={styles.categoryText}>{categoryName}</Text>
+          <ArcanaCard
+            word={currentWord}
+            realm={realm}
+            accent={COLORS.quest}
+            number={turnCount}
+            minHeight={280}
+            style={styles.arcana}
+          />
         </View>
 
         {/* Describe instruction */}
@@ -658,65 +623,16 @@ const styles = StyleSheet.create({
   },
 
   /* --- Parchment Card --- */
+  arcana: {
+    width: width - 48,
+  },
   wordCardContainer: {
     alignItems: 'center',
     marginTop: 16,
     marginBottom: 12,
   },
-  wordCard: {
-    width: width - 48,
-    backgroundColor: COLORS.parchment,
-    borderRadius: SIZES.cardRadius,
-    padding: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: COLORS.parchmentEdge,
-    minHeight: 160,
-    elevation: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
-  },
-  cardCorner: {
-    position: 'absolute',
-    width: 20,
-    height: 20,
-    borderColor: COLORS.quest,
-  },
-  decorLine: {
-    width: '60%',
-    height: 1,
-    backgroundColor: COLORS.parchmentEdge,
-    marginVertical: 8,
-  },
-  wordText: {
-    fontSize: 38,
-    fontFamily: FONTS.displayBlack,
-    color: COLORS.ink,
-    textAlign: 'center',
-    lineHeight: 48,
-    paddingVertical: 4,
-  },
 
   /* --- Category Badge --- */
-  categoryBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'center',
-    gap: 6,
-    backgroundColor: COLORS.quest + '15',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    marginBottom: 8,
-  },
-  categoryText: {
-    fontSize: SIZES.sm,
-    fontFamily: FONTS.bodyBold,
-    color: COLORS.quest,
-  },
 
   /* --- Instruction --- */
   instructionText: {
