@@ -21,6 +21,7 @@ import { useTimer } from '../hooks/useTimer';
 import { useSounds } from '../hooks/useSounds';
 import { useConfirmLeave } from '../hooks/useConfirmLeave';
 import { getGameNumber, getRoundNumber } from '../hooks/arenaSession';
+import { getTaskPool, pickTask, TASK_GROUP_ICONS } from '../data/tasks';
 import { useI18n } from '../i18n/I18nContext';
 
 const { width } = Dimensions.get('window');
@@ -73,9 +74,23 @@ export const GameScreen = ({ navigation }: any) => {
     sessionWins,
     dealWords,
     setWordGuessed,
+    getLastTaskId,
+    setLastTaskId,
   } = useGame();
 
-  const { t } = useI18n();
+  const { lang, t } = useI18n();
+
+  // Task rounds: decided once when the pre-round screen opens
+  const [task] = useState(() =>
+    pickTask(
+      getTaskPool(lang, settings.disabledTasks, settings.customTasks),
+      settings.taskFrequency ?? 'off',
+      getLastTaskId()
+    )
+  );
+  useEffect(() => {
+    if (task) setLastTaskId(task.id);
+  }, [task, setLastTaskId]);
   const leave = useConfirmLeave(navigation, {
     title: t.quitArenaTitle,
     message: t.quitArenaMessage,
@@ -382,6 +397,16 @@ export const GameScreen = ({ navigation }: any) => {
             {t.roundLabel} {roundNumber} · {t.targetLabel} {settings.winningScore}
           </Text>
 
+          {task && (
+            <View style={styles.taskCard}>
+              <View style={styles.taskCardHeader}>
+                <MaterialCommunityIcons name={TASK_GROUP_ICONS[task.group] as any} size={20} color={COLORS.ink} />
+                <Text style={styles.taskCardTitle}>{t.taskRoundTitle}</Text>
+              </View>
+              <Text style={styles.taskCardText}>{task.text}</Text>
+            </View>
+          )}
+
           <View style={styles.scoreBoard}>
             <Text style={styles.scoreBoardTitle}>{t.guildRanking}</Text>
             {teams.map((team) => (
@@ -577,6 +602,13 @@ export const GameScreen = ({ navigation }: any) => {
           <Text style={styles.pauseBtnText}>{t.pause}</Text>
         </TouchableOpacity>
       </View>
+
+      {task && (
+        <View style={styles.taskReminder}>
+          <MaterialCommunityIcons name={TASK_GROUP_ICONS[task.group] as any} size={16} color={COLORS.gold} />
+          <Text style={styles.taskReminderText} numberOfLines={2}>{task.text}</Text>
+        </View>
+      )}
 
       {isEight ? (
         <View style={styles.eightContainer}>
@@ -934,6 +966,52 @@ const styles = StyleSheet.create({
     color: COLORS.ink,
     textAlign: 'center',
     lineHeight: 52,
+  },
+
+  /* --- Task Rounds --- */
+  taskCard: {
+    width: '100%',
+    backgroundColor: COLORS.gold,
+    borderRadius: SIZES.cardRadius,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    marginBottom: 16,
+    gap: 6,
+  },
+  taskCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  taskCardTitle: {
+    fontSize: SIZES.sm,
+    fontFamily: FONTS.bodyBlack,
+    color: COLORS.ink,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  taskCardText: {
+    fontSize: SIZES.lg,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.ink,
+  },
+  taskReminder: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    gap: 8,
+    maxWidth: '90%',
+    marginTop: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    backgroundColor: 'rgba(212,168,83,0.12)',
+  },
+  taskReminderText: {
+    flexShrink: 1,
+    fontSize: SIZES.sm,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.gold,
   },
 
   /* --- Pause --- */

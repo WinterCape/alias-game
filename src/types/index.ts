@@ -1,3 +1,5 @@
+import type { CustomTask, TaskFrequency } from '../data/tasks';
+
 export interface Word {
   id: string;
   text: string;
@@ -51,6 +53,10 @@ export interface GameSettings {
   // Any team may guess the last word; players pick which one did
   sharedLastWord?: boolean;
   soundEnabled?: boolean;
+  // Task rounds: how often a round comes with a challenge for the explainer
+  taskFrequency?: TaskFrequency;
+  disabledTasks?: string[];
+  customTasks?: CustomTask[];
 }
 
 // 'off', a number of extra seconds, or 'unlimited'
@@ -93,5 +99,6 @@ export type RootStackParamList = {
   TeamSetup: undefined;
   Game: undefined;
   RoundResult: undefined;
+  Tasks: undefined;
   GameOver: { teams: Team[] };
 };

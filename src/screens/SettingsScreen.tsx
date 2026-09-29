@@ -14,6 +14,7 @@ import { CATEGORIES } from '../data/categories';
 import { ALL_CATEGORIES } from '../data/words';
 import { useGame } from '../hooks/GameContext';
 import { ArenaMode, CategoryId, Difficulty, LastWordTime } from '../types';
+import { getTaskPool, TaskFrequency } from '../data/tasks';
 import { useI18n } from '../i18n/I18nContext';
 import { useProgression } from '../progression/ProgressionContext';
 import { getUnlockedTimerOptions, getUnlockedScoreOptions, getMaxTeams } from '../progression/rewards';
@@ -52,7 +53,7 @@ const ToggleRow = ({
 
 export const SettingsScreen = ({ navigation }: any) => {
   const { settings, updateSettings } = useGame();
-  const { t } = useI18n();
+  const { lang, t } = useI18n();
   const { level } = useProgression();
 
   const ROUND_DURATIONS = getUnlockedTimerOptions(level);
@@ -71,6 +72,14 @@ export const SettingsScreen = ({ navigation }: any) => {
 
   const arenaMode: ArenaMode = settings.arenaMode ?? 'classic';
   const lastWordTime: LastWordTime = settings.lastWordTime ?? 'off';
+  const taskFrequency: TaskFrequency = settings.taskFrequency ?? 'off';
+  const TASK_FREQUENCIES: { id: TaskFrequency; label: string }[] = [
+    { id: 'off', label: t.lastWordOff },
+    { id: 'rare', label: t.freqRare },
+    { id: 'often', label: t.freqOften },
+    { id: 'always', label: t.freqAlways },
+  ];
+  const activeTaskCount = getTaskPool(lang, settings.disabledTasks, settings.customTasks).length;
   const LAST_WORD_OPTIONS: { id: LastWordTime; label: string }[] = [
     { id: 'off', label: t.lastWordOff },
     { id: 10, label: '10s' },
@@ -304,6 +313,38 @@ export const SettingsScreen = ({ navigation }: any) => {
           </>
         )}
 
+        {/* Task Rounds */}
+        <View style={styles.sectionHeader}>
+          <MaterialCommunityIcons name="drama-masks" size={18} color={COLORS.gold} />
+          <Text style={styles.sectionTitle}>{t.taskRounds}</Text>
+        </View>
+        <Text style={[styles.toggleDesc, styles.sectionDesc]}>{t.taskRoundsDesc}</Text>
+        <View style={styles.optionRow}>
+          {TASK_FREQUENCIES.map((f) => (
+            <TouchableOpacity
+              key={f.id}
+              style={[styles.optionChip, taskFrequency === f.id && styles.optionChipActive]}
+              onPress={() => updateSettings({ taskFrequency: f.id })}
+            >
+              <Text style={[styles.optionText, taskFrequency === f.id && styles.optionTextActive]}>
+                {f.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        {taskFrequency !== 'off' && (
+          <TouchableOpacity
+            style={styles.linkRow}
+            onPress={() => navigation.navigate('Tasks')}
+            accessibilityRole="button"
+          >
+            <MaterialCommunityIcons name="format-list-checks" size={18} color={COLORS.gold} />
+            <Text style={styles.linkText}>{t.taskList}</Text>
+            <Text style={styles.linkMeta}>{activeTaskCount} {t.activeSuffix}</Text>
+            <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textSecondary} />
+          </TouchableOpacity>
+        )}
+
         {/* Sounds */}
         <ToggleRow
           icon="volume-high"
@@ -444,6 +485,29 @@ const styles = StyleSheet.create({
   optionChipActive: {
     backgroundColor: 'rgba(212,168,83,0.15)',
     borderColor: COLORS.gold,
+  },
+  linkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(212,168,83,0.2)',
+    backgroundColor: 'rgba(212,168,83,0.04)',
+  },
+  linkText: {
+    flex: 1,
+    fontSize: SIZES.md,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.text,
+  },
+  linkMeta: {
+    fontSize: SIZES.sm,
+    fontFamily: FONTS.body,
+    color: COLORS.textSecondary,
   },
   sectionDesc: {
     marginTop: -6,

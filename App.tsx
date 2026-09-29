@@ -11,6 +11,7 @@ import { SettingsScreen } from './src/screens/SettingsScreen';
 import { TeamSetupScreen } from './src/screens/TeamSetupScreen';
 import { GameScreen } from './src/screens/GameScreen';
 import { RoundResultScreen } from './src/screens/RoundResultScreen';
+import { TasksScreen } from './src/screens/TasksScreen';
 import { GameOverScreen } from './src/screens/GameOverScreen';
 import { StatsScreen } from './src/screens/StatsScreen';
 import { I18nProvider } from './src/i18n/I18nContext';
@@ -65,6 +66,7 @@ export default function App() {
           <Stack.Screen name="Stats" component={StatsScreen} />
           <Stack.Screen name="Shop" component={ShopScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="Tasks" component={TasksScreen} />
           <Stack.Screen name="TeamSetup" component={TeamSetupScreen} />
           <Stack.Screen name="Game" component={GameScreen} />
           <Stack.Screen name="RoundResult" component={RoundResultScreen} />
