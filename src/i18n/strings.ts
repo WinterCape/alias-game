@@ -126,6 +126,8 @@ export interface Strings {
   quitQuestTitle: string;
   quitQuestMessage: string;
   quitQuestConfirm: string;
+  quitArenaTitle: string;
+  quitArenaMessage: string;
   pointsToWin: string;
   players: string;
   questScores: string;
@@ -256,6 +258,8 @@ export const RO: Strings = {
   quitQuestTitle: 'Părăsești aventura?',
   quitQuestMessage: 'Progresul acestui joc se va pierde.',
   quitQuestConfirm: 'Părăsește',
+  quitArenaTitle: 'Părăsești lupta?',
+  quitArenaMessage: 'Scorul acestui joc se va pierde.',
   pointsToWin: 'Puncte pentru victorie',
   players: 'Jucători',
   questScores: 'Clasament',
@@ -384,6 +388,8 @@ export const EN: Strings = {
   quitQuestTitle: 'Leave the adventure?',
   quitQuestMessage: 'This game\'s progress will be lost.',
   quitQuestConfirm: 'Leave',
+  quitArenaTitle: 'Leave the battle?',
+  quitArenaMessage: 'This game\'s scores will be lost.',
   pointsToWin: 'Points to win',
   players: 'Players',
   questScores: 'Scoreboard',
@@ -512,6 +518,8 @@ export const ES: Strings = {
   quitQuestTitle: '¿Abandonar la aventura?',
   quitQuestMessage: 'Se perderá el progreso de esta partida.',
   quitQuestConfirm: 'Abandonar',
+  quitArenaTitle: '¿Abandonar la batalla?',
+  quitArenaMessage: 'Se perderán las puntuaciones de esta partida.',
   pointsToWin: 'Puntos para ganar',
   players: 'Jugadores',
   questScores: 'Marcador',
@@ -640,6 +648,8 @@ export const FR: Strings = {
   quitQuestTitle: 'Quitter l\'aventure ?',
   quitQuestMessage: 'La progression de cette partie sera perdue.',
   quitQuestConfirm: 'Quitter',
+  quitArenaTitle: 'Quitter la bataille ?',
+  quitArenaMessage: 'Les scores de cette partie seront perdus.',
   pointsToWin: 'Points pour gagner',
   players: 'Joueurs',
   questScores: 'Tableau des scores',
@@ -768,6 +778,8 @@ export const RU: Strings = {
   quitQuestTitle: 'Покинуть приключение?',
   quitQuestMessage: 'Прогресс этой игры будет потерян.',
   quitQuestConfirm: 'Покинуть',
+  quitArenaTitle: 'Покинуть битву?',
+  quitArenaMessage: 'Очки этой игры будут потеряны.',
   pointsToWin: 'Очки для победы',
   players: 'Игроки',
   questScores: 'Таблица',

@@ -59,6 +59,8 @@ export const useGameState = (language: Language = 'ro', unlockedPacks: PackId[] 
     }
     setTeams(newTeams);
     setCurrentTeamIndex(0);
+    // Start each game with an empty history, even if the last one was abandoned
+    setRoundResults([]);
     setGameStarted(true);
   }, [settings.numberOfTeams]);
 
