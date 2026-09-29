@@ -7,6 +7,16 @@ export interface Strings {
   newAdventure: string;
   heroCode: string;
   heroShop: string;
+
+  // Shop
+  allAccess: string;
+  allAccessDesc: string;
+  allAccessOwned: string;
+  wordPacks: string;
+  wordsUnit: string;
+  packUnlocked: string;
+  levelShort: string;
+  orLevel: string;
   chronicles: string;
 
   // Settings
@@ -125,6 +135,14 @@ export const RO: Strings = {
   newAdventure: 'Aventură Nouă',
   heroCode: 'Codul Eroilor',
   heroShop: 'Magazinul Eroilor',
+  allAccess: 'Acces Total',
+  allAccessDesc: 'Deblochează toate pachetele de cuvinte',
+  allAccessOwned: 'Toate pachetele sunt deblocate!',
+  wordPacks: 'Pachete de Cuvinte',
+  wordsUnit: 'cuvinte',
+  packUnlocked: 'Deblocat',
+  levelShort: 'Nivel',
+  orLevel: 'sau Nivel',
   chronicles: 'Cronici',
   battlePrep: 'Pregătire de Luptă',
   missionDuration: 'Durata Misiunii (secunde)',
@@ -242,6 +260,14 @@ export const EN: Strings = {
   newAdventure: 'New Adventure',
   heroCode: 'Hero\'s Code',
   heroShop: 'Hero\'s Shop',
+  allAccess: 'All Access',
+  allAccessDesc: 'Unlock all word packs',
+  allAccessOwned: 'All packs are unlocked!',
+  wordPacks: 'Word Packs',
+  wordsUnit: 'words',
+  packUnlocked: 'Unlocked',
+  levelShort: 'Lvl',
+  orLevel: 'or Level',
   chronicles: 'Chronicles',
   battlePrep: 'Battle Preparation',
   missionDuration: 'Mission Duration (seconds)',
@@ -359,6 +385,14 @@ export const ES: Strings = {
   newAdventure: 'Nueva Aventura',
   heroCode: 'Código del Héroe',
   heroShop: 'Tienda del Héroe',
+  allAccess: 'Acceso Total',
+  allAccessDesc: 'Desbloquea todos los paquetes de palabras',
+  allAccessOwned: '¡Todos los paquetes están desbloqueados!',
+  wordPacks: 'Paquetes de Palabras',
+  wordsUnit: 'palabras',
+  packUnlocked: 'Desbloqueado',
+  levelShort: 'Nv.',
+  orLevel: 'o nivel',
   chronicles: 'Crónicas',
   battlePrep: 'Preparación de Batalla',
   missionDuration: 'Duración de la Misión (segundos)',
@@ -476,6 +510,14 @@ export const FR: Strings = {
   newAdventure: 'Nouvelle Aventure',
   heroCode: 'Code des Héros',
   heroShop: 'Boutique des Héros',
+  allAccess: 'Accès Total',
+  allAccessDesc: 'Débloque tous les packs de mots',
+  allAccessOwned: 'Tous les packs sont débloqués !',
+  wordPacks: 'Packs de Mots',
+  wordsUnit: 'mots',
+  packUnlocked: 'Débloqué',
+  levelShort: 'Niv.',
+  orLevel: 'ou niveau',
   chronicles: 'Chroniques',
   battlePrep: 'Préparation au Combat',
   missionDuration: 'Durée de la Mission (secondes)',
@@ -593,6 +635,14 @@ export const RU: Strings = {
   newAdventure: 'Новое Приключение',
   heroCode: 'Кодекс Героев',
   heroShop: 'Лавка Героев',
+  allAccess: 'Полный доступ',
+  allAccessDesc: 'Открой все наборы слов',
+  allAccessOwned: 'Все наборы открыты!',
+  wordPacks: 'Наборы слов',
+  wordsUnit: 'слов',
+  packUnlocked: 'Открыто',
+  levelShort: 'Ур.',
+  orLevel: 'или уровень',
   chronicles: 'Хроники',
   battlePrep: 'Подготовка к Битве',
   missionDuration: 'Длительность Миссии (секунды)',
