@@ -67,6 +67,7 @@ export interface Strings {
   addTaskPlaceholder: string;
   addTask: string;
   deleteTask: string;
+  readDescriptionAloud: string;
   chronicles: string;
 
   // Settings
@@ -247,6 +248,7 @@ export const RO: Strings = {
   addTaskPlaceholder: 'Scrie propria provocare…',
   addTask: 'Adaugă',
   deleteTask: 'Șterge',
+  readDescriptionAloud: 'Citește descrierea cu voce tare, apoi ajută cu indicii!',
   chronicles: 'Cronici',
   battlePrep: 'Pregătire de Luptă',
   missionDuration: 'Durata Misiunii (secunde)',
@@ -426,6 +428,7 @@ export const EN: Strings = {
   addTaskPlaceholder: 'Write your own task…',
   addTask: 'Add',
   deleteTask: 'Delete',
+  readDescriptionAloud: 'Read the description aloud, then help with clues!',
   chronicles: 'Chronicles',
   battlePrep: 'Battle Preparation',
   missionDuration: 'Mission Duration (seconds)',
@@ -605,6 +608,7 @@ export const ES: Strings = {
   addTaskPlaceholder: 'Escribe tu propio reto…',
   addTask: 'Añadir',
   deleteTask: 'Eliminar',
+  readDescriptionAloud: 'Lee la descripción en voz alta y luego ayuda con pistas',
   chronicles: 'Crónicas',
   battlePrep: 'Preparación de Batalla',
   missionDuration: 'Duración de la Misión (segundos)',
@@ -784,6 +788,7 @@ export const FR: Strings = {
   addTaskPlaceholder: 'Écris ton propre défi…',
   addTask: 'Ajouter',
   deleteTask: 'Supprimer',
+  readDescriptionAloud: 'Lis la description à voix haute, puis aide avec des indices !',
   chronicles: 'Chroniques',
   battlePrep: 'Préparation au Combat',
   missionDuration: 'Durée de la Mission (secondes)',
@@ -963,6 +968,7 @@ export const RU: Strings = {
   addTaskPlaceholder: 'Напиши своё задание…',
   addTask: 'Добавить',
   deleteTask: 'Удалить',
+  readDescriptionAloud: 'Прочитай описание вслух, а потом помогай подсказками!',
   chronicles: 'Хроники',
   battlePrep: 'Подготовка к Битве',
   missionDuration: 'Длительность Миссии (секунды)',
